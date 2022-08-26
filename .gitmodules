@@ -1,0 +1,24 @@
+[submodule "docs/submodule/Collateral"]
+	path = docs/submodule/Collateral
+	url = https://github.com/eclipse-dataspaceconnector/Collateral.git
+[submodule "docs/submodule/Connector"]
+	path = docs/submodule/Connector
+	url = https://github.com/eclipse-dataspaceconnector/DataSpaceConnector.git
+[submodule "docs/submodule/DataDashboard"]
+	path = docs/submodule/DataDashboard
+	url = https://github.com/eclipse-dataspaceconnector/DataDashboard.git
+[submodule "docs/submodule/FederatedCatalog"]
+	path = docs/submodule/FederatedCatalog
+	url = https://github.com/eclipse-dataspaceconnector/FederatedCatalog.git
+[submodule "docs/submodule/IdentityHub"]
+	path = docs/submodule/IdentityHub
+	url = https://github.com/eclipse-dataspaceconnector/IdentityHub.git
+[submodule "docs/submodule/MinimumViableDataspace"]
+	path = docs/submodule/MinimumViableDataspace
+	url = https://github.com/eclipse-dataspaceconnector/MinimumViableDataspace.git
+[submodule "docs/submodule/Publications"]
+	path = docs/submodule/Publications
+	url = https://github.com/eclipse-dataspaceconnector/Publications.git
+[submodule "docs/submodule/RegistrationService"]
+	path = docs/submodule/RegistrationService
+	url = https://github.com/eclipse-dataspaceconnector/RegistrationService.git
