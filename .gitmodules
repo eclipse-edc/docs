@@ -22,3 +22,6 @@
 [submodule "docs/submodule/RegistrationService"]
 	path = docs/submodule/RegistrationService
 	url = https://github.com/eclipse-dataspaceconnector/RegistrationService.git
+[submodule "docs/submodule/GradlePlugins"]
+	path = docs/submodule/GradlePlugins
+	url = https://github.com/eclipse-dataspaceconnector/GradlePlugins.git
