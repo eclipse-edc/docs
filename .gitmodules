@@ -25,3 +25,6 @@
 [submodule "docs/submodule/GradlePlugins"]
 	path = docs/submodule/GradlePlugins
 	url = https://github.com/eclipse-dataspaceconnector/GradlePlugins.git
+[submodule "docs/submodule/TrustFrameworkAdoption"]
+	path = docs/submodule/TrustFrameworkAdoption
+	url = https://github.com/eclipse-dataspaceconnector/TrustFrameworkAdoption
