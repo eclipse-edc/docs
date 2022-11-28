@@ -10,7 +10,7 @@
 - Asynchronous and highly available
 - Secure and sovereign data transfer
 
-[GitHub](https://github.com/eclipse-dataspacecomponents)
+[GitHub](https://github.com/eclipse-edc)
 [Getting Started](README.md)
 
 ![color](#f0f0f0)
