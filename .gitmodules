@@ -1,30 +1,30 @@
 [submodule "docs/submodule/Collateral"]
 	path = docs/submodule/Collateral
-	url = https://github.com/eclipse-dataspacecomponents/Collateral.git
+	url = https://github.com/eclipse-edc/Collateral.git
 [submodule "docs/submodule/Connector"]
 	path = docs/submodule/Connector
-	url = https://github.com/eclipse-dataspacecomponents/DataSpaceConnector.git
+	url = https://github.com/eclipse-edc/DataSpaceConnector.git
 [submodule "docs/submodule/DataDashboard"]
 	path = docs/submodule/DataDashboard
-	url = https://github.com/eclipse-dataspacecomponents/DataDashboard.git
+	url = https://github.com/eclipse-edc/DataDashboard.git
 [submodule "docs/submodule/FederatedCatalog"]
 	path = docs/submodule/FederatedCatalog
-	url = https://github.com/eclipse-dataspacecomponents/FederatedCatalog.git
+	url = https://github.com/eclipse-edc/FederatedCatalog.git
 [submodule "docs/submodule/IdentityHub"]
 	path = docs/submodule/IdentityHub
-	url = https://github.com/eclipse-dataspacecomponents/IdentityHub.git
+	url = https://github.com/eclipse-edc/IdentityHub.git
 [submodule "docs/submodule/MinimumViableDataspace"]
 	path = docs/submodule/MinimumViableDataspace
-	url = https://github.com/eclipse-dataspacecomponents/MinimumViableDataspace.git
+	url = https://github.com/eclipse-edc/MinimumViableDataspace.git
 [submodule "docs/submodule/Publications"]
 	path = docs/submodule/Publications
-	url = https://github.com/eclipse-dataspacecomponents/Publications.git
+	url = https://github.com/eclipse-edc/Publications.git
 [submodule "docs/submodule/RegistrationService"]
 	path = docs/submodule/RegistrationService
-	url = https://github.com/eclipse-dataspacecomponents/RegistrationService.git
+	url = https://github.com/eclipse-edc/RegistrationService.git
 [submodule "docs/submodule/GradlePlugins"]
 	path = docs/submodule/GradlePlugins
-	url = https://github.com/eclipse-dataspacecomponents/GradlePlugins.git
+	url = https://github.com/eclipse-edc/GradlePlugins.git
 [submodule "docs/submodule/TrustFrameworkAdoption"]
 	path = docs/submodule/TrustFrameworkAdoption
-	url = https://github.com/eclipse-dataspacecomponents/TrustFrameworkAdoption
+	url = https://github.com/eclipse-edc/TrustFrameworkAdoption

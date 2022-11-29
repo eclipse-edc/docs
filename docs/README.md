@@ -60,7 +60,7 @@ more customized environments, while avoiding any intellectual property rights (I
 
 ## Statement: EDC vs. DSC
 
-_Also to be read on [GitHub](https://github.com/eclipse-dataspacecomponents/DataSpaceConnector/discussions/1037)._
+_Also to be read on [GitHub](https://github.com/eclipse-edc/DataSpaceConnector/discussions/1037)._
 
 **The Eclipse Dataspace Components expand and improve the Dataspace Connector (DSC) as a follow-up development
 by an OSS community that is being contributed to the various initiatives that are involved in building data spaces.
@@ -92,7 +92,7 @@ parallel.
 ## Correlating projects
 
 **Please note**: Not every project may be mentioned here. If you want to add one, please feel free to open a PR
-or provide us with information via an [adoption request](https://github.com/eclipse-dataspacecomponents/DataSpaceConnector/issues/new?assignees=&labels=adoption&template=adoption_request.md&title=Adoption+Request).
+or provide us with information via an [adoption request](https://github.com/eclipse-edc/DataSpaceConnector/issues/new?assignees=&labels=adoption&template=adoption_request.md&title=Adoption+Request).
 
 | Name       | Description |
 | :--------- | :---------- |
