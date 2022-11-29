@@ -19,4 +19,4 @@ Closes # <-- _insert Issue number if one exists_
 
 - [ ] added/updated copyright headers?
 - [ ] documented code?
-- [ ] formatted title correctly? (_take a look at the [CONTRIBUTING](https://github.com/eclipse-dataspacecomponents/DataSpaceConnector/blob/main/CONTRIBUTING.md#submit-a-pull-request) for details_)
+- [ ] formatted title correctly? (_take a look at the [CONTRIBUTING](https://github.com/eclipse-edc/Connector/blob/main/CONTRIBUTING.md#submit-a-pull-request) for details_)
