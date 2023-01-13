@@ -58,6 +58,9 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      algolia: {
+        contextualSearch: true,
+      },
       navbar: {
         title: '',
         logo: {
