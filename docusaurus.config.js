@@ -58,9 +58,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      algolia: {
-        contextualSearch: true,
-      },
+
       navbar: {
         title: '',
         logo: {
@@ -76,28 +74,52 @@ const config = {
            // to: "sidebar.md"
             //to: "/docs"
           },
-
           {
-            href: 'https://github.com/eclipse-dataspacecomponents/',
+            to: 'blog',
+            docId: 'README',
+            position: 'left',
+            label: 'Blog',
+            // to: "sidebar.md"
+            //to: "/docs"
+          },
+          {
+            href: 'https://github.com/eclipse-edc',
             label: 'GitHub',
             position: 'right',
           },
+          {
+            href: 'https://search.maven.org/search?q=g:org.eclipse.edc',
+            label: 'Maven Central',
+            position: 'right',
+          },
+
+          {
+            href: 'https://app.swaggerhub.com/search?owner=eclipse-edc-bot',
+            label: 'SwaggerHub',
+            position: 'right',
+          },
+
         ],
       },
       footer: {
         style: 'dark',
         links: [
           {
-            title: 'Docs'
-
+            label: 'Contact',
+            href: 'https://projects.eclipse.org/projects/technology.edc/contact'
           },
 
           {
-            title: 'More'
+            label: 'Youtube',
+            href: 'https://www.youtube.com/channel/UCYmjEHtMSzycheBB4AeITHg'
+          },
+          {
+            label: 'EF Project',
+            href: 'https://projects.eclipse.org/projects/technology.edc'
 
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project,  built with Fraunhofer ISST.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Eclipse Dataspace Components, built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,
