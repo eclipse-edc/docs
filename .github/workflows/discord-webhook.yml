@@ -13,5 +13,6 @@ jobs:
     inputs:
       event-name: ${{ github.event_name }}
       event: ${{ github.event }}
+      repository: ${{ github.repository }}
     secrets:
       envDiscord: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
