@@ -10,7 +10,7 @@ on:
 jobs:
   trigger-workflow:
     uses: eclipse-edc/.github/.github/workflows/discord-webhook.yml@main
-    inputs:
+    with:
       event-name: ${{ github.event_name }}
       event: ${{ github.event }}
       repository: ${{ github.repository }}
