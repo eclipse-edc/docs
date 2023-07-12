@@ -10,9 +10,17 @@ on:
 jobs:
   trigger-workflow:
     uses: eclipse-edc/.github/.github/workflows/discord-webhook.yml@main
-    inputs:
-      event-name: ${{ github.event_name }}
-      event: ${{ github.event }}
-      repository: ${{ github.repository }}
+    with:
+      event_discussion_html_url: ${{ github.event.discussion.html_url }}
+      event_discussion_title: ${{ github.event.discussion.title }}
+      event_issue_html_url: ${{ github.event.issue.html_url }}
+      event_issue_title: ${{ github.event.issue.title }}
+      event_name: ${{ github.event_name }}
+      event_pull_request_html_url: ${{ github.event.pull_request.html_url }}
+      event_pull_request_title: ${{ github.event.pull_request.title }}
+      event_sender_avatar_url: ${{ github.event.sender.avatar_url }}
+      event_sender_html_url: ${{ github.event.sender.html_url }}
+      event_sender_login: ${{ github.event.sender.login }}
+      repository_name: ${{ github.repository }}
     secrets:
-      envDiscord: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
+      env_discord: ${{ secrets.DISCORD_WEBHOOK_GITHUB }}
