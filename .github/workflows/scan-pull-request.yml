@@ -12,5 +12,4 @@ concurrency:
 jobs:
   call-scan-pull-request:
     uses: eclipse-edc/.github/.github/workflows/scan-pull-request.yml@main
-    secrets:
-      envGH: ${{ secrets.GITHUB_TOKEN }}
+    secrets: inherit
