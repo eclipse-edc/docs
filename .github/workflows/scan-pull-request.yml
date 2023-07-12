@@ -10,6 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  call-scan-pull-request:
+  trigger-workflow:
     uses: eclipse-edc/.github/.github/workflows/scan-pull-request.yml@main
-    secrets: inherit
+    secrets:
+      envGH: ${{ secrets.GITHUB_TOKEN }}
