@@ -28,3 +28,6 @@
 [submodule "docs/submodule/TrustFrameworkAdoption"]
 	path = docs/submodule/TrustFrameworkAdoption
 	url = https://github.com/eclipse-edc/TrustFrameworkAdoption
+[submodule "docs/submodule/GitHub"]
+	path = docs/submodule/GitHub
+	url = https://github.com/eclipse-edc/.github.git
