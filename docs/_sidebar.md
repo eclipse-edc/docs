@@ -8,8 +8,8 @@ and https://github.com/docsifyjs/docsify/issues/1139)
 - <a href="#/README">Home</a>
 
 - Getting Started
-  - <a href="#/submodule/Connector/known_friends.md">Adoptions</a>
-  - <a href="#/submodule/Connector/CONTRIBUTING.md">Contributing</a>
+  - <a href="#/submodule/GitHub/KNOWN_FRIENDS.md">Adoptions</a>
+  - <a href="#/submodule/GitHub/CONTRIBUTING.md">Contributing</a>
   - <a href="#/hands-on.md">Hands-on</a>
 
 - Components
