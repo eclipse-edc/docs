@@ -92,7 +92,7 @@ parallel.
 ## Correlating projects
 
 **Please note**: Not every project may be mentioned here. If you want to add one, please feel free to open a PR
-or provide us with information via an [adoption request](https://github.com/eclipse-edc/DataSpaceConnector/issues/new?assignees=&labels=adoption&template=adoption_request.md&title=Adoption+Request).
+or provide us with information via an [adoption request](submodule/GitHub/contributing/adoption.md).
 
 | Name       | Description |
 | :--------- | :---------- |
@@ -100,4 +100,4 @@ or provide us with information via an [adoption request](https://github.com/ecli
 | Catena-X   | Uses the EDC as Connector component to build a data space between participants |
 | Tractus-X  | Eclipse Foundation OSS project initiated by Catena-X consortia, where specific (Catena-X related) EDC-extensions can be implemented under clear governance and rules |
 
-To see EDC adoptions, please take a look at our [known friends](submodule/Connector/known_friends.md) list.
+To see EDC adoptions, please take a look at our [known friends](submodule/GitHub/KNOWN_FRIENDS.md) list.
