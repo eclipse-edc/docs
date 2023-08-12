@@ -3,18 +3,18 @@
 <!-- TOC -->
 * [EDC Developer Handbook](#edc-developer-handbook)
   * [Introduction](#introduction)
-  * [Building your first connector](#building-your-first-connector)
+  * [Building a distribution](#building-a-distribution)
     * [Seed some data](#seed-some-data)
     * [Perform a data transfer](#perform-a-data-transfer)
   * [The control plane - core concepts](#the-control-plane---core-concepts)
     * [API objects in detail](#api-objects-in-detail)
-    * [State machines of EDC](#state-machines-of-edc)
+    * [EDC state machines](#edc-state-machines)
     * [The extension model](#the-extension-model)
-    * [Dependency Injection à la EDC](#dependency-injection-à-la-edc)
+    * [EDC dependency injection](#edc-dependency-injection)
     * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
   * [The data plane](#the-data-plane)
     * [Data plane selectors](#data-plane-selectors)
-    * [Write your own DataSink and DataSource](#write-your-own-datasink-and-datasource)
+    * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
     * [The Control API](#the-control-api)
   * [Advanced concepts](#advanced-concepts)
     * [Events and callbacks](#events-and-callbacks)
@@ -27,7 +27,7 @@
 
 --> states the intended audience, required pre-existing knowledge, required tools, etc.
 
-## Building your first connector
+## Building a distribution
 --> link to one of the samples
 
 ### Seed some data
@@ -44,7 +44,7 @@
 --> explains Assets, Policies, Contract Definitions, etc. from an external API perspective. mentions JSON-LD and related
 specs (ODRL, DCAT)
 
-### State machines of EDC
+### EDC state machines
 
 --> gives an overview of the state machines to understand asynchronicity and why some APIs only return IDs
 
@@ -52,7 +52,7 @@ specs (ODRL, DCAT)
 
 --> how to write your own first extension, explains plug-points points, metamodel annotations, SPIs, etc
 
-### Dependency Injection à la EDC
+### EDC dependency injection
 
 --> explains how a custom extension can inject and provide objects
 
@@ -64,7 +64,7 @@ specs (ODRL, DCAT)
 
 --> explains how dataplane selection works and how devs can register a dataplane with the selector
 
-### Write your own DataSink and DataSource
+### Writing a DataSink and DataSource extension
 
 --> link to samples?
 
