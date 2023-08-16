@@ -56,6 +56,11 @@ specs (ODRL, DCAT)
 ### The extension model
 
 --> how to write your own first extension, explains plug-points points, metamodel annotations, SPIs, etc
+- Authentication/Authorization of the Management API
+- policies and evaluation functions
+- persistence implementations
+- provisioners
+- transaction management (?)
 
 ### EDC dependency injection
 
