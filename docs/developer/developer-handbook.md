@@ -1,4 +1,4 @@
-# EDC Developer Handbook
+# Developer's Handbook
 
 <!-- TOC -->
 * [EDC Developer Handbook](#edc-developer-handbook)
