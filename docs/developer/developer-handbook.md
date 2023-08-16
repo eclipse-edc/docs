@@ -1,14 +1,15 @@
 # Developer's Handbook
 
 <!-- TOC -->
-* [EDC Developer Handbook](#edc-developer-handbook)
+* [Developer's Handbook](#developers-handbook)
   * [Introduction](#introduction)
   * [Building a distribution](#building-a-distribution)
     * [Seed some data](#seed-some-data)
     * [Perform a data transfer](#perform-a-data-transfer)
-  * [The control plane - core concepts](#the-control-plane---core-concepts)
+  * [Core concepts](#core-concepts)
+  * [The control plane](#the-control-plane)
     * [API objects in detail](#api-objects-in-detail)
-    * [EDC state machines](#edc-state-machines)
+    * [Control plane state machines](#control-plane-state-machines)
     * [The extension model](#the-extension-model)
     * [EDC dependency injection](#edc-dependency-injection)
     * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
@@ -37,16 +38,20 @@
 ### Perform a data transfer
 --> actually launches another connector, shows a data exchange -> link to samples
 
-## The control plane - core concepts
+## Core concepts
+
+--> lists and explains general building blocks like asynchronicity, to understand why some APIs only return IDs, etc.
+
+## The control plane
 
 ### API objects in detail
 
 --> explains Assets, Policies, Contract Definitions, etc. from an external API perspective. mentions JSON-LD and related
 specs (ODRL, DCAT)
 
-### EDC state machines
+### Control plane state machines
 
---> gives an overview of the state machines to understand asynchronicity and why some APIs only return IDs
+--> gives an overview of the contract negotiation and transfer process state machines 
 
 ### The extension model
 
