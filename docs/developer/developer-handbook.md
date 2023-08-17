@@ -4,13 +4,15 @@
 
 * [Developer's Handbook](#developers-handbook)
     * [Introduction](#introduction)
+        * [Terminology](#terminology)
     * [Building a distribution](#building-a-distribution)
         * [Perform a simple data transfer](#perform-a-simple-data-transfer)
-        * [Seed some more data](#seed-some-more-data)
+        * [Transfer some more data](#transfer-some-more-data)
     * [Core concepts](#core-concepts)
     * [The control plane](#the-control-plane)
         * [API objects in detail](#api-objects-in-detail)
         * [Control plane state machines](#control-plane-state-machines)
+            * [Provisioning](#provisioning)
         * [The extension model](#the-extension-model)
         * [EDC dependency injection](#edc-dependency-injection)
         * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
@@ -123,7 +125,7 @@ Great, you've just gone through a pre-canned data transfer of assets, that were 
 interesting, is it? Also, copying a local file from the provider to the consumer is not a very realistic scenario.
 
 Therefor in this chapter, we will use a slightly extended setup, where the data that the provider offers, is coming out
-of some private backend service, that is purportedly inaccessible to the consumer. The consumer then is given access
+of some "private backend" service, that is purportedly inaccessible to the consumer. The consumer then is given access
 to it through a proxy, and can obtain the data. We call this a "consumer-pull" transfer.
 
 Please be advised that the sample will use some concepts and terms we haven't discussed yet, such
@@ -136,7 +138,25 @@ need in order to be able to transfer it to the consumer.
 
 ## Core concepts
 
---> lists and explains general building blocks like asynchronicity, to understand why some APIs only return IDs, etc.
+When EDC was originally created, there were a few fundamental architectural principles around which we designed and
+implemented all dataspace components. These include:
+
+- **asynchronicity**: all mutations of internal data structures happen in an asynchronous fashion. While the REST
+  requests
+  to trigger the mutations may still be synchronous, the actual state changes happen in an asynchronous and persistent
+  way. For example starting a contract negotiation through the API will only return the negotiation's ID, and the
+  control plane will cyclically advance the negotiation's state.
+- **single-thread processing**: the control plane is designed around a set of
+  sequential [state machines](#control-plane-state-machines), that employ pessimistic locking to guard against race
+  conditions and other problems.
+- **idempotency**: requests, that don't trigger a mutation, are idempotent. The same is true when [provisioning external
+  resources](#provisioning).
+- **error-tolerance**: the design goal of the control plane was to favor correctness and reliability over (low) latency.
+  That means, even if a communication partner may not be reachable due to a transient error, it is designed to cope with
+  that error and attempt to overcome it.
+
+Other, less technical guidelines include simplicity and self-contained-ness. We are extremely careful when adding
+third-party libraries or technologies to maintain a simple, fast and un-opinionated platform. 
 
 ## The control plane
 
@@ -148,6 +168,8 @@ specs (ODRL, DCAT)
 ### Control plane state machines
 
 --> gives an overview of the contract negotiation and transfer process state machines
+
+#### Provisioning
 
 ### The extension model
 
