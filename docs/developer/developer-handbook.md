@@ -39,11 +39,11 @@
 This document is intended for developers, who aim at using the Eclipse Dataspace Components in their software project at
 the library level. The Eclipse Dataspace Components projects is not a ready-to-use application, but rather a
 comprehensive
-collection of libraries and modules, that are published as Maven artefacts, and that developers can use and extend.
+collection of libraries and modules, that are published as Maven artifacts, and that developers can use and extend.
 
-Therefore, if you are a solution architect looking for a high-level description and how to integrate EDC, or a developer
-wanting to contribute to the project itself, this guide is not for you. More suitable resources can be found [here]()
-and [here]() respectively.
+Therefore, if you are a solution architect looking for a high-level description on how to integrate EDC, or a developer
+wanting to contribute to the project itself, this guide is not for you. More suitable resources can be found [here](https://eclipse-edc.github.io/docs/#/README)
+and [here](https://github.com/eclipse-edc/.github/blob/main/CONTRIBUTING.md) respectively.
 
 However, if you are a developer who is familiar with Java (17+) and the Gradle build system in general, and concepts
 like extensibility, dependency injection and modularity, then this guide is for you.
@@ -71,8 +71,8 @@ version.
 ### Terminology
 
 - runtime: a Java process executing code written in the EDC programming model (e.g. a control plane)
-- a distribution: a specific assortment of modules, compiled into a runnable form, e.g. a JAR file, a Docker image etc.
-- a launcher: a runnable Java module, that pulls in other modules to form a distribution. sometimes used synonymously
+- distribution: a specific assortment of modules, compiled into a runnable form, e.g. a JAR file, a Docker image etc.
+- launcher: a runnable Java module, that pulls in other modules to form a distribution, sometimes used synonymously
   with distribution.
 - connector: a control plane runtime and 1...N data plane runtimes. Sometimes used interchangeably with _distribution_.
 
@@ -83,7 +83,7 @@ modules. It is sometimes sloppily referred to as "runtime", which is not _quite_
 the notion of a Linux distribution.
 
 Typically, distributions consist of a [control plane](#the-control-plane) and one or
-more [data planes](#the-data-plane). The earlier takes care of data manipulation, contract negotiation and transfer
+more [data planes](#the-data-plane). The former takes care of data manipulation, contract negotiation and transfer
 setup, and is geared toward reliability, whereas the job of the latter is to actually shovel bits from A to B.
 
 The EDC project provides a comprehensive collection of [samples](https://github.com/eclipse-edc/Samples), including one
@@ -165,7 +165,7 @@ and build their applications around them. For example, when developing an app th
 negotiation or a transfer process, it is better to listen to [events](#events-and-callbacks) rather than polling a
 service or an API.
 
-There are other, less technical guidelines of EDC such as simplicity and self-contained-ness. We are extremely careful
+There are other, less technical principles of EDC such as simplicity and self-contained-ness. We are extremely careful
 when adding third-party libraries or technologies to maintain a simple, fast and un-opinionated platform.
 
 ## The control plane
