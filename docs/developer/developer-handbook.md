@@ -1,32 +1,37 @@
 # Developer's Handbook
 
 <!-- TOC -->
-
 * [Developer's Handbook](#developers-handbook)
-    * [Introduction](#introduction)
-        * [Terminology](#terminology)
-    * [Building a distribution](#building-a-distribution)
-        * [Perform a simple data transfer](#perform-a-simple-data-transfer)
-        * [Transfer some more data](#transfer-some-more-data)
-    * [Core concepts](#core-concepts)
-    * [The control plane](#the-control-plane)
-        * [API objects in detail](#api-objects-in-detail)
-        * [Control plane state machines](#control-plane-state-machines)
-            * [Provisioning](#provisioning)
-        * [The extension model](#the-extension-model)
-        * [EDC dependency injection](#edc-dependency-injection)
-        * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
-    * [The data plane](#the-data-plane)
-        * [Data plane selectors](#data-plane-selectors)
-        * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
-        * [The Control API](#the-control-api)
-    * [Advanced concepts](#advanced-concepts)
-        * [Events and callbacks](#events-and-callbacks)
-        * [The EDC JUnit framework](#the-edc-junit-framework)
-        * [Automatic documentation](#automatic-documentation)
-        * [Customize the build](#customize-the-build)
-    * [Further references and specifications](#further-references-and-specifications)
-
+  * [Introduction](#introduction)
+    * [Terminology](#terminology)
+  * [Building a distribution](#building-a-distribution)
+    * [Perform a simple data transfer](#perform-a-simple-data-transfer)
+    * [Transfer some more data](#transfer-some-more-data)
+  * [Core concepts](#core-concepts)
+  * [The control plane](#the-control-plane)
+    * [API objects in detail](#api-objects-in-detail)
+      * [Assets](#assets)
+      * [Policies](#policies)
+      * [ContractDefinitions](#contractdefinitions)
+      * [ContractNegotiations](#contractnegotiations)
+      * [ContractAgreements](#contractagreements)
+      * [TransferProcessess](#transferprocessess)
+      * [A word on JSON-LD contexts](#a-word-on-json-ld-contexts)
+    * [Control plane state machines](#control-plane-state-machines)
+      * [Provisioning](#provisioning)
+    * [The extension model](#the-extension-model)
+    * [EDC dependency injection](#edc-dependency-injection)
+    * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
+  * [The data plane](#the-data-plane)
+    * [Data plane selectors](#data-plane-selectors)
+    * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
+    * [The Control API](#the-control-api)
+  * [Advanced concepts](#advanced-concepts)
+    * [Events and callbacks](#events-and-callbacks)
+    * [The EDC JUnit framework](#the-edc-junit-framework)
+    * [Automatic documentation](#automatic-documentation)
+    * [Customize the build](#customize-the-build)
+  * [Further references and specifications](#further-references-and-specifications)
 <!-- TOC -->
 
 ## Introduction
@@ -141,29 +146,173 @@ need in order to be able to transfer it to the consumer.
 When EDC was originally created, there were a few fundamental architectural principles around which we designed and
 implemented all dataspace components. These include:
 
-- **asynchronicity**: all mutations of internal data structures happen in an asynchronous fashion. While the REST
-  requests
-  to trigger the mutations may still be synchronous, the actual state changes happen in an asynchronous and persistent
-  way. For example starting a contract negotiation through the API will only return the negotiation's ID, and the
-  control plane will cyclically advance the negotiation's state.
+- **asynchrony**: all mutations of internal data structures happen in an asynchronous fashion. While the REST
+  requests to trigger the mutations may still be synchronous, the actual state changes happen in an asynchronous and
+  persistent way. For example starting a contract negotiation through the API will only return the negotiation's ID, and
+  the control plane will cyclically advance the negotiation's state.
 - **single-thread processing**: the control plane is designed around a set of
   sequential [state machines](#control-plane-state-machines), that employ pessimistic locking to guard against race
   conditions and other problems.
-- **idempotency**: requests, that don't trigger a mutation, are idempotent. The same is true when [provisioning external
+- **idempotency**: requests, that do not trigger a mutation, are idempotent. The same is true
+  when [provisioning external
   resources](#provisioning).
 - **error-tolerance**: the design goal of the control plane was to favor correctness and reliability over (low) latency.
   That means, even if a communication partner may not be reachable due to a transient error, it is designed to cope with
   that error and attempt to overcome it.
 
-Other, less technical guidelines include simplicity and self-contained-ness. We are extremely careful when adding
-third-party libraries or technologies to maintain a simple, fast and un-opinionated platform. 
+Developers who aim to use the Eclipse Dataspace Components in their projects are well-advised to follow these principles
+and build their applications around them. For example, when developing an app that monitors the progress of a contract
+negotiation or a transfer process, it is better to listen to [events](#events-and-callbacks) rather than polling a
+service or an API.
+
+There are other, less technical guidelines of EDC such as simplicity and self-contained-ness. We are extremely careful
+when adding third-party libraries or technologies to maintain a simple, fast and un-opinionated platform.
 
 ## The control plane
 
+Simply put, the control plane is the brains of a connector, whereas the data plane would be the muscle. Its tasks
+include handling protocol and API requests, managing various internal asynchronous processes, validating policies,
+performing participant authentication and delegating the data transfer to a data plane. Its job is to handle (almost)
+all business logic. For that, it is designed to favor _reliability_ over _low latency_. It does **not** directly
+transfer data from source to destination.
+
 ### API objects in detail
+
+We've seen in [previous sections](#transfer-some-more-data) that the primary way to interact with a running connector
+instance is the Management API. It follows conventional REST semantics and allows manipulation of certain objects within
+the control plane. For example, it allows to specify, which data offerings are presented to the dataspace, and under
+what conditions.
+
+> For this chapter we assume basic knowledge of [JSON-LD](http://json-ld.org), and we also recommend reading the
+> specifications for [ODRL](https://www.w3.org/TR/odrl-model/) and [DCAT](https://www.w3.org/TR/vocab-dcat-2/).
+
+#### Assets
+
+Assets are containers for metadata, they do **not** contain the actual bits and bytes. Say you want to offer a file to
+the dataspace, that is physically located in an S3 bucket, then the corresponding `Asset` would contain metadata about
+it, such as the content type, file size, etc. In addition, it could contain _private_ properties, for when you want to
+store properties on the asset, which you _do not want to_ expose to the dataspace.
+
+The `Asset` also contains a `DataAddress`, which can be understood as a "pointer into the physical world". In the S3
+example, that `DataAddress` might contain the bucket name and the region. Notice that the _schema_ of the `DataAddress`
+will depend on where the data is physically located, for instance a `HttpDataAddress` has different properties.
+
+A very simplistic `Asset` could look like this:
+
+```json
+{
+  "@context": {
+    "edc": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@id": "79d9c360-476b-47e8-8925-0ffbeba5aec2",
+  "properties": {
+    "somePublicProp": "a very interesting value"
+  },
+  "privateProperties": {
+    "secretKey": "this is very secret, never tell it to the dataspace!"
+  },
+  "dataAddress": {
+    "type": "HttpData",
+    "baseUrl": "http://localhost:8080/test"
+  }
+}
+```
+
+There are a couple of noteworthy things here. First, while there isn't a _strict requirement_ for the `@id` to be a
+UUID, we highly recommend it.
+
+By design, the `Asset` is extensible, so users can store any metadata they want in it. For example, the `properties`
+object could contain a simple string value, or it could be a complex object, following some custom schema. Be aware,
+that unless specified otherwise, all properties are put under the `edc` namespace by default.
+
+Here is an example of how an Asset with a custom property following a custom namespace would look like:
+
+```json
+{
+  "@context": {
+    "edc": "https://w3id.org/edc/v0.0.1/ns/",
+    "ex": "http://w3id.org/example/v0.0.1/ns/"
+  },
+  "@id": "79d9c360-476b-47e8-8925-0ffbeba5aec2",
+  "properties": {
+    "somePublicProp": "a very interesting value",
+    "ex:foo": {
+      "name": "Darth Vader",
+      "webpage": "https://death.star"
+    }
+  }
+  //...
+}
+```
+
+assuming the context object found at http://w3id.org/example/v0.0.1/ns/ contains a type definition of the `foo` object.
+As a reminder: the JSON-LD context could look like this:
+
+```json
+{
+  "@context": {
+    "name": "http://schema.org/name",
+    "webpage": {
+      "@id": "http://schema.org/url",
+      "@type": "@id"
+    }
+  }
+}
+```
+
+Note that upon ingress through the management API, all JSON-LD objects
+get [expanded](https://www.w3.org/TR/json-ld11/#expanded-document-form), because the control plane only operates on
+expanded JSON-LD objects. Since the `Asset` is an extensible type, this is necessary to avoid potential name clashes of
+properties.
+
+This is important to keep in mind, because when querying for assets using the `POST /assets/request` endpoint, the query
+that is submitted in the request body must target the _expanded_ property. For example, a query targeting
+the `somePublicProp` field from the example above would look like this:
+
+```json
+{
+  "https://w3id.org/edc/v0.0.1/ns/filterExpression": [
+    {
+      "https://w3id.org/edc/v0.0.1/ns/operandLeft": [
+        {
+          "@value": "https://w3id.org/edc/v0.0.1/ns/somePublicProp"
+        }
+      ],
+      "https://w3id.org/edc/v0.0.1/ns/operator": [
+        {
+          "@value": "="
+        }
+      ],
+      "https://w3id.org/edc/v0.0.1/ns/operandRight": [
+        {
+          "@value": "a very interesting value"
+        }
+      ]
+    }
+  ]
+}
+```
+
+More information about JSON-LD Contexts and type definitions can be
+found [here](https://www.w3.org/TR/json-ld11/#the-context).
+
+#### Policies
+
+#### ContractDefinitions
+
+#### ContractNegotiations
+
+#### ContractAgreements
+
+#### TransferProcessess
+
+#### A word on JSON-LD contexts
 
 --> explains Assets, Policies, Contract Definitions, etc. from an external API perspective. mentions JSON-LD and related
 specs (ODRL, DCAT)
+
+> The complete OpenAPI specification for the management API is
+> on [SwaggerHub](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api/0.2.0)
 
 ### Control plane state machines
 
