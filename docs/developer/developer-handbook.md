@@ -298,13 +298,13 @@ found [here](https://www.w3.org/TR/json-ld11/#the-context).
 
 #### Policies
 
-#### ContractDefinitions
+#### Contract definitions
 
-#### ContractNegotiations
+#### Contract negotiations
 
-#### ContractAgreements
+#### Contract agreements
 
-#### TransferProcessess
+#### Transfer processes
 
 #### A word on JSON-LD contexts
 
@@ -312,7 +312,7 @@ found [here](https://www.w3.org/TR/json-ld11/#the-context).
 specs (ODRL, DCAT)
 
 > The complete OpenAPI specification for the management API is
-> on [SwaggerHub](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api/0.2.0)
+> on [SwaggerHub](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api). Please select the latest version from the dropdown.
 
 ### Control plane state machines
 
