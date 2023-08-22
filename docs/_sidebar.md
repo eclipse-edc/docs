@@ -12,35 +12,35 @@ free to add sections and subsections to this sidebar.)
 &nbsp;&nbsp;**Components**
 
 - [Connector](/submodule/Connector/)
-  - [Developer](/submodule/Connector/docs/developer/)
+  - [Documentation](/submodule/Connector/docs/developer/)
   - [Decision Records](/submodule/Connector/docs/developer/decision-records/)
 
 - [Data Dashboard](/submodule/DataDashboard/)
-  - [Developer](/submodule/DataDashboard/docs/developer/)
+  - [Documentation](/submodule/DataDashboard/docs/developer/)
   - [Decision Records](/submodule/DataDashboard/docs/developer/decision-records/)
 
 - [Federated Catalog](/submodule/FederatedCatalog/)
-  - [Developer](/submodule/FederatedCatalog/docs/developer/)
+  - [Documentation](/submodule/FederatedCatalog/docs/developer/)
   - [Decision Records](/submodule/FederatedCatalog/docs/developer/decision-records/)
 
 - [Gradle Plugins](/submodule/GradlePlugins/)
-  - [Developer](/submodule/GradlePlugins/docs/developer/)
+  - [Documentation](/submodule/GradlePlugins/docs/developer/)
   - [Decision Records](/submodule/GradlePlugins/docs/developer/decision-records/)
 
 - [Identity Hub](/submodule/IdentityHub/)
-  - [Developer](/submodule/IdentityHub/docs/developer/)
+  - [Documentation](/submodule/IdentityHub/docs/developer/)
   - [Decision Records](/submodule/IdentityHub/docs/developer/decision-records/)
 
 - [Minimum Viable Dataspace](/submodule/MinimumViableDataspace/)
-  - [Developer](/submodule/MinimumViableDataspace/docs/developer/)
+  - [Documentation](/submodule/MinimumViableDataspace/docs/developer/)
   - [Decision Records](/submodule/MinimumViableDataspace/docs/developer/decision-records/)
 
 - [Registration Service](/submodule/RegistrationService/)
-  - [Developer](/submodule/RegistrationService/docs/developer/)
+  - [Documentation](/submodule/RegistrationService/docs/developer/)
   - [Decision Records](/submodule/RegistrationService/docs/developer/decision-records/)
 
 - [Trust Framework Adoption](/submodule/TrustFrameworkAdoption/)
-  - [Developer](/submodule/TrustFrameworkAdoption/docs/developer/)
+  - [Documentation](/submodule/TrustFrameworkAdoption/docs/developer/)
   - [Decision Records](/submodule/TrustFrameworkAdoption/docs/developer/decision-records/)
 
 &nbsp;&nbsp;**Documents**
