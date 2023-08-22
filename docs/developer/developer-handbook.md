@@ -1,37 +1,46 @@
 # Developer's Handbook
 
 <!-- TOC -->
+
 * [Developer's Handbook](#developers-handbook)
-  * [Introduction](#introduction)
-    * [Terminology](#terminology)
-  * [Building a distribution](#building-a-distribution)
-    * [Perform a simple data transfer](#perform-a-simple-data-transfer)
-    * [Transfer some more data](#transfer-some-more-data)
-  * [Core concepts](#core-concepts)
-  * [The control plane](#the-control-plane)
-    * [API objects in detail](#api-objects-in-detail)
-      * [Assets](#assets)
-      * [Policies](#policies)
-      * [ContractDefinitions](#contractdefinitions)
-      * [ContractNegotiations](#contractnegotiations)
-      * [ContractAgreements](#contractagreements)
-      * [TransferProcessess](#transferprocessess)
-      * [A word on JSON-LD contexts](#a-word-on-json-ld-contexts)
-    * [Control plane state machines](#control-plane-state-machines)
-      * [Provisioning](#provisioning)
-    * [The extension model](#the-extension-model)
-    * [EDC dependency injection](#edc-dependency-injection)
-    * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
-  * [The data plane](#the-data-plane)
-    * [Data plane selectors](#data-plane-selectors)
-    * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
-    * [The Control API](#the-control-api)
-  * [Advanced concepts](#advanced-concepts)
-    * [Events and callbacks](#events-and-callbacks)
-    * [The EDC JUnit framework](#the-edc-junit-framework)
-    * [Automatic documentation](#automatic-documentation)
-    * [Customize the build](#customize-the-build)
-  * [Further references and specifications](#further-references-and-specifications)
+    * [Introduction](#introduction)
+        * [Terminology](#terminology)
+    * [Building a distribution](#building-a-distribution)
+        * [Perform a simple data transfer](#perform-a-simple-data-transfer)
+        * [Transfer some more data](#transfer-some-more-data)
+    * [Core concepts](#core-concepts)
+    * [The control plane](#the-control-plane)
+        * [API objects in detail](#api-objects-in-detail)
+            * [Assets](#assets)
+            * [Policies](#policies)
+                * [Policy scopes](#policy-scopes)
+                * [Policy evaluation functions](#policy-evaluation-functions)
+                * [Example: binding an evaluation function](#example-binding-an-evaluation-function)
+                * [Advanced policy concepts](#advanced-policy-concepts)
+            * [Contract definitions](#contract-definitions)
+                * [Contract policy](#contract-policy)
+                * [Access policy](#access-policy)
+            * [Contract negotiations](#contract-negotiations)
+            * [Contract agreements](#contract-agreements)
+            * [Transfer processes](#transfer-processes)
+            * [Catalog](#catalog)
+            * [A word on JSON-LD contexts](#a-word-on-json-ld-contexts)
+        * [Control plane state machines](#control-plane-state-machines)
+            * [Provisioning](#provisioning)
+        * [The extension model](#the-extension-model)
+        * [EDC dependency injection](#edc-dependency-injection)
+        * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
+    * [The data plane](#the-data-plane)
+        * [Data plane selectors](#data-plane-selectors)
+        * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
+        * [The Control API](#the-control-api)
+    * [Advanced concepts](#advanced-concepts)
+        * [Events and callbacks](#events-and-callbacks)
+        * [The EDC JUnit framework](#the-edc-junit-framework)
+        * [Automatic documentation](#automatic-documentation)
+        * [Customize the build](#customize-the-build)
+    * [Further references and specifications](#further-references-and-specifications)
+
 <!-- TOC -->
 
 ## Introduction
@@ -42,7 +51,8 @@ comprehensive
 collection of libraries and modules, that are published as Maven artifacts, and that developers can use and extend.
 
 Therefore, if you are a solution architect looking for a high-level description on how to integrate EDC, or a developer
-wanting to contribute to the project itself, this guide is not for you. More suitable resources can be found [here](https://eclipse-edc.github.io/docs/#/README)
+wanting to contribute to the project itself, this guide is not for you. More suitable resources can be
+found [here](https://eclipse-edc.github.io/docs/#/README)
 and [here](https://github.com/eclipse-edc/.github/blob/main/CONTRIBUTING.md) respectively.
 
 However, if you are a developer who is familiar with Java (17+) and the Gradle build system in general, and concepts
@@ -223,7 +233,8 @@ UUID, we highly recommend it.
 
 By design, the `Asset` is extensible, so users can store any metadata they want in it. For example, the `properties`
 object could contain a simple string value, or it could be a complex object, following some custom schema. Be aware,
-that unless specified otherwise, all properties are put under the `edc` namespace by default.
+that unless specified otherwise, all properties are put under the `edc` namespace by default. There are some
+"well-known" properties in the `edc:` namespace: `id`, `description`, `version`, `name`, `contenttype`.
 
 Here is an example of how an Asset with a custom property following a custom namespace would look like:
 
@@ -298,7 +309,226 @@ found [here](https://www.w3.org/TR/json-ld11/#the-context).
 
 #### Policies
 
+Policies are the EDC way of expressing that certain conditions may, must or must not be satisfied in certain situations.
+In that sense, policies are used to express what requirements a subject (e.g. a communication partner) must satisfy in
+order to be able to perform an action. For example, one such requirement - or more specifically: a _duty_ could be that
+a communication partner who wants to negotiate a contract, must have headquarters in the European Union.
+
+Policies are [ODRL](https://www.w3.org/TR/odrl-model/) serialized as JSON-LD. Thus, our previous example would look like
+this:
+
+```json
+{
+  "@context": {
+    "edc": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "PolicyDefinition",
+  "policy": {
+    "@context": "http://www.w3.org/ns/odrl.jsonld",
+    "@type": "Set",
+    "duty": [
+      {
+        "target": "http://example.com/asset:12345",
+        "action": "use",
+        "constraint": {
+          "leftOperand": "headquarter_location",
+          "operator": "eq",
+          "rightOperand": "EU"
+        }
+      }
+    ]
+  }
+}
+```
+
+The `duty` object expresses the semantics of the constraint. It is a specialization of `rul`, which expresses either a
+MUST (`duty`), MAY (`permission`) or MUST NOT (`prohibition`) relation. The `action` expresses the type of action for
+which the rule is intended. Acceptable values for `action` are defined [here](https://www.w3.org/TR/odrl-model/#action),
+but in EDC you'll exclusively encounter `"use"`.
+
+The `constraint` object expresses logical relationship of a key (`leftOperand`), the
+value (`righOperand`) and the `operator`. Multiple constraints can be linked logically,
+see [advanced policy concepts](#advanced-policy-concepts).
+The `leftOperand` and `rightOperand` are completely arbitrary, only
+the `operator` is limited to the following possible
+values: `eq`, `neq`, `gt`, `geq`, `lt`, `leq`, `in`, `hasPart`, `isA`, `isAllOf`, `isAnyOf`, `isNoneOf`.
+
+Please note that not all operators are always allowed, for example `headquarter_location lt EU` is nonsensical and
+should result in an evaluation error, whereas `headquarter_location isAnOf [EU, US]` would be valid. Whether
+an `operator` is valid is solely defined by the [policy evaluation function](#policy-evaluation-functions), supplying an
+invalid operator should raise an exception.
+
+> NB: internally we always use the [expanded JSON-LD form](https://www.w3.org/TR/json-ld11/#expanded-document-form) for
+> all processing.
+
+##### Policy scopes
+
+In casual terms, a policy scope is the "context", in which a policy is to be evaluated. There are certain pre-defied
+points in the code, injecting/adding additional scopes is not possible. Currently, the following scopes exist:
+
+- `contract.negotiation`: evaluated upon initial contract offer. Ensures that the consumer fulfills
+  the [contract policy](#contract-policy).
+- `transfer.process`: evaluated before starting a transfer process to ensure that the policy of
+  the [contract agreement](#contract-agreements) is fulfilled. One example would be contract expiry.
+- `catalog`: evaluated when the [catalog](#catalog) for a particular [participant agent](#participant-agents) is
+  generated. Decides whether the participant has the asset in their catalog.
+- `request.contract.negotiation`: evaluated on every request during contract negotiation between two control plane
+  runtimes. Not relevant for end users.
+- `request.transfer.process`: evaluated on every request during transfer establishment between two control plane
+  runtimes. Not relevant for end users.
+- `request.catalog`: evaluated upon an incoming catalog request. Not relevant for end users.
+- `provision.manifest.verify`: evaluated during the precondition check for resource provisioning. Only relevant in
+  advanced use cases.
+
+A policy scope is a string that is used for two purposes:
+
+1. binding a scope to a rule type: implement filtering based on the `action` or the `leftExpression` of a policy. This
+   determines for every rule inside a policy whether it should be evaluated in the given scope.
+2. binding a [policy evaluation function](#policy-evaluation-functions) to a scope: if a policy is determined to be "in
+   scope" by the previous step, the policy engine invokes the evaluation function that was bound to the scope to
+   evaluate if the policy is fulfilled.
+
+Another way to understand policy scopes is for them to be the link between a rule and an evaluation function, and the
+points in the code where it needs to be evaluated.
+
+##### Policy evaluation functions
+
+If policies are a formalized declaration of requirements, policy evaluation functions are the means to evaluate those
+requirements. They are pieces of Java code executed at runtime. A policy on its own only _expresses_ the requirement,
+but in order to enforce it, we need to run policy evaluation functions.
+
+Upon evaluation, they receive the operator, the `rightOperand` (or _rightValue_), the rule, and the `PolicyContext`. A
+simple evaluation function that asserts the headquarters policy mentioned in the example above could look similar to
+this:
+
+```java
+public class HeadquarterFunction implements AtomicConstraintFunction<Duty> {
+    public boolean evaluate(Operator operator, Object rightValue, Permission rule, PolicyContext context) {
+        if (!(rightValue instanceof String)) {
+            context.reportProblem("Right-value expected to be String but was " + rightValue.getClass());
+            return false;
+        }
+        if (operator != Operator.EQ) {
+            context.reportProblem("Invalid operator, only EQ is allowed!");
+            return false;
+        }
+
+        var participant = context.getContextData(ParticipantAgent.class);
+        var participantLocation = extractLocationClaim(participant); // EU, US, etc.
+        return participantLocation != null && rightValue.equalsIgnoreCase(participantLocation);
+    }
+}
+```
+
+This particular evaluation function only accepts `eq` as operator, and only accepts scalars as `rightValue`.
+
+The `ParticipantAgent` is a representation of the communication counterparty that contains a set of verified claims. In
+the example, `extractLocationClaim()` would look for a claim that contains the location of the agent and return it as
+string.
+
+Other policies may require other context data than the participant's location, for example an exact timestamp, or may
+even need a lookup in some third party system such as a customer database.
+
+The same policy can be evaluated by different evaluation functions, if they are meaningful in different
+contexts ([scopes](#policy-scopes)).
+
+##### Example: binding an evaluation function
+
+As we've learned, for a policy to be evaluated at certain [points](#policy-scopes), we need to create a policy (duh!),
+bind the policy to a scope, create a [policy evaluation function](#policy-evaluation-functions), and we need to bind the
+function to the same scope.
+The standard way of registering and binding policies is done in an [extension](#the-extension-model). For example, here
+we configure our `HeadquarterFunction` so that it evaluates our `headquarter_location` function whenever someone tries
+to negotiate a contract:
+
+```java
+public class HeadquarterPolicyExtension implements ServiceExtension {
+
+    @Inject
+    private RuleBindingRegistry ruleBindingRegistry;
+
+    @Inject
+    private PolicyEngine policyEngine;
+
+    private static final String HEADQUARTER_POLICY_KEY = "headquarter_location";
+
+    @Override
+    public void initialize() {
+        // bind the policy to the scope
+        ruleBindingRegistry.bind(HEADQUARTER_POLICY_KEY, NEGOTIATION_SCOPE);
+        // create the function object
+        var function = new HeadquarterFunction();
+        // bind the function to the scope
+        policyEngine.registerFunction(NEGOTIATION_SCOPE, Duty.class, HEADQUARTER_POLICY_KEY, function);
+    }
+}
+```
+
+Lets accept for now, that `@Inject` is how [EDC achieves dependency injection](#edc-dependency-injection).
+This example assumes, a policy object exists in the system, that has a `leftOperand = headquarter_function`. For details
+on how to create policies, please check out
+the [OpenAPI documentation](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api/0.2.1#/Policy%20Definition/createPolicyDefinition).
+
+##### Advanced policy concepts
+
+Policies are in essence containers for rules (duties, permissions and prohibitions), and rules in turn are compose of
+one or multiple constraints each. The following example extends the previous one by adding another duty rule: the
+claimant must either have headquarters in the EU, or be in business for >= 10 years. Please also note that the
+following example uses the [compacted form](https://www.w3.org/TR/json-ld11/#compacted-document-form) because all EDC
+Management APIs return the compacted form.
+
+```json
+{
+  "@id": "test-policy",
+  "@type": "edc:PolicyDefinition",
+  "edc:createdAt": 1692858228518,
+  "edc:policy": {
+    "@id": "8c2ff88a-74bf-41dd-9b35-9587a3b95adf",
+    "@type": "odrl:Set",
+    "odrl:permission": [],
+    "odrl:prohibition": [],
+    "odrl:obligation": {
+      "odrl:action": {
+        "odrl:type": "USE"
+      },
+      "odrl:constraint": {
+        "odrl:or": [
+          {
+            "odrl:leftOperand": "headquarter_location",
+            "odrl:operator": {
+              "@id": "odrl:eq"
+            },
+            "odrl:rightOperand": "EU"
+          },
+          {
+            "odrl:leftOperand": "years_in_business",
+            "odrl:operator": {
+              "@id": "odrl:gteq"
+            },
+            "odrl:rightOperand": "10"
+          }
+        ]
+      }
+    }
+  },
+  "@context": {
+    "dct": "https://purl.org/dc/terms/",
+    "edc": "https://w3id.org/edc/v0.0.1/ns/",
+    "dcat": "https://www.w3.org/ns/dcat/",
+    "odrl": "http://www.w3.org/ns/odrl/2/",
+    "dspace": "https://w3id.org/dspace/v0.8/"
+  }
+}
+```
+
+Similarly, the `odrl:or` could have been replaced with an `odrl:and` or `odrl:xone` (exclusive-or). 
+
+
 #### Contract definitions
+
+##### Contract policy
+
+##### Access policy
 
 #### Contract negotiations
 
@@ -306,13 +536,16 @@ found [here](https://www.w3.org/TR/json-ld11/#the-context).
 
 #### Transfer processes
 
+#### Catalog
+
 #### A word on JSON-LD contexts
 
 --> explains Assets, Policies, Contract Definitions, etc. from an external API perspective. mentions JSON-LD and related
 specs (ODRL, DCAT)
 
 > The complete OpenAPI specification for the management API is
-> on [SwaggerHub](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api). Please select the latest version from the dropdown.
+> on [SwaggerHub](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api). Please select the latest version from
+> the dropdown.
 
 ### Control plane state machines
 
