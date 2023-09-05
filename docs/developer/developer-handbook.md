@@ -339,7 +339,7 @@ this:
 }
 ```
 
-The `duty` object expresses the semantics of the constraint. It is a specialization of `rul`, which expresses either a
+The `duty` object expresses the semantics of the constraint. It is a specialization of `rule`, which expresses either a
 MUST (`duty`), MAY (`permission`) or MUST NOT (`prohibition`) relation. The `action` expresses the type of action for
 which the rule is intended. Acceptable values for `action` are defined [here](https://www.w3.org/TR/odrl-model/#action),
 but in EDC you'll exclusively encounter `"use"`.
@@ -380,7 +380,7 @@ points in the code, injecting/adding additional scopes is not possible. Currentl
 
 A policy scope is a string that is used for two purposes:
 
-1. binding a scope to a rule type: implement filtering based on the `action` or the `leftExpression` of a policy. This
+1. binding a scope to a rule type: implement filtering based on the `action` or the `leftOperand` of a policy. This
    determines for every rule inside a policy whether it should be evaluated in the given scope.
 2. binding a [policy evaluation function](#policy-evaluation-functions) to a scope: if a policy is determined to be "in
    scope" by the previous step, the policy engine invokes the evaluation function that was bound to the scope to
