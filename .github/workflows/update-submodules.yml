@@ -19,7 +19,7 @@ jobs:
           submodules: "true"
       - name: Update submodule
         run: |
-          git submodule update --init --recursive --remote
+          git submodule update --init --remote
           echo "NEW_BRANCH=update-submodules-${GITHUB_SHA}" >> $GITHUB_ENV
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4

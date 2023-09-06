@@ -5,8 +5,8 @@ free to add sections and subsections to this sidebar.)
 - [Home](/README)
 
 &nbsp;&nbsp;**Getting Started**
-- [Adoptions](/submodule/GitHub/KNOWN_FRIENDS.md)
-- [Contributing](/submodule/GitHub/CONTRIBUTING.md)
+
+- [Contributing](/documentation/CONTRIBUTING.md)
 - [Hands-on](/hands-on.md)
 
 &nbsp;&nbsp;**Components**
@@ -50,3 +50,8 @@ free to add sections and subsections to this sidebar.)
   - [Latest Presentations](/submodule/Collateral/Latest%20Presentations/)
   - [Work Content](/submodule/Collateral/Work%20Content/)
 - [Publications](/publications.md)
+
+&nbsp;&nbsp;**Links**
+
+- [Known Friends](/documentation/KNOWN_FRIENDS.md)
+- [SwaggerHub](https://app.swaggerhub.com/search?owner=eclipse-edc-bot)
