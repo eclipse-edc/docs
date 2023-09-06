@@ -50,8 +50,8 @@ collection of libraries and modules, that are published as Maven artifacts, and 
 
 Therefore, if you are a solution architect looking for a high-level description on how to integrate EDC, or a developer
 wanting to contribute to the project itself, this guide is not for you. More suitable resources can be
-found [here](https://eclipse-edc.github.io/docs/#/README)
-and [here](https://github.com/eclipse-edc/.github/blob/main/CONTRIBUTING.md) respectively.
+found [here](../docs/documentation/)
+and [here](../docs/documentation/CONTRIBUTING.md) respectively.
 
 However, if you are a developer who is familiar with Java (17+) and the Gradle build system in general, and concepts
 like extensibility, dependency injection and modularity, then this guide is for you.
@@ -94,15 +94,15 @@ Typically, distributions consist of a [control plane](#the-control-plane) and on
 more [data planes](#the-data-plane). The former takes care of data manipulation, contract negotiation and transfer
 setup, and is geared toward reliability, whereas the job of the latter is to actually shovel bits from A to B.
 
-The EDC project provides a comprehensive collection of [samples](https://github.com/eclipse-edc/Samples), including one
+The EDC project provides a comprehensive collection of [samples](../docs/submodule/Samples/), including one
 that demonstrates
-the [assembly of a very simplistic distribution](https://github.com/eclipse-edc/Samples/blob/main/basic/basic-01-basic-connector/README.md).
+the [assembly of a very simplistic distribution](../docs/submodule/Samples/basic/basic-01-basic-connector/).
 
 This simplest of distributions doesn't do much yet, it cannot even be configured properly, but it serves as starting
 point for more complex distributions and launchers.
 
 Subsequent chapters of this document will assume a full understanding of the concepts and terms presented in
-the [basic samples](https://github.com/eclipse-edc/Samples/blob/main/basic), so please make sure you go through them
+the [basic samples](../docs/submodule/Samples/basic/), so please make sure you go through them
 carefully.
 
 ### Perform a simple data transfer
@@ -125,7 +125,7 @@ could install the same Linux distro on multiple computers, for demonstration pur
 distributions, but located in different directories and pre-loaded with different config values.
 
 Please work through
-the [complete sample](https://github.com/eclipse-edc/Samples/tree/main/transfer/transfer-01-file-transfer), look
+the [complete sample](../docs/submodule/Samples/transfer/transfer-01-file-transfer/), look
 at the enclosed source code and try to modify some values and see how they affect the data transfer.
 
 > Be advised that some of the concepts presented there are only suitable in a sample/demo environment and are not
@@ -144,7 +144,7 @@ to it through a proxy, and can obtain the data. We call this a "consumer-pull" t
 Please be advised that the sample will use some concepts and terms we haven't discussed yet, such
 as [policies](#policy-scopes-and-evaluation) and [data plane registration](#data-plane-selectors). Bear with us, we will
 explain them later. For now, please just make sure you follow
-the [http-pull sample guide](https://github.com/eclipse-edc/Samples/tree/main/transfer/transfer-06-consumer-pull-http/README.md).
+the [http-pull sample guide](../docs/submodule/Samples/transfer/transfer-06-consumer-pull-http/README.md).
 
 We encourage you to play around with this sample a bit, try to add a new asset and see if you can work out what else you
 need in order to be able to transfer it to the consumer.
@@ -462,7 +462,7 @@ public class HeadquarterPolicyExtension implements ServiceExtension {
 }
 ```
 
-Lets accept for now, that `@Inject` is how [EDC achieves dependency injection](#edc-dependency-injection).
+Let's accept for now, that `@Inject` is how [EDC achieves dependency injection](#edc-dependency-injection).
 This example assumes, a policy object exists in the system, that has a `leftOperand = headquarter_function`. For details
 on how to create policies, please check out
 the [OpenAPI documentation](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api/0.2.1#/Policy%20Definition/createPolicyDefinition).

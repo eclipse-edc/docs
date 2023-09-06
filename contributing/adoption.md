@@ -55,4 +55,4 @@ Note that even if all the aforementioned points are answered satisfactorily, **t
 
 ## Submitting an application
 
-Please open in issue using the _adoption request_ template, fill out all the sections to the best of your knowledge and wait to hear back from the EDC core team. We will comment in the issue, or reach out to you directly. Be aware that omitting sections from the application will greatly diminish the chance of approval.
+Please open in issue using the [adoption request](../docs/submodule/GitHub/contributing/adoption.md) template, fill out all the sections to the best of your knowledge and wait to hear back from the EDC core team. We will comment in the issue, or reach out to you directly. Be aware that omitting sections from the application will greatly diminish the chance of approval.

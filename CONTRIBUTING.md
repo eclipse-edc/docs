@@ -18,6 +18,10 @@ the [Eclipse Dataspace Components](https://projects.eclipse.org/projects/technol
   * [Releases](#releases)
 * [Contact Us](#contact-us)
 
+Find more information here:
+- [Adoptions](contributing/adoption.md)
+- [PR Etiquette](contributing/pr_etiquette.md)
+
 ## Code Of Conduct
 
 See the [Eclipse Code Of Conduct](https://www.eclipse.org/org/documents/Community_Code_of_Conduct.php).
