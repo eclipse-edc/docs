@@ -2,7 +2,7 @@
 
 - [Developer's Guide](documentation/developer/)
 - [Minimum Viable Dataspace](submodule/MinimumViableDataspace/)
-- [Samples repository](submodule/Samples/)
+- [Samples repository](samples/)
 
 Links:
 - [Management API Specification (SwaggerHub)](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api)

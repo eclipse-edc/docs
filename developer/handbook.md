@@ -94,15 +94,15 @@ Typically, distributions consist of a [control plane](#the-control-plane) and on
 more [data planes](#the-data-plane). The former takes care of data manipulation, contract negotiation and transfer
 setup, and is geared toward reliability, whereas the job of the latter is to actually shovel bits from A to B.
 
-The EDC project provides a comprehensive collection of [samples](../docs/submodule/Samples/), including one
+The EDC project provides a comprehensive collection of [samples](../docs/samples/), including one
 that demonstrates
-the [assembly of a very simplistic distribution](../docs/submodule/Samples/basic/basic-01-basic-connector/).
+the [assembly of a very simplistic distribution](../docs/samples/basic/basic-01-basic-connector/).
 
 This simplest of distributions doesn't do much yet, it cannot even be configured properly, but it serves as starting
 point for more complex distributions and launchers.
 
 Subsequent chapters of this document will assume a full understanding of the concepts and terms presented in
-the [basic samples](../docs/submodule/Samples/basic/), so please make sure you go through them
+the [basic samples](../docs/samples/basic/), so please make sure you go through them
 carefully.
 
 ### Perform a simple data transfer
@@ -125,7 +125,7 @@ could install the same Linux distro on multiple computers, for demonstration pur
 distributions, but located in different directories and pre-loaded with different config values.
 
 Please work through
-the [complete sample](../docs/submodule/Samples/transfer/transfer-01-file-transfer/), look
+the [complete sample](../docs/samples/transfer/transfer-01-file-transfer/), look
 at the enclosed source code and try to modify some values and see how they affect the data transfer.
 
 > Be advised that some of the concepts presented there are only suitable in a sample/demo environment and are not
@@ -144,7 +144,7 @@ to it through a proxy, and can obtain the data. We call this a "consumer-pull" t
 Please be advised that the sample will use some concepts and terms we haven't discussed yet, such
 as [policies](#policy-scopes-and-evaluation) and [data plane registration](#data-plane-selectors). Bear with us, we will
 explain them later. For now, please just make sure you follow
-the [http-pull sample guide](../docs/submodule/Samples/transfer/transfer-06-consumer-pull-http/README.md).
+the [http-pull sample guide](../docs/samples/transfer/transfer-06-consumer-pull-http/README.md).
 
 We encourage you to play around with this sample a bit, try to add a new asset and see if you can work out what else you
 need in order to be able to transfer it to the consumer.

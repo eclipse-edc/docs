@@ -34,3 +34,6 @@
 [submodule "docs/documentation"]
 	path = docs/documentation
 	url = https://github.com/eclipse-edc/docs.git
+[submodule "docs/samples"]
+	path = docs/samples
+	url = https://github.com/eclipse-edc/Samples.git
