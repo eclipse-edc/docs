@@ -25,7 +25,7 @@ started to appear after ~16 hours.
 In the meantime we also reached out to Codacy support to investigate the issue.
 
 Below screenshot shows code coverage diagram of the main branch analysis.
-![Code Coverage with Codacy](IdeaProjects/edc/docs/developer/decision-records/2022-02-10-code-coverage/code-coverage-codacy.png)
+![Code Coverage with Codacy](code-coverage-codacy.png)
 
 We didn't manage to set up Codacy to see the code coverage reports for the PRs neither in the Codacy dashboard nor in GitHub Actions.
 Codacy seems to offer more features for code quality analysis than for code coverage scans. 
