@@ -547,7 +547,7 @@ provider, and they are **never** sent to the consumer.
   does not automatically guarantee the successful _creation_ of a contract, it merely expresses the _eligibility_ to
   start the negotiation.
 
-Contract definitions also contain an `assetSelector`, which - in broad terms - is a query expression that defines all
+Contract definitions also contain an `assetsSelector`, which - in broad terms - is a query expression that defines all
 the assets that are included in the definition, not unlike an SQL SELECT statement. With that it is possible to
 configure the same set of conditions (= access policy and contract policy) for a multitude of assets.
 
@@ -622,7 +622,7 @@ the `operandRight` of the sample is an integer - what gives?
 
 In Java, enums are just "named integers", so we store them as integers in the database. Consequently, the transformation
 layer that converts from `Criterion` to an actual SQL query expects the `state` field to be an `INT`. For reference, all
-state values are
+`TransferProcess` state values are
 listed [here](https://github.com/eclipse-edc/Connector/blob/main/spi/control-plane/transfer-spi/src/main/java/org/eclipse/edc/connector/transfer/spi/types/TransferProcessStates.java).
 
 More detailed information about the canonical format and SQL queries can be
