@@ -92,7 +92,7 @@ The `Identity Hub` lacks several important features including VC revocation, key
 Although the DWN standard specifies a permission-based access method, it is not compatible with OAuth 2 and SIOPv2.
 Moreover, the goal of the DWN specification is to define a generic credential storage and message relay system. As such,
 it does not address key topics including credential metadata exchange. The DWN specification will therefore be replaced
-by the above Eclipse protocol specifications, which will be aligned with standards including SIOPv2, DIF Presentation
+by the protocol specifications mentioned above, which will be aligned with standards including SIOPv2, DIF Presentation
 Exchange, and W3C DID. Note that this will have no end-user impact as only the `Identity Hub` wire protocol will be
 changed.
 
