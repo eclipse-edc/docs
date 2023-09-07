@@ -15,7 +15,7 @@ the [OAuth 2 Client Credentials Grant](https://datatracker.ietf.org/doc/html/rfc
 relying on a centralized OAuth 2 Authorization Server is sufficient. However, there are a class of uses-cases which
 require a decentralized approach to exchanging identity and claims data. For example, operational continuity
 requirements may determine that a centralized Authentication Server poses too great a risk of service disruption. Or,
-privacy rules may dictate that claims verification must be done without requiring both the verifier and verified being
+privacy rules may dictate that claims verification must be done without requiring both the verifying and verified party being
 known to a third-party identity provider.
 
 The decentralized identity and trust system will enable dataspace participants to securely communicate and validate
