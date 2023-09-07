@@ -1,46 +1,48 @@
 # Developer's Handbook
 
 <!-- TOC -->
+
 * [Developer's Handbook](#developers-handbook)
-  * [Introduction](#introduction)
-    * [Terminology](#terminology)
-  * [Building a distribution](#building-a-distribution)
-    * [Perform a simple data transfer](#perform-a-simple-data-transfer)
-    * [Transfer some more data](#transfer-some-more-data)
-  * [Core concepts](#core-concepts)
-  * [The control plane](#the-control-plane)
-    * [API objects in detail](#api-objects-in-detail)
-      * [Assets](#assets)
-      * [Policies](#policies)
-        * [Policy scopes](#policy-scopes)
-        * [Policy evaluation functions](#policy-evaluation-functions)
-        * [Example: binding an evaluation function](#example-binding-an-evaluation-function)
-        * [Advanced policy concepts](#advanced-policy-concepts)
-      * [Contract definitions](#contract-definitions)
-      * [Contract negotiations](#contract-negotiations)
-      * [Contract agreements](#contract-agreements)
-      * [Transfer processes](#transfer-processes)
-      * [Catalog](#catalog)
-      * [Expressing queries with a `Criterion`](#expressing-queries-with-a-criterion)
-        * [Canonical form](#canonical-form)
-        * [Supported operators](#supported-operators)
-        * [Namespaced properties](#namespaced-properties)
-      * [A word on JSON-LD contexts](#a-word-on-json-ld-contexts)
-    * [Control plane state machines](#control-plane-state-machines)
-      * [Provisioning](#provisioning)
-    * [The extension model](#the-extension-model)
-    * [EDC dependency injection](#edc-dependency-injection)
-    * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
-  * [The data plane](#the-data-plane)
-    * [Data plane selectors](#data-plane-selectors)
-    * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
-    * [The Control API](#the-control-api)
-  * [Advanced concepts](#advanced-concepts)
-    * [Events and callbacks](#events-and-callbacks)
-    * [The EDC JUnit framework](#the-edc-junit-framework)
-    * [Automatic documentation](#automatic-documentation)
-    * [Customize the build](#customize-the-build)
-  * [Further references and specifications](#further-references-and-specifications)
+    * [Introduction](#introduction)
+        * [Terminology](#terminology)
+    * [Building a distribution](#building-a-distribution)
+        * [Perform a simple data transfer](#perform-a-simple-data-transfer)
+        * [Transfer some more data](#transfer-some-more-data)
+    * [Core concepts](#core-concepts)
+    * [The control plane](#the-control-plane)
+        * [API objects in detail](#api-objects-in-detail)
+            * [Assets](#assets)
+            * [Policies](#policies)
+                * [Policy scopes](#policy-scopes)
+                * [Policy evaluation functions](#policy-evaluation-functions)
+                * [Example: binding an evaluation function](#example-binding-an-evaluation-function)
+                * [Advanced policy concepts](#advanced-policy-concepts)
+            * [Contract definitions](#contract-definitions)
+            * [Contract negotiations](#contract-negotiations)
+            * [Contract agreements](#contract-agreements)
+            * [Transfer processes](#transfer-processes)
+            * [Catalog](#catalog)
+            * [Expressing queries with a `Criterion`](#expressing-queries-with-a-criterion)
+                * [Canonical form](#canonical-form)
+                * [Supported operators](#supported-operators)
+                * [Namespaced properties](#namespaced-properties)
+            * [A word on JSON-LD contexts](#a-word-on-json-ld-contexts)
+        * [Control plane state machines](#control-plane-state-machines)
+            * [Provisioning](#provisioning)
+        * [The extension model](#the-extension-model)
+        * [EDC dependency injection](#edc-dependency-injection)
+        * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
+    * [The data plane](#the-data-plane)
+        * [Data plane selectors](#data-plane-selectors)
+        * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
+        * [The Control API](#the-control-api)
+    * [Advanced concepts](#advanced-concepts)
+        * [Events and callbacks](#events-and-callbacks)
+        * [The EDC JUnit framework](#the-edc-junit-framework)
+        * [Automatic documentation](#automatic-documentation)
+        * [Customize the build](#customize-the-build)
+    * [Further references and specifications](#further-references-and-specifications)
+
 <!-- TOC -->
 
 ## Introduction
@@ -616,21 +618,24 @@ Thus, the resulting `Criterion` would look like this:
 
 Keen readers will notice, that the `TransferProcess#state` property is an enum named `TransferProcessStates`, but
 the `operandRight` of the sample is an integer - what gives?
-Enums are just "named integers", so we store them as integers in the database. Consequently, the transformation layer
-that converts from `Criterion` to an actual SQL query expects the `state` field to be an `INT`.
+
+In Java, enums are just "named integers", so we store them as integers in the database. Consequently, the transformation
+layer that converts from `Criterion` to an actual SQL query expects the `state` field to be an `INT`. For reference, all
+state values are
+listed [here](https://github.com/eclipse-edc/Connector/blob/main/spi/control-plane/transfer-spi/src/main/java/org/eclipse/edc/connector/transfer/spi/types/TransferProcessStates.java).
 
 More detailed information about the canonical format and SQL queries can be
 found [here](https://github.com/eclipse-edc/Connector/blob/main/docs/developer/sql_queries.md).
 
 ##### Supported operators
 
-The semantic cardinality of operators is virtually limitless, and that is impossible to main or test. Out-of-the box,
-EDC supports a limited set of operators. Please find the related
+The semantic cardinality of operators is virtually limitless, and it would be impossible to maintain or test. Out-of-the
+box, EDC supports a limited set of operators. Please find the related
 documentation [here](https://github.com/eclipse-edc/Connector/blob/main/docs/developer/sql_queries.md#supported-query-operators).
 
-It should be noted, that - like everything else in EDC - this can be extended through custom SQL dialects, or even
-custom data backends. In other words, the set of supported `operators` depend on the backend system interpreting the
-query. In the EDC PostgreSQL implementation, these are `=`, `like` and `in`.
+It should be noted, that - like everything else in EDC - this can be [extended](#the-extension-model) through custom SQL
+dialects, or even custom data backends. In other words, the set of supported `operators` depend on the backend system interpreting the
+query. In the EDC PostgreSQL implementation, these operators are `=`, `like` and `in`.
 
 ##### Namespaced properties
 
