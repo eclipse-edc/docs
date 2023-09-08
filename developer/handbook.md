@@ -1,44 +1,48 @@
 # Developer's Handbook
 
 <!-- TOC -->
+
 * [Developer's Handbook](#developers-handbook)
-  * [Introduction](#introduction)
-    * [Terminology](#terminology)
-  * [Building a distribution](#building-a-distribution)
-    * [Perform a simple data transfer](#perform-a-simple-data-transfer)
-    * [Transfer some more data](#transfer-some-more-data)
-  * [Core concepts](#core-concepts)
-  * [The control plane](#the-control-plane)
-    * [API objects in detail](#api-objects-in-detail)
-      * [Assets](#assets)
-      * [Policies](#policies)
-        * [Policy scopes](#policy-scopes)
-        * [Policy evaluation functions](#policy-evaluation-functions)
-        * [Example: binding an evaluation function](#example-binding-an-evaluation-function)
-        * [Advanced policy concepts](#advanced-policy-concepts)
-      * [Contract definitions](#contract-definitions)
-        * [Contract policy](#contract-policy)
-        * [Access policy](#access-policy)
-      * [Contract negotiations](#contract-negotiations)
-      * [Contract agreements](#contract-agreements)
-      * [Transfer processes](#transfer-processes)
-      * [Catalog](#catalog)
-      * [A word on JSON-LD contexts](#a-word-on-json-ld-contexts)
-    * [Control plane state machines](#control-plane-state-machines)
-      * [Provisioning](#provisioning)
-    * [The extension model](#the-extension-model)
-    * [EDC dependency injection](#edc-dependency-injection)
-    * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
-  * [The data plane](#the-data-plane)
-    * [Data plane selectors](#data-plane-selectors)
-    * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
-    * [The Control API](#the-control-api)
-  * [Advanced concepts](#advanced-concepts)
-    * [Events and callbacks](#events-and-callbacks)
-    * [The EDC JUnit framework](#the-edc-junit-framework)
-    * [Automatic documentation](#automatic-documentation)
-    * [Customize the build](#customize-the-build)
-  * [Further references and specifications](#further-references-and-specifications)
+    * [Introduction](#introduction)
+        * [Terminology](#terminology)
+    * [Building a distribution](#building-a-distribution)
+        * [Perform a simple data transfer](#perform-a-simple-data-transfer)
+        * [Transfer some more data](#transfer-some-more-data)
+    * [Core concepts](#core-concepts)
+    * [The control plane](#the-control-plane)
+        * [API objects in detail](#api-objects-in-detail)
+            * [Assets](#assets)
+            * [Policies](#policies)
+                * [Policy scopes](#policy-scopes)
+                * [Policy evaluation functions](#policy-evaluation-functions)
+                * [Example: binding an evaluation function](#example-binding-an-evaluation-function)
+                * [Advanced policy concepts](#advanced-policy-concepts)
+            * [Contract definitions](#contract-definitions)
+            * [Contract negotiations](#contract-negotiations)
+            * [Contract agreements](#contract-agreements)
+            * [Transfer processes](#transfer-processes)
+            * [Catalog](#catalog)
+            * [Expressing queries with a `Criterion`](#expressing-queries-with-a-criterion)
+                * [Canonical form](#canonical-form)
+                * [Supported operators](#supported-operators)
+                * [Namespaced properties](#namespaced-properties)
+            * [A word on JSON-LD contexts](#a-word-on-json-ld-contexts)
+        * [Control plane state machines](#control-plane-state-machines)
+            * [Provisioning](#provisioning)
+        * [The extension model](#the-extension-model)
+        * [EDC dependency injection](#edc-dependency-injection)
+        * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
+    * [The data plane](#the-data-plane)
+        * [Data plane selectors](#data-plane-selectors)
+        * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
+        * [The Control API](#the-control-api)
+    * [Advanced concepts](#advanced-concepts)
+        * [Events and callbacks](#events-and-callbacks)
+        * [The EDC JUnit framework](#the-edc-junit-framework)
+        * [Automatic documentation](#automatic-documentation)
+        * [Customize the build](#customize-the-build)
+    * [Further references and specifications](#further-references-and-specifications)
+
 <!-- TOC -->
 
 ## Introduction
@@ -194,6 +198,10 @@ what conditions.
 > For this chapter we assume basic knowledge of [JSON-LD](http://json-ld.org), and we also recommend reading the
 > specifications for [ODRL](https://www.w3.org/TR/odrl-model/) and [DCAT](https://www.w3.org/TR/vocab-dcat-2/).
 
+
+> The complete OpenAPI specification for the management API is
+> on [SwaggerHub](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api). Please select the latest version from
+> the dropdown.
 #### Assets
 
 Assets are containers for metadata, they do **not** contain the actual bits and bytes. Say you want to offer a file to
@@ -519,14 +527,58 @@ Management APIs return the compacted form.
 }
 ```
 
-Similarly, the `odrl:or` could have been replaced with an `odrl:and` or `odrl:xone` (exclusive-or). 
-
+Similarly, the `odrl:or` could have been replaced with an `odrl:and` or `odrl:xone` (exclusive-or).
 
 #### Contract definitions
 
-##### Contract policy
+Contract definitions are how [assets](#assets) and [policies](#policies) are linked together. It is our way of
+expressing which policies are in effect for an asset. So when we want to offer an asset (or several assets) in the
+dataspace, we use a contract definition to express under what conditions we do that. Those conditions are comprised of a
+_contract policy_ and an _access policy_, see below for details. Those policies are referenced by ID, that means they
+must already exist in the policy store before creating the contract definition.
 
-##### Access policy
+It is important to note that contract definitions are a _internal objects_, i.e. they **never** leave the realm of the
+provider, and they are **never** sent to the consumer.
+
+- **access policy**: determines whether a particular consumer is offered an asset or not. For example, we may want to
+  restrict certain assets such that only consumers within a particular geography can see them. Consumers outside that
+  geography wouldn't even have them in their [catalog](#catalog).
+- **contract policy**: determines the conditions for initiating a contract negotiation for a particular asset. Note that
+  does not automatically guarantee the successful _creation_ of a contract, it merely expresses the _eligibility_ to
+  start the negotiation.
+
+Contract definitions also contain an `assetsSelector`, which - in broad terms - is a query expression that defines all
+the assets that are included in the definition, not unlike an SQL SELECT statement. With that it is possible to
+configure the same set of conditions (= access policy and contract policy) for a multitude of assets.
+
+Please note that creating an `assetSelector` may require knowledge about the shape of an Asset and can get complex
+fairly quickly, so be sure to read the chapter about [querying](#expressing-queries-with-a-criterion).
+
+Here is an example of a contract definition, that defines an access policy and a contract policy for all assets, that
+have the `foo=bar` property.
+
+```json
+{
+  "@context": {
+    "edc": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "https://w3id.org/edc/v0.0.1/ns/ContractDefinition",
+  "@id": "test-id",
+  "edc:accessPolicyId": "access-policy-1234",
+  "edc:contractPolicyId": "contract-policy-5678",
+  "edc:assetsSelector": [
+    {
+      "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
+      "edc:operandLeft": "foo",
+      "edc:operator": "=",
+      "edc:operandRight": "bar"
+    }
+  ]
+}
+```
+
+The sample expresses that every asset, that contains a property `"foo" : "bar"` be made available under the access
+policy `access-policy-1234` and contract policy `contract-policy-5678`.
 
 #### Contract negotiations
 
@@ -536,14 +588,70 @@ Similarly, the `odrl:or` could have been replaced with an `odrl:and` or `odrl:xo
 
 #### Catalog
 
+#### Expressing queries with a `Criterion`
+
+A `Criterion` is a normalized way of expressing a logical requirement between two operands and an operator. For example,
+we can use this to formulate a query, which selects all objects, where a particular property must have a particular
+value. This is similar to an SQL `SELECT` statement, or a policy's `constraint` property.
+
+Like the `constraint`, a `Criterion` has an `operandLeft`, an `operator` and an `operandRight`, which determine the
+semantics of the query.
+
+However, there are several very important aspects to understand:
+
+##### Canonical form
+
+The `operandLeft` targets the _canonical form_ or the object. For non-extensible properties, the canonical form is equal
+to the object representation in Java code. For example, the canonical form of a transfer process's state field
+is `state`,
+because that is what the property on the Java class `TransferProcess.java` is called.
+
+Thus, the resulting `Criterion` would look like this:
+
+```json
+{
+  "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
+  "operandLeft": "state",
+  "operator": "=",
+  "operandRight": 800
+}
+```
+
+Keen readers will notice, that the `TransferProcess#state` property is an enum named `TransferProcessStates`, but
+the `operandRight` of the sample is an integer - what gives?
+
+In Java, enums are just "named integers", so we store them as integers in the database. Consequently, the transformation
+layer that converts from `Criterion` to an actual SQL query expects the `state` field to be an `INT`. For reference, all
+`TransferProcess` state values are
+listed [here](https://github.com/eclipse-edc/Connector/blob/main/spi/control-plane/transfer-spi/src/main/java/org/eclipse/edc/connector/transfer/spi/types/TransferProcessStates.java).
+
+More detailed information about the canonical format and SQL queries can be
+found [here](https://github.com/eclipse-edc/Connector/blob/main/docs/developer/sql_queries.md).
+
+##### Supported operators
+
+The semantic cardinality of operators is virtually limitless, and it would be impossible to maintain or test. Out-of-the
+box, EDC supports a limited set of operators. Please find the related
+documentation [here](https://github.com/eclipse-edc/Connector/blob/main/docs/developer/sql_queries.md#supported-query-operators).
+
+It should be noted, that - like everything else in EDC - this can be [extended](#the-extension-model) through custom SQL
+dialects, or even custom data backends. In other words, the set of supported `operators` depend on the backend system
+interpreting the
+query. In the EDC PostgreSQL implementation, these operators are `=`, `like` and `in`.
+
+##### Namespaced properties
+
+Some objects, such as `Asset` don't have a fixed a schema, rather they are "extensible objects". This is comparable to
+a `java.util.Map`. That means, you can store on them whatever you like, even complex objects. That not only brings a lot
+of flexibility, it also introduces the potential danger of name clashes: for instance, a property `content-type` could
+potentially have different meanings in different _contexts_. To counter this, we always persist the keys of such dynamic
+objects with their fully qualified namespace. So if you are using custom properties with a custom JSON-LD namespace, you
+will
+have to use that namespace in the `Criterion`!
+
 #### A word on JSON-LD contexts
 
---> explains Assets, Policies, Contract Definitions, etc. from an external API perspective. mentions JSON-LD and related
-specs (ODRL, DCAT)
 
-> The complete OpenAPI specification for the management API is
-> on [SwaggerHub](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api). Please select the latest version from
-> the dropdown.
 
 ### Control plane state machines
 
