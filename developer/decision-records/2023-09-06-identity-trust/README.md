@@ -75,7 +75,7 @@ the [OpenID for Verifiable Credential Issuance specification](https://openid.net
 was considered, but determined not to be sufficient, due to its focus on end-user interactions and lack of support for
 long-running issuance processes that may involve human interaction.
 
-### Protocol Specifications and The Eclipse Dataspace Working Group
+#### Protocol Specifications and The Eclipse Dataspace Working Group
 
 The protocol specifications (i.e. documents that define the message exchanges) for the Identity and Trust System will be
 transferred to the [Eclipse Dataspace Working Group](https://www.eclipse.org/org/workinggroups/dataspace-charter.php)
