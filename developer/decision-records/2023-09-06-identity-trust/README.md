@@ -63,7 +63,7 @@ was considered, but determined not to be sufficient, due to its focus on end-use
 interactions. [DidComm Messaging](https://identity.foundation/didcomm-messaging/spec/) was also investigated as a
 potential starting point but not selected due to unneeded complexity and lack of widespread adoption.
 
-### Verifiable Credential Issuance
+#### Verifiable Credential Issuance
 
 Dataspaces will require an interoperable way for participant agent systems to request credential issuance, renew
 credentials, and check for credential revocation. The Verifiable Credential Issuance will define a RESTful API over
