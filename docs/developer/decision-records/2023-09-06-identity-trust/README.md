@@ -79,7 +79,7 @@ long-running issuance processes that may involve human interaction.
 
 The protocol specifications (i.e. documents that define the message exchanges) for the Identity and Trust System will be
 transferred to the [Eclipse Dataspace Working Group](https://www.eclipse.org/org/workinggroups/dataspace-charter.php)
-for formal standardization. The EDC will track changes to the protocol specifications as they undergo standardization.
+for standardization. The EDC will track changes to the protocol specifications as they undergo standardization.
 
 ## Impact
 
