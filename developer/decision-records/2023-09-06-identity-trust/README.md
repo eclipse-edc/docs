@@ -98,7 +98,7 @@ by the protocol specifications mentioned above, which will be aligned with stand
 Exchange, and W3C DID. Note that this will have no end-user impact as only the `Identity Hub` wire protocol will be
 changed.
 
-### Issuance Service
+#### Issuance Service
 
 A new `Issuance Service` will be created to support VC issuance and revocation. This service will be built on existing
 core EDC components and deployable as a standalone or embedded service.
