@@ -46,7 +46,7 @@ The shape of self-issued identity tokens and protocol for obtaining them will be
 the [Self-Issued OpenID Provider v2 specification](https://openid.net/specs/openid-connect-self-issued-v2-1_0.html#section-1.1) (
 SIOPv2).
 
-### Verifiable Credential Presentation
+#### Verifiable Credential Presentation
 
 Data providers will often require a set of Verifiable Presentations (i.e. the presentation of a Verifiable Credential)
 to access their assets. In addition, trust anchors such as Credential Issuers need a way to deliver Verifiable
