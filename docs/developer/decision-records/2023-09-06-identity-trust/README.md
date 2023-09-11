@@ -15,7 +15,8 @@ the [OAuth 2 Client Credentials Grant](https://datatracker.ietf.org/doc/html/rfc
 relying on a centralized OAuth 2 Authorization Server is sufficient. However, there are a class of uses-cases which
 require a decentralized approach to exchanging identity and claims data. For example, operational continuity
 requirements may determine that a centralized Authentication Server poses too great a risk of service disruption. Or,
-privacy rules may dictate that claims verification must be done without requiring both the verifying and verified party being
+privacy rules may dictate that claims verification must be done without requiring both the verifying and verified party
+being
 known to a third-party identity provider.
 
 The decentralized identity and trust system will enable dataspace participants to securely communicate and validate
@@ -48,12 +49,13 @@ SIOPv2).
 ### Verifiable Credential Presentation
 
 Data providers will often require a set of Verifiable Presentations (i.e. the presentation of a Verifiable Credential)
-to access an asset. In addition, trust anchors such as Credential Issuers need a way to deliver Verifiable Credentials
-to a holder.
+to access their assets. In addition, trust anchors such as Credential Issuers need a way to deliver Verifiable
+Credentials to a holder.
 
 The Verifiable Presentation protocol will define a set of operations for reading and writing Verifiable Credentials
 using the W3C [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/). The protocol will also
-make use of the [DIF Presentation Exchange specification](https://identity.foundation/presentation-exchange/spec/v2.0.0/).
+make use of
+the [DIF Presentation Exchange specification](https://identity.foundation/presentation-exchange/spec/v2.0.0/).
 
 Note that
 the [OpenID for Verifiable Presentations specification](https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6.1)
