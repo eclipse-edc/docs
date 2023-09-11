@@ -86,7 +86,7 @@ for standardization. The EDC will track changes to the protocol specifications a
 The decentralized Identity and Trust System will have negligible architectural impact, as this work will be an extension
 of existing EDC services. The most notable impact will be on the wire protocol used by the `Identity Hub.`
 
-### Identity Hub
+#### Identity Hub
 
 The `Identity Hub` is currently based on an early version of
 the [Decentralized Web Nodes specification](https://identity.foundation/decentralized-web-node/spec/) (DWN).
