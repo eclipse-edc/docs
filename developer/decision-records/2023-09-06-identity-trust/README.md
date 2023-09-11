@@ -26,7 +26,7 @@ DSP) in a way that preserves privacy and limits the possibility of network disru
 
 ## Approach
 
-The EDC identity and trust system will define a set of message interactions (termed "protocols") for the following:
+The EDC identity and trust system will implement a set of message interactions (termed "protocols") for the following:
 
 - **Self-Issued Identity Tokens**: Obtaining and cryptographically validating self-issued tokens that contain identity
   claims
