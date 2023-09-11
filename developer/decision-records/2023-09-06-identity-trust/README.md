@@ -40,7 +40,7 @@ maintained in the [Eclipse Tractus-X SSI repository](https://github.com/eclipse-
 will be transferred to the Eclipse Dataspace Working Group as
 described [here](#protocol-specifications-and-the-eclipse-dataspace-working-group).
 
-### Self-Issued Identity Tokens
+#### Self-Issued Identity Tokens
 
 The shape of self-issued identity tokens and protocol for obtaining them will be based on
 the [Self-Issued OpenID Provider v2 specification](https://openid.net/specs/openid-connect-self-issued-v2-1_0.html#section-1.1) (
