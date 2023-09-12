@@ -35,18 +35,17 @@ The EDC identity and trust system will implement a set of message interactions (
 - **Verifiable Credential Issuance**: Issuing and renewing Verifiable Credentials and providing a mechanism for
   communicating credential revocation
 
-For convenience (and because not all stakeholders are EDC committers), the protocol specifications will be temporarily
-maintained in the [Eclipse Tractus-X SSI repository](https://github.com/eclipse-tractusx/ssi-docu). These specifications
-will be transferred to the Eclipse Dataspace Working Group as
-described [here](#protocol-specifications-and-the-eclipse-dataspace-working-group).
+The protocol specifications will be temporarily maintained in
+the [Eclipse Tractus-X SSI repository](https://github.com/eclipse-tractusx/ssi-docu), but will be transferred to the
+Eclipse Dataspace Working Group as described [here](#protocol-specifications-and-the-eclipse-dataspace-working-group).
 
-#### Self-Issued Identity Tokens
+### Self-Issued Identity Tokens
 
 The shape of self-issued identity tokens and protocol for obtaining them will be based on
 the [Self-Issued OpenID Provider v2 specification](https://openid.net/specs/openid-connect-self-issued-v2-1_0.html#section-1.1) (
 SIOPv2).
 
-#### Verifiable Credential Presentation
+### Verifiable Credential Presentation
 
 Data providers will often require a set of Verifiable Presentations (i.e. the presentation of a Verifiable Credential)
 to access their assets. In addition, trust anchors such as Credential Issuers need a way to deliver Verifiable
@@ -63,7 +62,7 @@ was considered, but determined not to be sufficient, due to its focus on end-use
 interactions. [DidComm Messaging](https://identity.foundation/didcomm-messaging/spec/) was also investigated as a
 potential starting point but not selected due to unneeded complexity and lack of widespread adoption.
 
-#### Verifiable Credential Issuance
+### Verifiable Credential Issuance
 
 Dataspaces will require an interoperable way for participant agent systems to request credential issuance, renew
 credentials, and check for credential revocation. The Verifiable Credential Issuance will define a RESTful API over
@@ -75,7 +74,7 @@ the [OpenID for Verifiable Credential Issuance specification](https://openid.net
 was considered, but determined not to be sufficient, due to its focus on end-user interactions and lack of support for
 long-running issuance processes that may involve human interaction.
 
-#### Protocol Specifications and The Eclipse Dataspace Working Group
+### Protocol Specifications and The Eclipse Dataspace Working Group
 
 The protocol specifications (i.e. documents that define the message exchanges) for the Identity and Trust System will be
 transferred to the [Eclipse Dataspace Working Group](https://www.eclipse.org/org/workinggroups/dataspace-charter.php)
@@ -86,7 +85,7 @@ for standardization. The EDC will track changes to the protocol specifications a
 The decentralized Identity and Trust System will have negligible architectural impact, as this work will be an extension
 of existing EDC services. The most notable impact will be on the wire protocol used by the `Identity Hub.`
 
-#### Identity Hub
+### Identity Hub
 
 The `Identity Hub` is currently based on an early version of
 the [Decentralized Web Nodes specification](https://identity.foundation/decentralized-web-node/spec/) (DWN).
@@ -98,7 +97,7 @@ by the protocol specifications mentioned above, which will be aligned with stand
 Exchange, and W3C DID. Note that this will have no end-user impact as only the `Identity Hub` wire protocol will be
 changed.
 
-#### Issuance Service
+### Issuance Service
 
 A new `Issuance Service` will be created to support VC issuance and revocation. This service will be built on existing
 core EDC components and deployable as a standalone or embedded service.
