@@ -21,6 +21,7 @@
 - [2023-06-19 New Issue Triage Process](2023-06-19-new-issue-triage-process/)
 - [2023-06-19 Onboarding Contributors](2023-06-19-onboarding-contributors/)
 - [2023-07-06 Committer Retirements](2023-07-06-committer-retirement/)
+- [2023-09-06 Identity and Trust](2023-09-06-identity-trust/)
 
 ## Repository-specific
 
@@ -36,3 +37,4 @@
 - [Technology Azure](../../docs/submodule/Technology-Azure/docs/developer/decision-records/)
 - [Technology GCP](../../docs/submodule/Technology-GCP/docs/developer/decision-records/)
 - [Trust Framework Adoption](../../docs/submodule/TrustFrameworkAdoption/docs/developer/decision-records/)
+
