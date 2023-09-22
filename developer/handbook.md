@@ -202,6 +202,7 @@ what conditions.
 > The complete OpenAPI specification for the management API is
 > on [SwaggerHub](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api). Please select the latest version from
 > the dropdown.
+
 #### Assets
 
 Assets are containers for metadata, they do **not** contain the actual bits and bytes. Say you want to offer a file to
@@ -582,11 +583,62 @@ policy `access-policy-1234` and contract policy `contract-policy-5678`.
 
 #### Contract negotiations
 
+If a connector fulfills the [contract policy](#contract-definitions), it may initiate the negotiation of a contract for
+a particular asset. During that negotiation, both parties can send offers and counter-offers that can contain altered
+terms (= policy) as any human would in a negotiation, and the counter-party may accept or reject them.
+
+Contract negotiations have a few key aspects:
+
+- they target _one_ asset
+- they take place between a _provider_ and a _consumer_ connector
+- they cannot be changed by the user directly
+- users can only be decline, terminate or cancel them
+
+As a side note it is also important to note that contract offers are _ephemeral_ objects as they are generated
+on-the-fly for a particular participant, and they are never persisted in a database and thus cannot be queried through
+any API.
+
+Contract negotiations are asynchronous in nature. That means after initiating them, they become (potentially
+long-running) stateful processes that are advanced by an internal [state machine](#control-plane-state-machines).
+The current state of the negotiation can be queried and altered through the management API.
+
+> In the current iteration all contract offers are automatically accepted by both parties if the contract
+> policy is satisfied. This may change in the future, when manual interaction hooks are implemented.
+
+
+Please check out
+the [OpenAPI documentation](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api/0.2.1#/Policy%20Definition/createPolicyDefinition)
+for an exemplary request to initiate a negotiation. The `callbackAddresses` object is optional and can be used to get
+notified about state changes of the negotiation. Read more on callbacks in the section
+about [events and callbacks](#events-and-callbacks).
+
 #### Contract agreements
 
-#### Transfer processes
+Once a contract negotiation is successfully concluded (i.e. reaches the `FINALIZED` state), it "turns into" a contract
+agreement. Note that it is always the provider connector that gives the final approval. Contract agreements are
+immutable objects that contain the final, agreed-on policy, the ID of the asset that the contract was negotiated for,
+and the exact signing date.
+
+> Note that in future iterations contracts will be cryptographically signed to further support the need for
+> immutability and non-repudiation.
 
 #### Catalog
+
+The catalog contains the "data offerings" of a connector and one or multiple service endpoints to initiate a negotiation
+for those offerings.
+
+Every data offering is represented by
+a [`Dataset` object](https://www.w3.org/TR/vocab-dcat-2/#Class:Dataset) which contains a [policy](#policies) and
+one or multiple [`Distribution` objects](https://www.w3.org/TR/vocab-dcat-2/#Class:Distribution). A `Distribution`
+should be understood as a _variant_ or _representation_ of the `Dataset`. For instance, if a file is accessible through
+multiple transmission channels from a provider (HTTP and FTP), then each of those channels would be represented as a
+`Distribution`. Another example would be image assets that are available in different file formats (PNG, TIFF, JPEG).
+
+A [`DataService` object](https://www.w3.org/TR/vocab-dcat-2/#Class:Data_Service) specifies the endpoint where
+contract negotiations and transfers are accepted by the provider. In practice, this will be the DSP endpoint of the
+connector.
+
+#### Transfer processes
 
 #### Expressing queries with a `Criterion`
 
@@ -651,8 +703,6 @@ have to use that namespace in the `Criterion`!
 
 #### A word on JSON-LD contexts
 
-
-
 ### Control plane state machines
 
 --> gives an overview of the contract negotiation and transfer process state machines
@@ -675,6 +725,8 @@ have to use that namespace in the `Criterion`!
 
 ### Policy scopes and evaluation
 
+see [the chapter about policy scopes](#policy-evaluation-functions)
+
 ## The data plane
 
 ### Data plane selectors
@@ -693,7 +745,7 @@ have to use that namespace in the `Criterion`!
 
 ### Events and callbacks
 
---> shows how to hook into
+--> shows how to hook into the event observers, and how to use http callbacks
 
 ### The EDC JUnit framework
 
