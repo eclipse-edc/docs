@@ -640,6 +640,43 @@ connector.
 
 #### Transfer processes
 
+A `TransferProcess` is a record of the data sharing procedure between a _consumer_ and a _provider_. It percolates
+through several states (`TransferProcessStates`).
+
+Once a contract is [negotiated](#contract-negotiations)) and an agreement is [reached](#contract-agreements), the
+consumer connector may send a transfer initiate request (more on that [here](#control-plane-state-machines)). Both
+parties may provision additional resources, for example deploying a temporary object store, where the provider should
+put the data. Similarly, the provider may need to take some preparatory steps, e.g. anonymizing the data.
+
+This is sometimes referred to as the _provisioning phase_.
+
+Once that is done, the transfer begins in earnest, according to the `dataDestination`, that was passed in the initiate
+request.
+
+The Management API provides several endpoints to manipulate data transfers.
+
+##### About Data Destinations
+
+A data destination is a description of where the consumer expects to find the data after the transfer completes. In a "
+provider-push" scenario this could be an object storage container, a directory on a file system, etc. In a
+"consumer-pull" scenario this could be an API endpoint from which the consumer wants to fetch the data.
+
+A data address is a schemaless object, and the provider and the consumer need to have a common understanding of the
+required fields. For example, if the provider is supposed to put the data into a file share, the `DataAddress` object
+representing the data destination will likely contain the host URL, a path and possibly a file name. So both connectors
+need to be "aware" of that.
+
+The actual data transfer is handled by a [data plane](#the-data-plane) through extensions (called "sources" and "
+sinks"). Thus, the way to establish that "understanding" is to make sure that both parties have matching sources and
+sinks. That means, if a consumer asks to put the data in a file share, the provider must have the appropriate data plane
+extensions to be able to perform that transfer. 
+
+If either side does _not_ have the appropriate extensions loaded at runtime, the transfer process will fail. 
+
+##### Using event callbacks
+
+
+
 #### Expressing queries with a `Criterion`
 
 A `Criterion` is a normalized way of expressing a logical requirement between two operands and an operator. For example,
