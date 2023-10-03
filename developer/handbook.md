@@ -1,48 +1,48 @@
 # Developer's Handbook
 
 <!-- TOC -->
-
 * [Developer's Handbook](#developers-handbook)
-    * [Introduction](#introduction)
-        * [Terminology](#terminology)
-    * [Building a distribution](#building-a-distribution)
-        * [Perform a simple data transfer](#perform-a-simple-data-transfer)
-        * [Transfer some more data](#transfer-some-more-data)
-    * [Core concepts](#core-concepts)
-    * [The control plane](#the-control-plane)
-        * [API objects in detail](#api-objects-in-detail)
-            * [Assets](#assets)
-            * [Policies](#policies)
-                * [Policy scopes](#policy-scopes)
-                * [Policy evaluation functions](#policy-evaluation-functions)
-                * [Example: binding an evaluation function](#example-binding-an-evaluation-function)
-                * [Advanced policy concepts](#advanced-policy-concepts)
-            * [Contract definitions](#contract-definitions)
-            * [Contract negotiations](#contract-negotiations)
-            * [Contract agreements](#contract-agreements)
-            * [Transfer processes](#transfer-processes)
-            * [Catalog](#catalog)
-            * [Expressing queries with a `Criterion`](#expressing-queries-with-a-criterion)
-                * [Canonical form](#canonical-form)
-                * [Supported operators](#supported-operators)
-                * [Namespaced properties](#namespaced-properties)
-            * [A word on JSON-LD contexts](#a-word-on-json-ld-contexts)
-        * [Control plane state machines](#control-plane-state-machines)
-            * [Provisioning](#provisioning)
-        * [The extension model](#the-extension-model)
-        * [EDC dependency injection](#edc-dependency-injection)
-        * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
-    * [The data plane](#the-data-plane)
-        * [Data plane selectors](#data-plane-selectors)
-        * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
-        * [The Control API](#the-control-api)
-    * [Advanced concepts](#advanced-concepts)
-        * [Events and callbacks](#events-and-callbacks)
-        * [The EDC JUnit framework](#the-edc-junit-framework)
-        * [Automatic documentation](#automatic-documentation)
-        * [Customize the build](#customize-the-build)
-    * [Further references and specifications](#further-references-and-specifications)
-
+  * [Introduction](#introduction)
+    * [Terminology](#terminology)
+  * [Building a distribution](#building-a-distribution)
+    * [Perform a simple data transfer](#perform-a-simple-data-transfer)
+    * [Transfer some more data](#transfer-some-more-data)
+  * [Core concepts](#core-concepts)
+  * [The control plane](#the-control-plane)
+    * [API objects in detail](#api-objects-in-detail)
+      * [Assets](#assets)
+      * [Policies](#policies)
+        * [Policy scopes](#policy-scopes)
+        * [Policy evaluation functions](#policy-evaluation-functions)
+        * [Example: binding an evaluation function](#example-binding-an-evaluation-function)
+        * [Advanced policy concepts](#advanced-policy-concepts)
+      * [Contract definitions](#contract-definitions)
+      * [Contract negotiations](#contract-negotiations)
+      * [Contract agreements](#contract-agreements)
+      * [Catalog](#catalog)
+      * [Transfer processes](#transfer-processes)
+        * [About Data Destinations](#about-data-destinations)
+        * [Using event callbacks](#using-event-callbacks)
+      * [Expressing queries with a `Criterion`](#expressing-queries-with-a-criterion)
+        * [Canonical form](#canonical-form)
+        * [Supported operators](#supported-operators)
+        * [Namespaced properties](#namespaced-properties)
+      * [A word on JSON-LD contexts](#a-word-on-json-ld-contexts)
+    * [Control plane state machines](#control-plane-state-machines)
+      * [Provisioning](#provisioning)
+    * [The extension model](#the-extension-model)
+    * [EDC dependency injection](#edc-dependency-injection)
+    * [Policy scopes and evaluation](#policy-scopes-and-evaluation)
+  * [The data plane](#the-data-plane)
+    * [Data plane selectors](#data-plane-selectors)
+    * [Writing a DataSink and DataSource extension](#writing-a-datasink-and-datasource-extension)
+    * [The Control API](#the-control-api)
+  * [Advanced concepts](#advanced-concepts)
+    * [Events and callbacks](#events-and-callbacks)
+    * [The EDC JUnit framework](#the-edc-junit-framework)
+    * [Automatic documentation](#automatic-documentation)
+    * [Customize the build](#customize-the-build)
+  * [Further references and specifications](#further-references-and-specifications)
 <!-- TOC -->
 
 ## Introduction
@@ -680,6 +680,48 @@ extensions to be able to perform that transfer.
 If either side does _not_ have the appropriate extensions loaded at runtime, the transfer process will fail.
 
 ##### Using event callbacks
+
+In order to get timely updates about status changes of a transfer process, we could simply poll the management API by
+firing a `GET /{tp-id}/state` request every X amount of time. That will not only put unnecessary load on the connector,
+you may also run into rate-limiting situations, if the connector is behind a load balancer of some sort. Thus, we
+recommend using event callbacks.
+
+As shown in
+the [OpenAPI documentation](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api/0.3.1#/Transfer%20Process/initiateTransferProcess)
+they must be specified when requesting to initiate the transfer:
+
+```json
+{
+  // ...
+  "callbackAddresses": [
+    {
+      "transactional": false,
+      "uri": "http://callback/url",
+      "events": [
+        "contract.negotiation",
+        "transfer.process"
+      ],
+      "authKey": "auth-key",
+      "authCodeId": "auth-code-id"
+    }
+  ]
+  //...
+}
+```
+
+Currently, we support the following events:
+- `transfer.process.deprovisioned`
+- `transfer.process.completed`
+- `transfer.process.deprovisioningRequested`
+- `transfer.process.initiated`
+- `transfer.process.provisioned`
+- `transfer.process.provisioning`
+- `transfer.process.requested`
+- `transfer.process.started`
+- `transfer.process.terminated`
+
+The connector's event dispatcher will send invoke the webhook specified in the `uri` field passing the event
+payload as JSON object. 
 
 #### Expressing queries with a `Criterion`
 
