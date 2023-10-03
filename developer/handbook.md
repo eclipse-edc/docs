@@ -640,18 +640,24 @@ connector.
 
 #### Transfer processes
 
-A `TransferProcess` is a record of the data sharing procedure between a _consumer_ and a _provider_. It percolates
-through several states (`TransferProcessStates`).
+A `TransferProcess` is a record of the data sharing procedure between a _consumer_ and a _provider_. As they traverse
+through the system, they transition through several
+states (`TransferProcessStates`, [source](https://github.com/eclipse-edc/Connector/blob/main/spi/control-plane/transfer-spi/src/main/java/org/eclipse/edc/connector/transfer/spi/types/TransferProcessStates.java)).
 
-Once a contract is [negotiated](#contract-negotiations)) and an agreement is [reached](#contract-agreements), the
-consumer connector may send a transfer initiate request (more on that [here](#control-plane-state-machines)). Both
-parties may provision additional resources, for example deploying a temporary object store, where the provider should
-put the data. Similarly, the provider may need to take some preparatory steps, e.g. anonymizing the data.
+Once a contract is [negotiated](#contract-negotiations)) and an [agreement is reached](#contract-agreements), the
+consumer connector may send a transfer initiate request (more on that [here](#control-plane-state-machines)) to start
+the transfer. In the course of doing that, both parties may provision additional resources, for example deploying a
+temporary object store, where the provider should put the data. Similarly, the provider may need to take some
+preparatory steps, e.g. anonymizing the data before sending it out.
 
-This is sometimes referred to as the _provisioning phase_.
+This is sometimes referred to as the _provisioning phase_. If no additional provisioning is needed, the transfer process
+simply transitions through the state with a NOOP.
 
-Once that is done, the transfer begins in earnest, according to the `dataDestination`, that was passed in the initiate
-request.
+Once that is done, the transfer begins in earnest. Data is transmitted according to the `dataDestination`, that was
+passed in the initiate-request.
+
+Once the transmission has completed, the transfer process will transition to the `COMPLETED` state, or - if an error
+occurred - to the `TERMINATED` state.
 
 The Management API provides several endpoints to manipulate data transfers.
 
@@ -669,13 +675,11 @@ need to be "aware" of that.
 The actual data transfer is handled by a [data plane](#the-data-plane) through extensions (called "sources" and "
 sinks"). Thus, the way to establish that "understanding" is to make sure that both parties have matching sources and
 sinks. That means, if a consumer asks to put the data in a file share, the provider must have the appropriate data plane
-extensions to be able to perform that transfer. 
+extensions to be able to perform that transfer.
 
-If either side does _not_ have the appropriate extensions loaded at runtime, the transfer process will fail. 
+If either side does _not_ have the appropriate extensions loaded at runtime, the transfer process will fail.
 
 ##### Using event callbacks
-
-
 
 #### Expressing queries with a `Criterion`
 
