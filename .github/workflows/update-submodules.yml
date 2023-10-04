@@ -29,7 +29,6 @@ jobs:
           branch: ${{ env.NEW_BRANCH }}
           create_branch: true
           commit_message: ${{ env.COMMIT_MESSAGE }}
-          commit_options: '--reset-author' # https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---reset-author
       - name: Create a pull request
         id: create_a_pull_request
         uses: vsoch/pull-request-action@master
