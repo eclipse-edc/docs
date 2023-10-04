@@ -17,9 +17,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           submodules: "true"
+      - name: Pull Remote Changes
+        run: git pull
       - name: Update submodule
         run: |
-          git pull
           git submodule update --init --remote
           echo "NEW_BRANCH=update-submodules-${GITHUB_SHA}" >> $GITHUB_ENV
       - name: Commit changes
