@@ -36,9 +36,3 @@ jobs:
           PULL_REQUEST_BRANCH: "main"
           PULL_REQUEST_FROM_BRANCH: ${{ env.NEW_BRANCH }}
           PULL_REQUEST_TITLE: ${{ env.COMMIT_MESSAGE }}
-      - name: Assign an author to a PR
-        uses: actions-ecosystem/action-add-assignees@v1
-        with:
-          assignees: ${{ github.actor }}
-          number: ${{ steps.create_a_pull_request.outputs.pull_request_number }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
