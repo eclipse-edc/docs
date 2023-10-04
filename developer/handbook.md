@@ -665,7 +665,8 @@ The Management API provides several endpoints to manipulate data transfers.
 
 A data destination is a description of where the consumer expects to find the data after the transfer completes. In a "
 provider-push" scenario this could be an object storage container, a directory on a file system, etc. In a
-"consumer-pull" scenario this could be an API endpoint from which the consumer wants to fetch the data.
+"consumer-pull" scenario this would be a placeholder, that does not contain any information about the destination, as
+the provider "decides" on which endpoint he makes the data available.
 
 A data address is a schemaless object, and the provider and the consumer need to have a common understanding of the
 required fields. For example, if the provider is supposed to put the data into a file share, the `DataAddress` object
@@ -677,7 +678,7 @@ sinks"). Thus, the way to establish that "understanding" is to make sure that bo
 sinks. That means, if a consumer asks to put the data in a file share, the provider must have the appropriate data plane
 extensions to be able to perform that transfer.
 
-If either side does _not_ have the appropriate extensions loaded at runtime, the transfer process will fail.
+If the provider connector does _not_ have the appropriate extensions loaded at runtime, the transfer process will fail.
 
 ##### Using event callbacks
 
@@ -710,6 +711,7 @@ they must be specified when requesting to initiate the transfer:
 ```
 
 Currently, we support the following events:
+
 - `transfer.process.deprovisioned`
 - `transfer.process.completed`
 - `transfer.process.deprovisioningRequested`
@@ -721,7 +723,7 @@ Currently, we support the following events:
 - `transfer.process.terminated`
 
 The connector's event dispatcher will send invoke the webhook specified in the `uri` field passing the event
-payload as JSON object. 
+payload as JSON object.
 
 #### Expressing queries with a `Criterion`
 
