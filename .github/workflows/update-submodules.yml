@@ -29,6 +29,9 @@ jobs:
           branch: ${{ env.NEW_BRANCH }}
           create_branch: true
           commit_message: ${{ env.COMMIT_MESSAGE }}
+          commit_user_name: eclipse-edc-bot
+          commit_user_email: edc-bot@eclipse.org
+          commit_author: eclipse-edc-bot <edc-bot@eclipse.org>
       - name: Create a pull request
         id: create_a_pull_request
         uses: vsoch/pull-request-action@master
