@@ -17,6 +17,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           submodules: "true"
+      - name: Pull Remote Changes
+        run: git pull
       - name: Update submodule
         run: |
           git submodule update --init --remote
@@ -27,6 +29,7 @@ jobs:
           branch: ${{ env.NEW_BRANCH }}
           create_branch: true
           commit_message: ${{ env.COMMIT_MESSAGE }}
+          commit_options: '--reset-author' # https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---reset-author
       - name: Create a pull request
         id: create_a_pull_request
         uses: vsoch/pull-request-action@master
@@ -35,9 +38,3 @@ jobs:
           PULL_REQUEST_BRANCH: "main"
           PULL_REQUEST_FROM_BRANCH: ${{ env.NEW_BRANCH }}
           PULL_REQUEST_TITLE: ${{ env.COMMIT_MESSAGE }}
-      - name: Assign an author to a PR
-        uses: actions-ecosystem/action-add-assignees@v1
-        with:
-          assignees: ${{ github.actor }}
-          number: ${{ steps.create_a_pull_request.outputs.pull_request_number }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
