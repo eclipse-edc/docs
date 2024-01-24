@@ -94,10 +94,11 @@ parallel.
 **Please note**: Not every project may be mentioned here. If you want to add one, please feel free to open a PR
 or provide us with information via an [adoption request](submodule/GitHub/contributing/adoption.md).
 
-| Name       | Description |
-| :--------- | :---------- |
-| Gaia-X     | The EDC allows organizations to exchange data compliant to rules and policies of the Gaia-X AISBL according to the corresponding Trust Framework |
-| Catena-X   | Uses the EDC as Connector component to build a data space between participants |
-| Tractus-X  | Eclipse Foundation OSS project initiated by Catena-X consortia, where specific (Catena-X related) EDC-extensions can be implemented under clear governance and rules |
+| Name      | Description                                                                                                                                                          |
+|:----------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Gaia-X    | The EDC allows organizations to exchange data compliant to rules and policies of the Gaia-X AISBL according to the corresponding Trust Framework                     |
+| Catena-X  | Uses the EDC as Connector component to build a data space between participants                                                                                       |
+| Tractus-X | Eclipse Foundation OSS project initiated by Catena-X consortia, where specific (Catena-X related) EDC-extensions can be implemented under clear governance and rules |
+| Eona-X    | Uses the EDC components to build a Mobility & Tourism dataspace                                                                                                      |
 
 To see EDC adoptions, please take a look at our [known friends](submodule/GitHub/KNOWN_FRIENDS.md) list.
