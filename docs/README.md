@@ -101,4 +101,4 @@ or provide us with information via an [adoption request](submodule/GitHub/contri
 | Tractus-X | Eclipse Foundation OSS project initiated by Catena-X consortia, where specific (Catena-X related) EDC-extensions can be implemented under clear governance and rules |
 | Eona-X    | Uses the EDC components to build a Mobility & Tourism dataspace                                                                                                      |
 
-To see EDC adoptions, please take a look at our [known friends](submodule/GitHub/KNOWN_FRIENDS.md) list.
+To see EDC adoptions, please take a look at our [known friends](https://github.com/eclipse-edc/docs/blob/main/KNOWN_FRIENDS.md) list.
