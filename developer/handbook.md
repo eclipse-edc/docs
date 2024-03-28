@@ -199,9 +199,7 @@ what conditions.
 > specifications for [ODRL](https://www.w3.org/TR/odrl-model/) and [DCAT](https://www.w3.org/TR/vocab-dcat-2/).
 
 
-> The complete OpenAPI specification for the management API is
-> on [SwaggerHub](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api). Please select the latest version from
-> the dropdown.
+> The complete OpenAPI specification for the management API can be found [here](https://eclipse-edc.github.io/Connector/openapi/management-api/).
 
 #### Assets
 
@@ -474,7 +472,7 @@ public class HeadquarterPolicyExtension implements ServiceExtension {
 Let's accept for now, that `@Inject` is how [EDC achieves dependency injection](#edc-dependency-injection).
 This example assumes, a policy object exists in the system, that has a `leftOperand = headquarter_function`. For details
 on how to create policies, please check out
-the [OpenAPI documentation](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api/0.2.1#/Policy%20Definition/createPolicyDefinition).
+the [OpenAPI documentation](https://eclipse-edc.github.io/Connector/openapi/management-api/#/Policy%20Definition/createPolicyDefinition).
 
 ##### Advanced policy concepts
 
@@ -607,7 +605,7 @@ The current state of the negotiation can be queried and altered through the mana
 
 
 Please check out
-the [OpenAPI documentation](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api/0.2.1#/Policy%20Definition/createPolicyDefinition)
+the [OpenAPI documentation](https://eclipse-edc.github.io/Connector/openapi/management-api/#/Policy%20Definition/createPolicyDefinition)
 for an exemplary request to initiate a negotiation. The `callbackAddresses` object is optional and can be used to get
 notified about state changes of the negotiation. Read more on callbacks in the section
 about [events and callbacks](#events-and-callbacks).
@@ -688,7 +686,7 @@ you may also run into rate-limiting situations, if the connector is behind a loa
 recommend using event callbacks.
 
 As shown in
-the [OpenAPI documentation](https://app.swaggerhub.com/apis/eclipse-edc-bot/management-api/0.3.1#/Transfer%20Process/initiateTransferProcess)
+the [OpenAPI documentation](https://eclipse-edc.github.io/Connector/openapi/management-api/#/Transfer%20Process/initiateTransferProcess)
 they must be specified when requesting to initiate the transfer:
 
 ```json

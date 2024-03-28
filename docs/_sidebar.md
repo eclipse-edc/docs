@@ -14,6 +14,13 @@ free to add sections and subsections to this sidebar.)
 - [Connector](/submodule/Connector/)
   - [Documentation](/submodule/Connector/docs/developer/)
   - [Decision Records](/submodule/Connector/docs/developer/decision-records/)
+  - [Modules](https://eclipse-edc.github.io/Connector/autodoc/)
+  - Api
+    - [Management](https://eclipse-edc.github.io/Connector/openapi/management-api/)
+    - [Observability](https://eclipse-edc.github.io/Connector/openapi/observability-api/)
+    - [Control](https://eclipse-edc.github.io/Connector/openapi/control-api/)
+    - [DSP](https://eclipse-edc.github.io/Connector/openapi/dsp-api/)
+    - [Public](https://eclipse-edc.github.io/Connector/openapi/public-api/)
 
 - [Data Dashboard](/submodule/DataDashboard/)
   - [Documentation](/submodule/DataDashboard/docs/developer/)
@@ -54,4 +61,3 @@ free to add sections and subsections to this sidebar.)
 &nbsp;&nbsp;**Links**
 
 - [Known Friends](/documentation/KNOWN_FRIENDS.md)
-- [SwaggerHub](https://app.swaggerhub.com/search?owner=eclipse-edc-bot)
