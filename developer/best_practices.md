@@ -13,7 +13,7 @@ is applicable everywhere. You know your use case best.
 This document is not an exhaustive list of prescribed steps, that will shield adopters from any conceivable harm or
 danger, but rather should serve as starting point for engineers to build upon.
 
-Finally, it should go without saying that the software of the EDC project is distributed "as is", and committers of EDC
+Finally, it should go without saying that the software of the EDC project is distributed "as is" and committers of EDC
 take no responsibility or liability, direct or indirect, for any harm or damage caused by the use of it. This document
 does not change that.
 
@@ -33,7 +33,7 @@ However, we advise __extreme caution__ when making APIs accessible via the inter
 the data plane's public API should be accessible via the internet, the others (management API, signaling API,...) are
 intended _only for local network access_.
 
-There are those who think that only HTTPS/TLS connections should be used, even between pods in a Kubernetes cluster.
+Company security policies might require that only HTTPS/TLS connections should be used, even between pods in a Kubernetes cluster.
 While the EDC project makes no argument pro or contra, that is certainly an idea worth considering in high security
 environments.
 
@@ -49,7 +49,7 @@ authorization. That is handled by the [DSP protocol itself]().
 
 We have a rudimentary token-based API security module available, which can be used to secure the connection API
 gateway <-> connector if so desired.
-It should be noted that it is _not designed to act a port-of-entry!_
+It should be noted that it is _not designed to act as a port-of-entry!_
 
 > TL;DR: don't expose any APIs if you can help it, but if you must, use available tools to harden the ingress
 
@@ -76,7 +76,7 @@ authentication, authorization and request throttling.
 
 ### 1.4 A word on authentication and authorization
 
-EDC does not have a concept of a "user" as many client-facing applications do. In terms of identity, the connector
+EDC does not have a concept of a "user account" as many client-facing applications do. In terms of identity, the connector
 itself represents a participant in a dataspace. That means, that client-consumable APIs such as the Management API only
 have rudimentary security. This is by design and __must__ be solved out-of-band.
 
@@ -122,10 +122,10 @@ Further, the roles of the technical user for the connector should be limited to 
 and `DELETE`. There is no reason for that user to have permissions to modify databases, tables, permissions or execute
 other DDL statements.
 
-### 1.7 Store sensitive data in a Vault
+### 1.7 Store sensitive data in a vault
 
 While the default behaviour of EDC is that configuration values are taken either from environment variables, system
-properties or from configuration extensions, it is highly recommended to store sensitive data in a `Vault` when
+properties or from configuration extensions, it is highly recommended to store sensitive data in a `vault` when
 developing EDC extensions.
 
 Here is a (non-exhaustive) list of examples of such sensitive values:
@@ -137,7 +137,7 @@ Here is a (non-exhaustive) list of examples of such sensitive values:
 - credentials for other third-party services, even if temporary
 
 Sensitive values should not be passed through multiple layers of code. Instead, they should be referenced by their
-alias, and be resolved from the `Vault` wherever they are used. Do not store sensitive data as class members but use
+alias, and be resolved from the `vault` wherever they are used. Do not store sensitive data as class members but use
 local variables that are garbage-collected when leaving execution scope.
 
 ## 2. General recommendations
@@ -172,7 +172,7 @@ is well integrated with GitHub actions, but this is not an endorsement. Alternat
 ### 2.3 Use database persistence wherever possible
 
 While the connector runtime provides in-memory persistence by default, it is recommended to use database persistence in
-production scenarios, if possible. Hosting the persistence of several modules (e.g. AssetIndex, PolicyDefinitionStore)
+production scenarios, if possible. Hosting the persistence of several modules (e.g. AssetIndex and PolicyDefinitionStore)
 in the same database is generally OK.
 
 This is because although memory stores are fast and easy to use, they have certain drawbacks, for instance:
