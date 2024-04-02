@@ -21,6 +21,7 @@ free to add sections and subsections to this sidebar.)
     - [Control](https://eclipse-edc.github.io/Connector/openapi/control-api/)
     - [DSP](https://eclipse-edc.github.io/Connector/openapi/dsp-api/)
     - [Public](https://eclipse-edc.github.io/Connector/openapi/public-api/)
+  - [Best Practices](../developer/best_practices.md)
 
 - [Data Dashboard](/submodule/DataDashboard/)
   - [Documentation](/submodule/DataDashboard/docs/developer/)

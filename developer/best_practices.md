@@ -41,11 +41,11 @@ The key take-away is that all of EDC's APIs - if accessible outside the local ne
 through separate software components such as API gateways or load balancers. These are specialized tools with sole
 purpose of performing authentication, authorization, rate limiting, IP blacklisting/whitelisting etc.
 
-In the particular case of the DSP API, the same principle holds, although with the exception of authentication and
-authorization. That is handled by the [DSP protocol itself]().
-
 There is a plethora of ready-made components available, both commercial and open-source, therefor the EDC project _will
 not provide that functionality._ Requests and issues to that effect will be ignored.
+
+In the particular case of the DSP API, the same principle holds, although with the exception of authentication and
+authorization. That is handled by the [DSP protocol itself]().
 
 We have a rudimentary token-based API security module available, which can be used to secure the connection API
 gateway <-> connector if so desired.
@@ -153,7 +153,8 @@ Snapshots are less stable, less tested and less reliable than release versions a
 That said, we realize that sometimes living on the bleeding edge of technology is thrilling, or in some circumstances
 even necessary. EDC components publish a `-SNAPSHOT` build on every commit the `main` branch, so there
 could be several such builds per day, each overwriting the previous one. In addition, we publish nightly builds, that
-are versioned `<VERSION>-<YYYYMMDD>-SNAPSHOT` and those don't get overwritten.
+are versioned `<VERSION>-<YYYYMMDD>-SNAPSHOT` and those don't get overwritten. For more information please refer to the 
+[respective documentation](https://eclipse-edc.github.io/docs/#/documentation/developer/releases).
 
 ### 2.2 Upgrade regularly
 

@@ -4,6 +4,7 @@
 - [Style Guide](contributing/styleguide.md)
 - [Coding Principles](contributing/coding-principles.md)
 - [Decision Records](decision-records/)
+- [Best Practices](./best_practices.md)
 
 More links:
 - [Autodoc Gradle plugin](autodoc.md)
