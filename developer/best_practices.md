@@ -45,11 +45,11 @@ There is a plethora of ready-made components available, both commercial and open
 not provide that functionality._ Requests and issues to that effect will be ignored.
 
 In the particular case of the DSP API, the same principle holds, although with the exception of authentication and
-authorization. That is handled by the [DSP protocol itself]().
+authorization. That is handled by the [DSP protocol itself](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol).
 
 We have a rudimentary token-based API security module available, which can be used to secure the connection API
 gateway <-> connector if so desired.
-It should be noted that it is _not designed to act as a port-of-entry!_
+It should be noted that it is _not designed to act as a ingress point!_
 
 > TL;DR: don't expose any APIs if you can help it, but if you must, use available tools to harden the ingress
 
