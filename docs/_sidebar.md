@@ -8,6 +8,7 @@ free to add sections and subsections to this sidebar.)
 
 - [Contributing](/documentation/CONTRIBUTING.md)
 - [Hands-on](/hands-on.md)
+- [Best Practices](../developer/best-practices)
 
 &nbsp;&nbsp;**Components**
 
