@@ -1,4 +1,4 @@
-# Decision: separation build pipelines for Technology Repositories
+# Decision: Separate build pipelines for Technology Repositories
 
 ## Definition of terms
 
@@ -11,8 +11,8 @@ For the purposes of this document, the following definition of terms apply:
 
 ## Decision
 
-We will separate the build and release pipelines for the technology repositories. That means, that continuous builds,
-nightly builds and release builds can technically happen separate from the core components builds.
+We will separate the build and release pipelines for the technology repositories. That means continuous builds,
+nightly builds, and release builds can technically happen separately from the core components builds.
 
 To achieve that, every technology repository will get its own Maven sub-group-id:
 
