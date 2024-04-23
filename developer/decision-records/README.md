@@ -22,6 +22,8 @@
 - [2023-06-19 Onboarding Contributors](2023-06-19-onboarding-contributors/)
 - [2023-07-06 Committer Retirements](2023-07-06-committer-retirement/)
 - [2023-09-06 Identity and Trust](2023-09-06-identity-trust/)
+- [2023-09-12 Publishing from GitHub](2023-09-12-publishing_from_github/)
+- [2024-04-19 Separating Release process of Technology repos](2024-04-19-tech-repo-split/)
 
 ## Repository-specific
 
