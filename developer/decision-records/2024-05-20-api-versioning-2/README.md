@@ -35,7 +35,7 @@ the notable exclusions of DSP.
    This API should not be exposed outside the container/pod. This is currently located under the `"default"` context.
 3. the `"control"` context: contains endpoints that are designed for component-to-component interaction, for
    example [Data Plane Signaling](https://github.com/eclipse-edc/Connector/tree/main/docs/developer/decision-records/2023-12-12-dataplane-signaling)
-   between control plane and data plane.
+   between control plane and data plane. These APIs are not intended to be exposed to the internet or consumed by third-party applications.
 4. the `"public"` context: this is the public-facing endpoint(s) exposed by the dataplane for HTTP-PULL transfers.
 5. the `"sts"` context: the endpoints that are exposed by the Secure Token Service
 6. the `"version"` context: contains the endpoint to access version information,
@@ -59,7 +59,7 @@ provide version information about each API that is deployed in the current runti
 can obtain that information:
 
 ```shell
-GET /api/version
+GET /api/version/v1/
 ```
 
 returns a response like the following:
@@ -70,26 +70,26 @@ returns a response like the following:
       {
          "version": "3.0.0",
          "urlPath": "/v3",
-         "last_updated": "2024-05-20T14:02:41Z"
+         "lastUpdated": "2024-05-20T14:02:41Z"
       },
       {
          "version": "2.0.4",
          "urlPath": "/v2",
-         "last_updated": "2023-06-18T18:00:00Z"
+         "lastUpdated": "2023-06-18T18:00:00Z"
       }
    ],
    "control": [
       {
          "version": "1.0.2",
          "urlPath": "/v1",
-         "last_updated": "2023-01-01T12:00:00Z"
+         "lastUpdated": "2023-01-01T12:00:00Z"
       }
    ],
    "version": [
       {
          "version": "1.0.0",
          "urlPath": "/v1",
-         "last_updated": "2024-05-20T00:00:00Z"
+         "lastUpdated": "2024-05-20T00:00:00Z"
       }
    ]
 }
@@ -107,6 +107,8 @@ group contributes a version record into a central directory, which is then expos
 public record VersionRecord(String version, String urlPath, Instant lastUpdated) {
 }
 ```
+
+Note that `lastUpdated` refers to the time when the developer bumped the version. This will likely have to be done manually.
 
 ### Runtime view of APIs
 
