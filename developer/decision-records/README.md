@@ -24,6 +24,7 @@
 - [2023-09-06 Identity and Trust](2023-09-06-identity-trust/)
 - [2023-09-12 Publishing from GitHub](2023-09-12-publishing_from_github/)
 - [2024-04-19 Separating Release process of Technology repos](2024-04-19-tech-repo-split/)
+- [2024-05-27 EDC Maturity Levels and Deprecation Policy](2024-05-27-maturity-levels-deprecation-policy)
 
 ## Repository-specific
 
