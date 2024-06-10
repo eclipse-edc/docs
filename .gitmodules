@@ -19,9 +19,6 @@
 [submodule "docs/submodule/Publications"]
 	path = docs/submodule/Publications
 	url = https://github.com/eclipse-edc/Publications.git
-[submodule "docs/submodule/RegistrationService"]
-	path = docs/submodule/RegistrationService
-	url = https://github.com/eclipse-edc/RegistrationService.git
 [submodule "docs/submodule/GradlePlugins"]
 	path = docs/submodule/GradlePlugins
 	url = https://github.com/eclipse-edc/GradlePlugins.git
@@ -34,6 +31,7 @@
 [submodule "docs/documentation"]
 	path = docs/documentation
 	url = https://github.com/eclipse-edc/docs.git
+	shallow = true
 [submodule "docs/samples"]
 	path = docs/samples
 	url = https://github.com/eclipse-edc/Samples.git
