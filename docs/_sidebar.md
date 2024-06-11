@@ -43,10 +43,6 @@ free to add sections and subsections to this sidebar.)
   - [Documentation](/submodule/MinimumViableDataspace/docs/developer/)
   - [Decision Records](/submodule/MinimumViableDataspace/docs/developer/decision-records/)
 
-- [Registration Service](/submodule/RegistrationService/)
-  - [Documentation](/submodule/RegistrationService/docs/developer/)
-  - [Decision Records](/submodule/RegistrationService/docs/developer/decision-records/)
-
 - [Trust Framework Adoption](/submodule/TrustFrameworkAdoption/)
   - [Documentation](/submodule/TrustFrameworkAdoption/docs/developer/)
   - [Decision Records](/submodule/TrustFrameworkAdoption/docs/developer/decision-records/)
