@@ -2,14 +2,13 @@
 
 In order to maintain a coherent code style throughout the project we ask every contributor to adhere to a few simple
 style guidelines. We assume most developers will use at least something like `vim` and therefore have support for
-automatic code formatting, we are not going to list the guidelines here. If you absolutely want to take a look, checkout
-the [config written in XML](../../resources/edc-checkstyle-config.xml).
+automatic code formatting, we are not going to list the guidelines here.
 
 ## Checkstyle configuration
 
 Checkstyle is a [tool](https://checkstyle.sourceforge.io/) that can statically analyze your source code to check against
-a set of given rules. Those rules are formulated in an [XML document](../../resources/edc-checkstyle-config.xml). Many modern
-IDEs have a plugin available for download that runs in the background and does code analysis.
+a set of given rules. Those rules are formulated in an XML document (you can find it in every code repository in the EDC organization).
+Many modern IDEs have a plugin available for download that runs in the background and does code analysis.
 
 Our checkstyle config is based off of the [Google Style](https://checkstyle.sourceforge.io/google_style.html) with a few
 additional rules such as the naming of constants and Types.
@@ -53,10 +52,10 @@ If you absolutely want to make sure that no piece of ever-so-slightly malformed 
 advise you to use the [SaveActions plugin](https://plugins.jetbrains.com/plugin/7642-save-actions) for IntelliJ IDEA. It
 takes care that your code is always correctly formatted. Unfortunately SaveActions has no export feature, so please just
 copy this configuration:
-![](../../resources/save_actions_screenshot.png)
+![](save_actions_screenshot.png)
 
 ## [Optional] Generic `.editorConfig`
 
-For most other editors and IDEs we've supplied an [.editorConfig](../../resources/edc-codestyle.editorconfig) file that can be
+For most other editors and IDEs we've supplied an `.editorConfig` file for every repository that can be
 placed at the appropriate location. The specific location will largely depend on your editor and your OS, please refer
 to the [official documentation](https://editorconfig.org) for details.
