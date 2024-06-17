@@ -58,37 +58,6 @@ As an open source project hosted by the Eclipse Foundation, the EDC provides a g
 widely-deployed cloud environments (AWS, Azure, GCP, OTC, etc.) "out-of-the-box" and can easily be extended for
 more customized environments, while avoiding any intellectual property rights (IPR) headaches.
 
-## Statement: EDC vs. DSC
-
-_Also to be read on [GitHub](https://github.com/eclipse-edc/DataSpaceConnector/discussions/1037)._
-
-**The Eclipse Dataspace Components expand and improve the Dataspace Connector (DSC) as a follow-up development
-by an OSS community that is being contributed to the various initiatives that are involved in building data spaces.
-Both connectors do _not_ have the same codebase, but follow the same ideas of sovereign data spaces.**
-
-The DSC is a component previously developed by Fraunhofer ISST. The goal was to build an IDS-compliant connector
-driven by a community (e.g., from initiatives as Catena-X, Gaia-X, Mobility Data Space) as OSS to foster distribution
-and usage. While some discussions with several partner organizations begin/mid last year, it became very clear that
-the underlying governance and rules for contributions did not fit the requirements to form such a community and work
-on the code together due to questions regarding intellectual property (IP), licensing, etc.
-
-As a solution, partners agreed in June '21 to create a project within the Eclipse Foundation (EF), since EF provides
-clear governance structures and rules allowing exactly the collaboration and community building, it was aimed for.
-While the transfer process and meetings with initial committers (among others), the architecture was rethought to
-directly address future requirements in terms of applicability, robustness, scaling, etc. A much-discussed issue
-dealt with the limitation to a single data protocol such as the IDS vs. a solution that can support multiple such
-protocols. The decision fell on the latter and so the EDC is now developed based on a new architecture and design
-principles but based on available parts (like the DSC) that were transferred as initial contributions to the EF
-(see the [project's proposal](https://projects.eclipse.org/proposals/eclipse-dataspace-connector)). This time
-with a [community of various companies](https://projects.eclipse.org/projects/technology.edc/who)
-that bring in requirements from different initiatives like Catena-X, Eona-X, IDSA, Gaia-X, or MDS, and work on
-a decentralized data space implementation based on a data space connector that provides capabilities for data
-exchange and extensibility to various shared service implementations (catalog, identity, usage control, logging, etc.)
-through interfaces. Thereby, the EDC can support IDS(A)-based components like the DAPS (Identity), or Metadata Broker
-(Catalog) as well as other approaches like WEB-DID (Identity) or Federated Catalog (Catalog). All with the same core
-to enable organizations to use a single technology to participate in multiple data spaces/ecosystems/federations in
-parallel.
-
 ## Correlating projects
 
 **Please note**: Not every project may be mentioned here. If you want to add one, please feel free to open a PR
