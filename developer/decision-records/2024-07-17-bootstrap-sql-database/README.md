@@ -11,7 +11,7 @@ Note that this is not a fully-fledged migration solution, as it will not provide
 Currently, users of EDC have to come up with their very own way to create database schemas whenever they deploy a connector. While this may be acceptable (and even desired) in large-scale production environments, where dedicated database engineering teams are available that also perform data migration, it creates a considerable barrier of entry for new adopters of EDC. 
 To even spin up a demo or a proof-of-concept connector that uses PostgreSQL, developers have to also find a way to create the database structure. While it is not particularly hard to do, it needlessly makes life harder in these situations. 
 
-As an option, EDC will offer a config switch `edc.database.schema.autocreate=true|false`, that globally enables or disables the automatic bootstrapping of the database.
+As an option, EDC will offer a config switch `edc.sql.schema.autocreate=true|false`, that globally enables or disables the automatic bootstrapping of the database.
 
 ## Approach
 
