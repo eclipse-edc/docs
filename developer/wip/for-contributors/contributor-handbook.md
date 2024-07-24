@@ -3,7 +3,7 @@
 ## 0. Intended audience
 
 This document is aimed at software developers who have already ingested the [adopter documentation](../for-adopters/)
-and want to contribute code to the Eclipse Dataspace Connector project.
+and want to contribute code to the Eclipse Dataspace Components project.
 
 Its purpose is to explain in greater detail the core concepts of EDC. After reading through it, readers should have a
 good understanding of EDCs inner workings, implementation details and some of the advanced concepts.
