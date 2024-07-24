@@ -33,7 +33,8 @@ Further, the following tools are required:
 - CLI tools like `curl` and `git`
 
 This guide will use CLI tools as common denominator, but in many cases graphical alternatives exist (e.g. Postman,
-Insomnia, some database client, etc.), and most developers will likely use IDEs like IntelliJ or VSCode. We are of course aware of them and
+Insomnia, some database client, etc.), and most developers will likely use IDEs like IntelliJ or VSCode. We are of
+course aware of them and
 absolutely recommend their use, but we simply cannot cover and explain every possible combination of OS, tool
 and tool version.
 
@@ -49,7 +50,29 @@ and tool version.
   are sometimes used synonymously
 - connector: a control plane runtime and 1...N data plane runtimes. Sometimes used interchangeably with "distribution".
 
-### 1.3 Coding principles
+### 1.3 Architectural and coding principles
+
+When EDC was originally created, there were a few fundamental architectural principles around which we designed and
+implemented all dataspace components. These include:
+
+- **asynchrony**: all external mutations of internal data structures happen in an asynchronous fashion. While the REST
+  requests to trigger the mutations may still be synchronous, the actual state changes happen in an asynchronous and
+  persistent way. For example starting a contract negotiation through the API will only return the negotiation's ID, and
+  the control plane will cyclically advance the negotiation's state.
+- **single-thread processing**: the control plane is designed around a set of
+  sequential [state machines](#221-state-machines), that employ pessimistic locking to guard against race conditions and
+  other problems.
+- **idempotency**: requests, that do not trigger a mutation, are idempotent. The same is true when provisioning external
+  resources.
+- **error-tolerance**: the design goal of the control plane was to favor correctness and reliability over (low) latency.
+  That means, even if a communication partner may not be reachable due to a transient error, it is designed to cope with
+  that error and attempt to overcome it.
+
+Prospective contributors to the Eclipse Dataspace Components are well-advised to follow these principles
+and build their applications around them.
+
+There are other, less technical principles of EDC such as simplicity and self-contained-ness. We are extremely careful
+when adding third-party libraries or technologies to maintain a simple, fast and un-opinionated platform.
 
 Take a look at our [coding principles](../../contributing/coding-principles.md) and
 our [styleguide](../../contributing/styleguide.md).
