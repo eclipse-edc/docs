@@ -1,6 +1,6 @@
 Many organizations face the challenge of securely sharing data with their partners or other trusted third parties. In
 the past, this has been the realm of proprietary EDI solutions. EDC is an alternative to these systems built on the
-concept of [dataspaces](). EDC is a set of components that enable developers to create dataspaces using the following
+concept of [dataspaces](https://dataspace.eclipse.org/). EDC is a set of components that enable developers to create dataspaces using the following
 building blocks:
 
 - **Identity service** for managing and verifying organizational credentials using `dids`
