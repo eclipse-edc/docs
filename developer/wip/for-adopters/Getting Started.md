@@ -3,7 +3,7 @@ the past, this has been the realm of proprietary EDI solutions. EDC is an altern
 concept of [dataspaces](https://dataspace.eclipse.org/). EDC is a set of components that enable developers to create dataspaces using the following
 building blocks:
 
-- **Identity service** for managing and verifying organizational credentials using `dids`
+- **Identity service** for managing and verifying organizational credentials using [DIDs](https://www.w3.org/TR/did-core/)
   and `W3C Verifiable Credentials` or OAuth2 tokens.
 - **Catalog service** for publishing and securing assets that can be shared with other organizations.
 - **Negotiation service** for the automated creation and processing of data usage agreements that grant access to data.
