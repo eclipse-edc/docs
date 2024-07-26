@@ -49,7 +49,7 @@ section provides a quick overview of the key EDC components.
 
 ### The Connector
 
-The Connector is a pair of components that *control* data sharing and *execute* data transfer. These components are the
+The Connector is a pair of components that _control_ data sharing and _execute_ data transfer. These components are the
 **_Control Plane_** and **_Data Plane,_** respectively. In keeping with EDC's modular design philosophy, connector
 components may be deployed in a single monolith (for simple use cases) or provisioned as clusters of individual
 services. It is recommended to separate the Control Plane and Data Plane so they can be individually managed and scaled.
