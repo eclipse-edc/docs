@@ -46,7 +46,7 @@
 
 ## 0. Intended audience
 
-This document is aimed at software developers who have already ingested the [adopter documentation](../for-adopters) and
+This document is aimed at software developers who have already read the [adopter documentation](../for-adopters) and
 want to contribute code to the Eclipse Dataspace Components project.
 
 Its purpose is to explain in greater detail the core concepts of EDC. After reading through it, readers should have a
@@ -170,7 +170,7 @@ schema enforcement beyond a very basic validation. Read [chapter 2.6](#26-servic
 custom validators.
 
 A few things must be noted. First, while there isn't a _strict requirement_ for the `@id` to be a UUID, we highly
-recommend it. Hint: go with the JDK `UUID` implementation.
+recommend using the JDK `UUID` implementation.
 
 Second, _never_ store access credentials such as passwords, tokens, keys etc. in the `dataAddress` or even the
 `privateProperties` object. While the latter does not get serialized over DSP, both properties are persisted in the
@@ -269,7 +269,7 @@ targeting the `sw:faction` field from the example above would look like this:
 #### 2.1.2 Policies
 
 Policies are the EDC way of expressing that certain conditions may, must or must not be satisfied in certain situations.
-In that sense, policies are used to express what requirements a subject (e.g. a communication partner) must fulfill in
+Policies are used to express what requirements a subject (e.g. a communication partner) must fulfill in
 order to be able to perform an action. For example, that the communication partner must be headquartered in the European
 Union.
 
