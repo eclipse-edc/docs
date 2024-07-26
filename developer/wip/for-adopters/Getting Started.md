@@ -4,7 +4,7 @@ concept of [dataspaces](https://dataspace.eclipse.org/). EDC is a set of compone
 building blocks:
 
 - **Identity service** for managing and verifying organizational credentials using [DIDs](https://www.w3.org/TR/did-core/)
-  and `W3C Verifiable Credentials` or OAuth2 tokens.
+  and [W3C Verifiable Credentials](https://www.w3.org/TR/vc-data-model/) or OAuth2 tokens.
 - **Catalog service** for publishing and securing assets that can be shared with other organizations.
 - **Negotiation service** for the automated creation and processing of data usage agreements that grant access to data.
 - **Data transfer and monitoring services** for automatically initiating and managing data transfers using off-the-shelf
