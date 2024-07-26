@@ -42,7 +42,7 @@ environment in a few minutes.
 
 ## Overview: Key Components
 
-EDC is architected as modules called ***extensions*** that can be combined and customized to create ***components***
+EDC is architected as modules called _extensions_ that can be combined and customized to create _components_
 that perform specific tasks. These components (the "C" in EDC) are **not** what is commonly referred to as "
 microservices." Rather, EDC components may be deployed as separate services or collocated in a runtime process. This
 section provides a quick overview of the key EDC components.
