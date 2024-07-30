@@ -1,48 +1,51 @@
 # Contributor Documentation
 
 <!-- TOC -->
-
-- [Contributor Documentation](#contributor-documentation)
-  - [0. Intended audience](#0-intended-audience)
-  - [1. Getting started](#1-getting-started)
-    - [1.1 Prerequisites](#11-prerequisites)
-    - [1.2 Terminology](#12-terminology)
-    - [1.3 Architectural and coding principles](#13-architectural-and-coding-principles)
-  - [2. The control plane](#2-the-control-plane)
-    - [2.1 Entities](#21-entities)
-      - [2.1.1 Assets](#211-assets)
-      - [2.1.2 Policies](#212-policies)
-        - [2.1.2.1 Policy vs PolicyDefinition](#2121-policy-vs-policydefinition)
-        - [2.1.2.2 Policy scopes and bindings](#2122-policy-scopes-and-bindings)
-        - [2.1.2.3 Policy evaluation functions](#2123-policy-evaluation-functions)
-        - [2.1.2.4 Example: binding an evaluation function](#2124-example-binding-an-evaluation-function)
-        - [2.1.2.5 Advanced policy concepts](#2125-advanced-policy-concepts)
-      - [2.1.3 Contract definitions](#213-contract-definitions)
-      - [2.1.4 Contract agreements](#214-contract-agreements)
-    - [2.2 Programming Primitives](#22-programming-primitives)
-      - [2.2.1 State machines](#221-state-machines)
-      - [2.2.2 Transformers](#222-transformers)
-      - [2.2.3 Token generation and decorators](#223-token-generation-and-decorators)
-      - [2.2.4 Token validation and rules](#224-token-validation-and-rules)
-    - [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
-    - [2.4 Extension model](#24-extension-model)
-    - [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
-    - [2.6 Service layers](#26-service-layers)
-    - [2.7 Protocol extensions (DSP)](#27-protocol-extensions-dsp)
-    - [2.8 (Postgre-)SQL persistence](#28-postgre-sql-persistence)
-    - [2.9 Data plane signaling](#29-data-plane-signaling)
-  - [3. The data plane](#3-the-data-plane)
-    - [3.1 Data plane self-registration](#31-data-plane-self-registration)
-    - [3.2 Public API authentication](#32-public-api-authentication)
-    - [3.3 Writing a custom data plane extension (sink/source)](#33-writing-a-custom-data-plane-extension-sinksource)
-    - [3.4 Writing a custom data plane (using only DPS)](#34-writing-a-custom-data-plane-using-only-dps)
-  - [4. Development best practices](#4-development-best-practices)
-    - [4.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#41-writing-unit--component--integration--api--endtoend-tests)
-    - [4.1 Other best practices](#41-other-best-practices)
-  - [5. Further concepts](#5-further-concepts)
-  _ [4.3 Autodoc](#43-autodoc)
-  _ [4.4 Adapting the Gradle build](#44-adapting-the-gradle-build)
-  <!-- TOC -->
+* [Contributor Documentation](#contributor-documentation)
+  * [0. Intended audience](#0-intended-audience)
+  * [1. Getting started](#1-getting-started)
+    * [1.1 Prerequisites](#11-prerequisites)
+    * [1.2 Terminology](#12-terminology)
+    * [1.3 Architectural and coding principles](#13-architectural-and-coding-principles)
+  * [2. The control plane](#2-the-control-plane)
+    * [2.1 Entities](#21-entities)
+      * [2.1.1 Assets](#211-assets)
+      * [2.1.2 Policies](#212-policies)
+        * [2.1.2.1 Policy vs PolicyDefinition](#2121-policy-vs-policydefinition)
+        * [2.1.2.2 Policy scopes and bindings](#2122-policy-scopes-and-bindings)
+        * [2.1.2.3 Policy evaluation functions](#2123-policy-evaluation-functions)
+        * [2.1.2.4 Example: binding an evaluation function](#2124-example-binding-an-evaluation-function)
+        * [2.1.2.5 Advanced policy concepts](#2125-advanced-policy-concepts)
+          * [Pre- and Post-Evaluators](#pre--and-post-evaluators)
+          * [Dynamic functions](#dynamic-functions)
+      * [2.1.3 Contract definitions](#213-contract-definitions)
+      * [2.1.4 Contract agreements](#214-contract-agreements)
+      * [2.1.5 Catalog](#215-catalog)
+      * [2.1.5 Querying with `QuerySpec` and `Criterion`](#215-querying-with-queryspec-and-criterion)
+    * [2.2 Programming Primitives](#22-programming-primitives)
+      * [2.2.1 State machines](#221-state-machines)
+      * [2.2.2 Transformers](#222-transformers)
+      * [2.2.3 Token generation and decorators](#223-token-generation-and-decorators)
+      * [2.2.4 Token validation and rules](#224-token-validation-and-rules)
+    * [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
+    * [2.4 Extension model](#24-extension-model)
+    * [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
+    * [2.6 Service layers](#26-service-layers)
+    * [2.7 Protocol extensions (DSP)](#27-protocol-extensions-dsp)
+    * [2.8 (Postgre-)SQL persistence](#28-postgre-sql-persistence)
+    * [2.9 Data plane signaling](#29-data-plane-signaling)
+  * [3. The data plane](#3-the-data-plane)
+    * [3.1 Data plane self-registration](#31-data-plane-self-registration)
+    * [3.2 Public API authentication](#32-public-api-authentication)
+    * [3.3 Writing a custom data plane extension (sink/source)](#33-writing-a-custom-data-plane-extension-sinksource)
+    * [3.4 Writing a custom data plane (using only DPS)](#34-writing-a-custom-data-plane-using-only-dps)
+  * [4. Development best practices](#4-development-best-practices)
+    * [4.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#41-writing-unit--component--integration--api--endtoend-tests)
+    * [4.1 Other best practices](#41-other-best-practices)
+  * [5. Further concepts](#5-further-concepts)
+    * [4.3 Autodoc](#43-autodoc)
+    * [4.4 Adapting the Gradle build](#44-adapting-the-gradle-build)
+<!-- TOC -->
 
 ## 0. Intended audience
 
@@ -508,9 +511,201 @@ have more than 5000 employees.
 
 #### 2.1.3 Contract definitions
 
+Contract definitions are how [assets](#211-assets) and [policies](#212-policies) are linked together. It is EDC's way of
+expressing which policies are in effect for an asset. So when an asset (or several assets) are offered in the dataspace,
+a contract definition is used to express under what conditions they are offered. Those conditions are comprised of a
+_contract policy_ and an _access policy_. The _access policy_ determines, whether a participant will even get the offer,
+and the contract policy determines whether they can negotiate a contract for it. Those policies are referenced by ID,
+but foreign-key constrainta are not enforced. This means that contract definitions can be created _ahead of time_.
+
+It is important to note that contract definitions are _implementation details_ (i.e. _internal objects_), which means
+they **never** leave the realm of the provider, and they are **never** sent to the consumer via DSP.
+
+- **access policy**: determines whether a particular consumer is offered an asset when making a catalog request. For
+  example, we may want to restrict certain assets such that only consumers within a particular geography can see them.
+  Consumers outside that geography wouldn't even have them in their catalog.
+- **contract policy**: determines the conditions for initiating a contract negotiation for a particular asset. Note that
+  this only guarantees the successful _initiation_ of a contract negotiation, it does not automatically guarantee the
+  successful _conclusion_ of it!
+
+Contract definitions also contain an `assetsSelector`. THat is a query expression that defines all the assets that are
+included in the definition, like an SQL `SELECT` statement. With that it is possible to configure the same set of
+conditions (= access policy and contract policy) for a multitude of assets.
+
+Please note that creating an `assetSelector` may require knowledge about the shape of an Asset and can get complex
+fairly quickly, so be sure to read the chapter about [querying](#215-querying-with-queryspec-and-criterion).
+
+Here is an example of a contract definition, that defines an access policy and a contract policy for assets `id1`, `id2`
+and `id3` that must contain the `"foo" : "bar"` property.
+```json
+{
+  "@context": {
+    "edc": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "https://w3id.org/edc/v0.0.1/ns/ContractDefinition",
+  "@id": "test-id",
+  "edc:accessPolicyId": "access-policy-1234",
+  "edc:contractPolicyId": "contract-policy-5678",
+  "edc:assetsSelector": [
+    {
+      "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
+      "edc:operandLeft": "id",
+      "edc:operator": "in",
+      "edc:operandRight": ["id1", "id2", "id3"]
+    },
+    {
+      "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
+      "edc:operandLeft": "foo",
+      "edc:operator": "=",
+      "edc:operandRight": "bar"
+    },
+  ]
+}
+```
+
+The sample expresses that a set of assets identified by their ID be made available under the access policy
+`access-policy-1234` and contract policy `contract-policy-5678`, if they contain a property `"foo" : "bar"`.
+
+> Note that asset selector expressions are always logically conjoined using an "AND" operation.
+
 #### 2.1.4 Contract agreements
 
-explain all "entities" in detail query specs, criterion default in-mem stores, predicate converters,
+Once a contract negotiation is successfully concluded (i.e. it reaches the `FINALIZED` state), it "turns into" a
+contract agreement. It is always the provider connector that gives the final approval. Contract agreements are
+immutable objects that contain the final, agreed-on policy, the ID of the asset that the contract was negotiated for,
+the IDs of the negotiation parties and the exact signing date.
+
+> Note that in future iterations contracts will be cryptographically signed to further support the need for
+> immutability and non-repudiation.
+
+Like contract definitions, contract agreements are entities that only exist within the bounds of a connector.
+
+*About terminating contracts:* once a contract negotiation has reached a [terminal
+state](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/contract-negotiation/contract.negotiation.protocol#id-1.2-state-machine)
+`TERMINATED` or `FINALIZED`, it becomes immutable. This could be compared to not being able to scratch a signature off a
+physical paper contract. Cancelling or terminating a contract is therefor handled through other channels like eventing
+systems. The semantics of cancelling a contract are highly individual to each dataspace and may even bring legal side
+effects, so EDC cannot make an assumption here.
+
+#### 2.1.5 Catalog
+
+The catalog contains the "data offerings" of a connector and one or multiple service endpoints to initiate a negotiation
+for those offerings.
+
+Every data offering is represented by a [`Dataset` object](https://www.w3.org/TR/vocab-dcat-2/#Class:Dataset) which
+contains a [policy](#212-policies) and one or multiple [`Distribution`
+objects](https://www.w3.org/TR/vocab-dcat-2/#Class:Distribution). A `Distribution` should be understood as a _variant_
+or _representation_ of the `Dataset`. For instance, if a file is accessible via multiple transmission channels from a
+provider (HTTP and FTP), then each of those channels would be represented as a `Distribution`. Another example would be
+image assets that are available in different file formats (PNG, TIFF, JPEG).
+
+A [`DataService` object](https://www.w3.org/TR/vocab-dcat-2/#Class:Data_Service) specifies the endpoint where contract
+negotiations and transfers are accepted by the provider. In practice, this will be the DSP endpoint of the connector.
+
+The following example shows an HTTP response to a catalog request, that contains one offer that is available via two channels `HttpData-PUSH` and `HttpData-PULL`.
+
+<details>
+  <summary>catalog example</summary>
+
+```json
+{
+    "@id": "567bf428-81d0-442b-bdc8-437ed46592c9",
+    "@type": "dcat:Catalog",
+    "dcat:dataset": [
+        {
+            "@id": "asset-2",
+            "@type": "dcat:Dataset",
+            "odrl:hasPolicy": {
+                "@id": "c2Vuc2l0aXZlLW9ubHktZGVm:YXNzZXQtMg==:MzhiYzZkNjctMDIyNi00OGJjLWFmNWYtZTQ2ZjAwYTQzOWI2",
+                "@type": "odrl:Offer",
+                "odrl:permission": [],
+                "odrl:prohibition": [],
+                "odrl:obligation": {
+                    "odrl:action": {
+                        "@id": "use"
+                    },
+                    "odrl:constraint": {
+                        "odrl:leftOperand": {
+                            "@id": "DataAccess.level"
+                        },
+                        "odrl:operator": {
+                            "@id": "odrl:eq"
+                        },
+                        "odrl:rightOperand": "sensitive"
+                    }
+                }
+            },
+            "dcat:distribution": [
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "HttpData-PULL"
+                    },
+                    "dcat:accessService": {
+                        "@id": "a6c7f3a3-8340-41a7-8154-95c6b5585532",
+                        "@type": "dcat:DataService",
+                        "dcat:endpointDescription": "dspace:connector",
+                        "dcat:endpointUrl": "http://localhost:8192/api/dsp",
+                        "dct:terms": "dspace:connector",
+                        "dct:endpointUrl": "http://localhost:8192/api/dsp"
+                    }
+                },
+                {
+                    "@type": "dcat:Distribution",
+                    "dct:format": {
+                        "@id": "HttpData-PUSH"
+                    },
+                    "dcat:accessService": {
+                        "@id": "a6c7f3a3-8340-41a7-8154-95c6b5585532",
+                        "@type": "dcat:DataService",
+                        "dcat:endpointDescription": "dspace:connector",
+                        "dcat:endpointUrl": "http://localhost:8192/api/dsp",
+                        "dct:terms": "dspace:connector",
+                        "dct:endpointUrl": "http://localhost:8192/api/dsp"
+                    }
+                }
+            ],
+            "description": "This asset requires Membership to view and SensitiveData credential to negotiate.",
+            "id": "asset-2"
+        }
+    ],
+    "dcat:distribution": [],
+    "dcat:service": {
+        "@id": "a6c7f3a3-8340-41a7-8154-95c6b5585532",
+        "@type": "dcat:DataService",
+        "dcat:endpointDescription": "dspace:connector",
+        "dcat:endpointUrl": "http://localhost:8192/api/dsp",
+        "dct:terms": "dspace:connector",
+        "dct:endpointUrl": "http://localhost:8192/api/dsp"
+    },
+    "dspace:participantId": "did:web:localhost%3A7093",
+    "participantId": "did:web:localhost%3A7093",
+    "@context": {
+        
+    }
+}
+```
+</details>
+<br/>
+
+Catalogs are ephemeral objects, they are not persisted or cached on the provider side. Everytime a consumer participant
+makes a catalog request through DSP, the connector runtime has to evaluate the incoming request and build up the catalog
+specifically for that participant. The reason for this is that between two subsequent requests from the same
+participant, the contract definition or the claims or the participant could have changed.
+
+The relevant component in EDC is the `DatasetResolver`, which resolves all contract definitions that are relevant to a
+participant filtering out those where the participant does not satisfy the access policy and collects all the assets
+therein.
+
+In order to determine how an asset can be _distributed_, the resolver requires knowledge about the data planes that are
+available. It uses the [Dataplane Signaling Protocol](#29-data-plane-signaling) to query them and construct the list of
+`Distributions` for an asset.
+
+> For details about the FederatedCatalog, please refer to its [documentation](https://github.com/eclipse-edc/FederatedCatalog/).
+
+#### 2.1.5 Querying with `QuerySpec` and `Criterion`
+
+explain query specs, criterion default in-mem stores, predicate converters,
 CriterionOperatorRegistry, ReflectionBasedQueryResolver
 
 ### 2.2 Programming Primitives
