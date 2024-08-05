@@ -1,5 +1,6 @@
 # Contributor Documentation
 
+
 <!-- TOC -->
 * [Contributor Documentation](#contributor-documentation)
   * [0. Intended audience](#0-intended-audience)
@@ -24,6 +25,8 @@
       * [2.1.5 Querying with `QuerySpec` and `Criterion`](#215-querying-with-queryspec-and-criterion)
     * [2.2 Programming Primitives](#22-programming-primitives)
       * [2.2.1 State machines](#221-state-machines)
+        * [2.2.1.1 Batch-size, sorting and tick-over timeout](#2211-batch-size-sorting-and-tick-over-timeout)
+        * [2.2.1.2 Database-level locking](#2212-database-level-locking)
       * [2.2.2 Transformers](#222-transformers)
       * [2.2.3 Token generation and decorators](#223-token-generation-and-decorators)
       * [2.2.4 Token validation and rules](#224-token-validation-and-rules)
@@ -507,7 +510,7 @@ Let's revisit our headquarter policy from earlier and change it a little:
 ```
 
 This means two things. One, our policy has changed its semantics: now we require the headquarter to be in the EU, or to
-have more than 5000 employees. 
+have more than 5000 employees.
 
 #### 2.1.3 Contract definitions
 
@@ -537,6 +540,7 @@ fairly quickly, so be sure to read the chapter about [querying](#215-querying-wi
 
 Here is an example of a contract definition, that defines an access policy and a contract policy for assets `id1`, `id2`
 and `id3` that must contain the `"foo" : "bar"` property.
+
 ```json
 {
   "@context": {
@@ -558,7 +562,7 @@ and `id3` that must contain the `"foo" : "bar"` property.
       "edc:operandLeft": "foo",
       "edc:operator": "=",
       "edc:operandRight": "bar"
-    },
+    }
   ]
 }
 ```
@@ -580,7 +584,7 @@ the IDs of the negotiation parties and the exact signing date.
 
 Like contract definitions, contract agreements are entities that only exist within the bounds of a connector.
 
-*About terminating contracts:* once a contract negotiation has reached a [terminal
+_About terminating contracts:_ once a contract negotiation has reached a [terminal
 state](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/contract-negotiation/contract.negotiation.protocol#id-1.2-state-machine)
 `TERMINATED` or `FINALIZED`, it becomes immutable. This could be compared to not being able to scratch a signature off a
 physical paper contract. Cancelling or terminating a contract is therefor handled through other channels like eventing
@@ -609,82 +613,81 @@ The following example shows an HTTP response to a catalog request, that contains
 
 ```json
 {
-    "@id": "567bf428-81d0-442b-bdc8-437ed46592c9",
-    "@type": "dcat:Catalog",
-    "dcat:dataset": [
-        {
-            "@id": "asset-2",
-            "@type": "dcat:Dataset",
-            "odrl:hasPolicy": {
-                "@id": "c2Vuc2l0aXZlLW9ubHktZGVm:YXNzZXQtMg==:MzhiYzZkNjctMDIyNi00OGJjLWFmNWYtZTQ2ZjAwYTQzOWI2",
-                "@type": "odrl:Offer",
-                "odrl:permission": [],
-                "odrl:prohibition": [],
-                "odrl:obligation": {
-                    "odrl:action": {
-                        "@id": "use"
-                    },
-                    "odrl:constraint": {
-                        "odrl:leftOperand": {
-                            "@id": "DataAccess.level"
-                        },
-                        "odrl:operator": {
-                            "@id": "odrl:eq"
-                        },
-                        "odrl:rightOperand": "sensitive"
-                    }
-                }
+  "@id": "567bf428-81d0-442b-bdc8-437ed46592c9",
+  "@type": "dcat:Catalog",
+  "dcat:dataset": [
+    {
+      "@id": "asset-2",
+      "@type": "dcat:Dataset",
+      "odrl:hasPolicy": {
+        "@id": "c2Vuc2l0aXZlLW9ubHktZGVm:YXNzZXQtMg==:MzhiYzZkNjctMDIyNi00OGJjLWFmNWYtZTQ2ZjAwYTQzOWI2",
+        "@type": "odrl:Offer",
+        "odrl:permission": [],
+        "odrl:prohibition": [],
+        "odrl:obligation": {
+          "odrl:action": {
+            "@id": "use"
+          },
+          "odrl:constraint": {
+            "odrl:leftOperand": {
+              "@id": "DataAccess.level"
             },
-            "dcat:distribution": [
-                {
-                    "@type": "dcat:Distribution",
-                    "dct:format": {
-                        "@id": "HttpData-PULL"
-                    },
-                    "dcat:accessService": {
-                        "@id": "a6c7f3a3-8340-41a7-8154-95c6b5585532",
-                        "@type": "dcat:DataService",
-                        "dcat:endpointDescription": "dspace:connector",
-                        "dcat:endpointUrl": "http://localhost:8192/api/dsp",
-                        "dct:terms": "dspace:connector",
-                        "dct:endpointUrl": "http://localhost:8192/api/dsp"
-                    }
-                },
-                {
-                    "@type": "dcat:Distribution",
-                    "dct:format": {
-                        "@id": "HttpData-PUSH"
-                    },
-                    "dcat:accessService": {
-                        "@id": "a6c7f3a3-8340-41a7-8154-95c6b5585532",
-                        "@type": "dcat:DataService",
-                        "dcat:endpointDescription": "dspace:connector",
-                        "dcat:endpointUrl": "http://localhost:8192/api/dsp",
-                        "dct:terms": "dspace:connector",
-                        "dct:endpointUrl": "http://localhost:8192/api/dsp"
-                    }
-                }
-            ],
-            "description": "This asset requires Membership to view and SensitiveData credential to negotiate.",
-            "id": "asset-2"
+            "odrl:operator": {
+              "@id": "odrl:eq"
+            },
+            "odrl:rightOperand": "sensitive"
+          }
         }
-    ],
-    "dcat:distribution": [],
-    "dcat:service": {
-        "@id": "a6c7f3a3-8340-41a7-8154-95c6b5585532",
-        "@type": "dcat:DataService",
-        "dcat:endpointDescription": "dspace:connector",
-        "dcat:endpointUrl": "http://localhost:8192/api/dsp",
-        "dct:terms": "dspace:connector",
-        "dct:endpointUrl": "http://localhost:8192/api/dsp"
-    },
-    "dspace:participantId": "did:web:localhost%3A7093",
-    "participantId": "did:web:localhost%3A7093",
-    "@context": {
-        
+      },
+      "dcat:distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "dct:format": {
+            "@id": "HttpData-PULL"
+          },
+          "dcat:accessService": {
+            "@id": "a6c7f3a3-8340-41a7-8154-95c6b5585532",
+            "@type": "dcat:DataService",
+            "dcat:endpointDescription": "dspace:connector",
+            "dcat:endpointUrl": "http://localhost:8192/api/dsp",
+            "dct:terms": "dspace:connector",
+            "dct:endpointUrl": "http://localhost:8192/api/dsp"
+          }
+        },
+        {
+          "@type": "dcat:Distribution",
+          "dct:format": {
+            "@id": "HttpData-PUSH"
+          },
+          "dcat:accessService": {
+            "@id": "a6c7f3a3-8340-41a7-8154-95c6b5585532",
+            "@type": "dcat:DataService",
+            "dcat:endpointDescription": "dspace:connector",
+            "dcat:endpointUrl": "http://localhost:8192/api/dsp",
+            "dct:terms": "dspace:connector",
+            "dct:endpointUrl": "http://localhost:8192/api/dsp"
+          }
+        }
+      ],
+      "description": "This asset requires Membership to view and SensitiveData credential to negotiate.",
+      "id": "asset-2"
     }
+  ],
+  "dcat:distribution": [],
+  "dcat:service": {
+    "@id": "a6c7f3a3-8340-41a7-8154-95c6b5585532",
+    "@type": "dcat:DataService",
+    "dcat:endpointDescription": "dspace:connector",
+    "dcat:endpointUrl": "http://localhost:8192/api/dsp",
+    "dct:terms": "dspace:connector",
+    "dct:endpointUrl": "http://localhost:8192/api/dsp"
+  },
+  "dspace:participantId": "did:web:localhost%3A7093",
+  "participantId": "did:web:localhost%3A7093",
+  "@context": {}
 }
 ```
+
 </details>
 <br/>
 
@@ -710,9 +713,87 @@ CriterionOperatorRegistry, ReflectionBasedQueryResolver
 
 ### 2.2 Programming Primitives
 
+This chapter describes the fundamental architectural and programming paradigms that are used in EDC. Typically, they
+are not related to one single extension or feature area, they are of overarching character.
+
 #### 2.2.1 State machines
 
-used for async, processors, database-level locks, stateful entities
+EDC is asynchronous by design, which means that processes are processed in such a way that they don't block neither the
+runtime nor the caller. For example starting a contract negotiation is a long-running process and every contract
+negotiation has to traverse a series of
+[states](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/contract-negotiation/contract.negotiation.protocol#id-1.2-state-machine),
+most of which involve sending remote messages to the counter party. These state transitions are not guaranteed to happen
+within a certain time frame, they could take hours or even days.
+
+From that it follows that an EDC instance must be regarded as ephemeral (= they can't hold state in memory), so the
+state (of a contract negotiation) must be held in persistent storage. This makes it possible to start and stop connector
+runtimes arbitrarily, and every replica picks up where the other left off, without causing conflicts or processing an
+entity twice.
+
+The state machine itself is synchronous: in every iteration it processes a number of objects and then either goes back
+to sleep, if there was nothing to process, or continues right away.
+
+At a high level this is implemented in the `StateMachineManager`, which uses a set of `Processor`s. The
+`StateMachineManager` sequentially invokes each `Processor`, who then reports the number of processed entities. In EDC's
+state machines, processors are functions who handle `StatefulEntities` in a particular state and are registered when the
+application starts up:
+
+```java
+// ProviderContractNegotiationManagerImpl.java
+
+@Override
+protected StateMachineManager.Builder configureStateMachineManager(StateMachineManager.Builder builder) {
+    return builder
+        .processor(processNegotiationsInState(OFFERING, this::processOffering))
+        .processor(processNegotiationsInState(REQUESTED, this::processRequested))
+        .processor(processNegotiationsInState(ACCEPTED, this::processAccepted))
+        .processor(processNegotiationsInState(AGREEING, this::processAgreeing))
+        .processor(processNegotiationsInState(VERIFIED, this::processVerified))
+        .processor(processNegotiationsInState(FINALIZING, this::processFinalizing))
+        .processor(processNegotiationsInState(TERMINATING, this::processTerminating));
+}
+
+```
+
+This instantiates a `Processor` that binds a given state to a callback function. For example `AGREEING` ->
+`this::processAgreeing`. When the `StateMachineManager` invokes this `Processor`, it loads all contract negotiations in
+that state (here: `AGREEING`) and passes each one to the `processAgreeing` method. 
+
+All processors are invoked sequentially, because it is possible that one single entity transitions to multiple states in
+the same iteration.
+
+##### 2.2.1.1 Batch-size, sorting and tick-over timeout
+
+In every iteration the state machine loads multiple `StatefulEntity` objects from the database. To avoid overwhelming
+the state machine and to prevent entites from becoming stale, two main safeguards are in place:
+- batch-size: this is the maximum amount of entities per state that are fetched from the database
+- sorting: `StatefulEntity` objects are sorted based on when their state was last updated, oldest first. 
+- iteration timeout: if no `StatefulEntities` were processed, the statemachine simply yields for a configurable amount of time.
+
+##### 2.2.1.2 Database-level locking
+
+In production deployments the control plane is typically replicated over several instances for performance and
+robustness. This must be considered when loading `StatefulEntity` objects from the database, because it is possible that
+two replicas attempt to load the same entity at the same time, which - without locks - would lead to a race condition,
+data inconsistencies, duplicated DSP messages and other problems.
+
+To avoid this, EDC employs pessimistic exclusive locks on the database level for stateful entities, which are called
+`Lease`. These are entries in a database that indicate whether an entity is currently leased, whether the lease is
+expired and which replica leased the entity. Attempting to acquire a lease for an already-leased entity is only possible if the
+lease holder is the same.
+
+> Note that the value of the `edc.runtime.id` property is used to record the holder of a `Lease`. It is _recommended not
+> to configure_ this property in clustered environments so that randomized runtime IDs (= default) are used.
+
+Generally the process is as follows:
+- load `N` "leasable" entities and acquire a lease for each one. An entity is considered "leasable" if it is not already
+  leased, or the current runtime already holds the lease, or the lease is expired.
+- if the entity was processed, advance state, free the lease
+- if the entity was not processed, free the lease
+
+That way, each replica of the control plane holds an exclusive lock for a particular entity while it is trying to
+proceoss and advance its state. 
+
 
 #### 2.2.2 Transformers
 
