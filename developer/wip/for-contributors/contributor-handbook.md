@@ -28,12 +28,20 @@
         * [2.2.1.1 Batch-size, sorting and tick-over timeout](#2211-batch-size-sorting-and-tick-over-timeout)
         * [2.2.1.2 Database-level locking](#2212-database-level-locking)
       * [2.2.2 Transformers](#222-transformers)
+        * [2.2.2.1 Basic Serialization and Deserialization](#2221-basic-serialization-and-deserialization)
+        * [2.2.2.1 Transformer context](#2221-transformer-context)
+        * [2.2.2.2 Segmented transformer registries](#2222-segmented-transformer-registries)
+        * [2.2.2.3 Reporting transformation errors](#2223-reporting-transformation-errors)
       * [2.2.3 Token generation and decorators](#223-token-generation-and-decorators)
       * [2.2.4 Token validation and rules](#224-token-validation-and-rules)
     * [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
     * [2.4 Extension model](#24-extension-model)
     * [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
     * [2.6 Service layers](#26-service-layers)
+      * [2.6.1 API controllers](#261-api-controllers)
+      * [2.6.2 Validators](#262-validators)
+      * [2.6.3 Transformers](#263-transformers)
+      * [2.6.4 Aggregate services](#264-aggregate-services)
     * [2.7 Protocol extensions (DSP)](#27-protocol-extensions-dsp)
     * [2.8 (Postgre-)SQL persistence](#28-postgre-sql-persistence)
     * [2.9 Data plane signaling](#29-data-plane-signaling)
@@ -792,10 +800,117 @@ Generally the process is as follows:
 - if the entity was not processed, free the lease
 
 That way, each replica of the control plane holds an exclusive lock for a particular entity while it is trying to
-proceoss and advance its state. 
+process and advance its state. 
 
 
 #### 2.2.2 Transformers
+
+EDC uses JSON-LD serialization on API ingress and egress. For information about this can be found [in this
+chapter](#23-serialization-via-json-ld), but the TL;DR is that it is necessary because of extensible properties and
+namespaces on wire-level DTOs. 
+
+##### 2.2.2.1 Basic Serialization and Deserialization
+On API ingress and egress this means that conventional serialization and deserialization ("SerDes") cannot be achieved
+with Jackson, because Jackson operates on a configurable, but ultimately rigid schema.
+
+For that reason, EDC implements its own SerDes layer, called "transformers". The common base class for all transformers
+is the `AbstractJsonLdTransformer<I,O>` and the naming convention is `JsonObject[To|From]<Entity>Transformer` for
+example `JsonObjectToAssetTransformer`. They typically come in pairs, to enable both serialization and deserialization.
+
+Another rule is that the entity class must contain the fully-qualified (expanded) property names as constants and typical programming patterns are:
+- deserialization: transformers contain a `switch` statement that parses the property names and populates the entity's builder.
+- serialization: transformers simply construct the `JsonObject` based on the properties of the entity using a `JsonObjectBuilder`
+
+##### 2.2.2.1 Transformer context
+
+Many entities in EDC are complex objects that contain other complex objects. For example, a `ContractDefinition`
+contains the asset selector, which is a `List<Criterion>`. However, a `Criterion` is also used in a `QuerySpec`, so it
+makes sense to extract its deserialization into a dedicated transformer. So when the
+`JsonObjectFromContractDefinitionTransformer` encounters the asset selector property in the JSON structure, it delegates
+its deserialization back to the `TransformerContext`, which holds a global list of type transformers (`TypeTransformerRegistry`). 
+
+As a general rule of thumb, a transformer should only deserialize first-order properties, and nested complex objects
+should be delegated back to the `TransformerContext`.
+
+Every module that contains a type transformer should register it with the `TypeTransformerRegistry` in its accompanying extension:
+
+```java
+@Inject
+private TypeTransformerRegistry typeTransformerRegistry;
+
+@Override
+public void initialize(ServiceExtensionContext context){
+  typeTransformerRegistry.register(new JsonObjectToYourEntityTransformer());
+}
+```
+##### 2.2.2.2 Segmented transformer registries
+
+One might encounter situations, where different serialization formats are required for the same entity, for example
+`DataAddress` objects are serialized differently on the [Signaling API](#29-data-plane-signaling) and the [DSP
+API](#27-protocol-extensions-dsp).
+
+If we would simply register both transformers with the transformer registry, the second registration would overwrite the
+first, because both transformers have the same input and output types:
+
+```java
+public class JsonObjectFromDataAddressTransformer extends AbstractJsonLdTransformer<DataAddress, JsonObject> {
+  //...
+}
+
+public class JsonObjectFromDataAddressDspaceTransformer extends AbstractJsonLdTransformer<DataAddress, JsonObject> {
+  //...
+}
+```
+
+Consequently, all `DataAddress` objects would get serialized in the same way.
+
+To overcome this limitation, EDC has the concept of _segmented_ transformer registries, where the segment is defined by
+a string called a "context": 
+
+```java
+@Inject
+private TypeTransformerRegistry typeTransformerRegistry;
+
+@Override
+public void initialize(ServiceExtensionContext context){
+  var signalingApiRegistry = typeTransformerRegistry.forContext("signaling-api");
+  signalingApiRegistry.register(new JsonObjectFromDataAddressDspaceTransformer(/*arguments*/));
+
+  var dspRegistry = typeTransformerRegistry.forContext("dsp-api");
+  dspRegistry.register(new JsonObjectToDataAddressTransformer());
+}
+```
+_Note that this example serves for illustration purposes only!_
+
+Usually, transformation happens in API controllers to deserialize input, process and serialize output, but controllers
+don't use transformers directly because more than one transformer may be required to correctly deserialize an object.
+Rather, they have a reference to a `TypeTransformerRegistry` for this. For more information please refer to the [chapter
+about service layers](#26-service-layers).
+
+##### 2.2.2.3 Reporting transformation errors
+
+Generally speaking, input validation should be performed by [validators](#262-validators). However, it is still possible
+that an object cannot be serialized/deserialized correctly, for example when a property has has the wrong type, wrong
+multiplicity, cannot be parsed, unknown property, etc. Those types of errors should be reported to the
+`TransformerContext`:
+
+```java
+// JsonObjectToDataPlaneInstanceTransformer.java
+private void transformProperties(String key, JsonValue jsonValue, DataPlaneInstance.Builder builder, TransformerContext context) {
+    switch (key) {
+        case URL -> {
+            try {
+                builder.url(new URL(Objects.requireNonNull(transformString(jsonValue, context))));
+            } catch (MalformedURLException e) {
+                context.reportProblem(e.getMessage());
+            }
+        }
+    // other properties
+    }
+}
+```
+Transformers should report errors to the context instead of throwing exceptions. Please note that basic JSON validation should be performed by [validators](#262-validators).
+
 
 #### 2.2.3 Token generation and decorators
 
@@ -803,7 +918,7 @@ proceoss and advance its state.
 
 ### 2.3 Serialization via JSON-LD
 
-why its needed, why we sometimes use Jackson SerDes
+why its needed, why we sometimes use Jackson SerDes, ingress = expanded, egress = compacted, validation
 
 ### 2.4 Extension model
 
@@ -816,7 +931,43 @@ demand) dependency graph lifecycle best practices
 
 ### 2.6 Service layers
 
-- api controllers: transformers, validators
+#### 2.6.1 API controllers
+```java
+@Consumes({ MediaType.APPLICATION_JSON })
+@Produces({ MediaType.APPLICATION_JSON })
+@Path("/v1/foo/bar")
+public class SomeApiObjectController {
+
+    private final TypeTransformerRegistry typeTransformerRegistry;
+
+    public SomeApiObjectController(TypeTransformerRegistry typeTransformerRegistry) {
+        this.typeTransformerRegistry = typeTransformerRegistry;
+    }
+
+    @POST
+    @Override
+    public JsonObject create(JsonObject someApiObject) {
+      // deserialize JSON -> SomeApiObject
+      var someApiObject = typeTransformerRegistry.transform(dataFlowStartMessage, SomeApiObject.class)
+                .onFailure(f -> /*log warning*/)
+                .orElseThrow(InvalidRequestException::new);
+
+      var processedObject = someService.process(someApiObject);
+
+      // serialize SomeApiObject -> JSON
+      return typeTransformerRegistry.transform(processedObject, JsonObject.class)
+                .orElseThrow(f -> new EdcException(f.getFailureDetail()));
+    }
+}
+```
+
+#### 2.6.2 Validators
+
+#### 2.6.3 Transformers
+
+#### 2.6.4 Aggregate services
+
+The above example 
 - (aggregate) services: transaction management
 - stores:
 - Events and callbacks
