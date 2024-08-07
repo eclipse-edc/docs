@@ -948,7 +948,7 @@ public class SomeApiObjectController {
     @Override
     public JsonObject create(JsonObject someApiObject) {
       // deserialize JSON -> SomeApiObject
-      var someApiObject = typeTransformerRegistry.transform(dataFlowStartMessage, SomeApiObject.class)
+      var someApiObject = typeTransformerRegistry.transform(someApiObject, SomeApiObject.class)
                 .onFailure(f -> /*log warning*/)
                 .orElseThrow(InvalidRequestException::new);
 
