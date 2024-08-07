@@ -654,7 +654,7 @@ The `counterPartyAddress` is the address where to send the `ContractRequestMessa
 
 The `policy` should hold the same policy associated to the data offering chosen from the [catalog](#216-catalog), plus two additional properties:
 
-- `assigner` the provider ID
+- `assigner` the providers `participantId`
 - `target` the asset (dataset) ID
 
 In addition the `callbackAddresses`, which is optional, can be used to get notified about state changes of the negotiation. Read more on callbacks in the section about [events and callbacks](#51-events-and-callbacks).
