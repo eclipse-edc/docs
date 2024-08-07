@@ -657,7 +657,7 @@ The `policy` should hold the same policy associated to the data offering chosen 
 - `assigner` the providers `participantId`
 - `target` the asset (dataset) ID
 
-In addition the `callbackAddresses`, which is optional, can be used to get notified about state changes of the negotiation. Read more on callbacks in the section about [events and callbacks](#51-events-and-callbacks).
+In addition, the (optional) `callbackAddresses` array can be used to get notified about state changes of the negotiation. Read more on callbacks in the section about [events and callbacks](#51-events-and-callbacks).
 
 > Note: if the `policy` sent by the consumer differs from the one expressed by the provider, the contract negotiation will fail and transition to a `TERMINATED` state.
 
