@@ -609,9 +609,6 @@ Contract negotiations are asynchronous in nature. That means after initiating th
 long-running) stateful processes that are advanced by an internal [state machine](#221-state-machines).
 The current state of the negotiation can be queried and altered through the management API.
 
-> In the current iteration all contract offers are automatically accepted by both parties if the contract
-> policy is satisfied. This may change in the future, when manual interaction hooks are implemented.
-
 Here's a diagram of the state machine applied to contract negotiations:
 
 ![Contract Negotiation State Machine](diagrams/contract-negotiation-states.png)
