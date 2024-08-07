@@ -706,10 +706,88 @@ available. It uses the [Dataplane Signaling Protocol](#29-data-plane-signaling) 
 
 > For details about the FederatedCatalog, please refer to its [documentation](https://github.com/eclipse-edc/FederatedCatalog/).
 
-#### 2.1.5 Querying with `QuerySpec` and `Criterion`
+#### 2.1.6 Querying with `QuerySpec` and `Criterion`
 
-explain query specs, criterion default in-mem stores, predicate converters,
-CriterionOperatorRegistry, ReflectionBasedQueryResolver
+Most of the entities can be queried with the `QuerySpec` object, which is a generic way of expressing limit, offset, sort and filters when querying a collection of objects managed by the EDC stores. 
+
+Here's an example of how a `QuerySpec` object might look like when querying for Assets via management APIs:
+
+```json
+{
+	"@context": {
+		"edc": "https://w3id.org/edc/v0.0.1/ns/"
+	},
+	"@type": "QuerySpec",
+	"limit": 1,
+	"offset": 1,
+	"sortField": "createdAt",
+	"sortOrder": "DESC",
+	"filterExpression": [
+		{
+			"operandLeft": "https://w3id.org/edc/v0.0.1/ns/description",
+			"operator": "=",
+			"operandRight": "This asset"
+		}
+	]
+}
+```
+
+which filters by the `description` custom property being equals to `This asset`. The query also paginates the result with limit and p set to 1. Additionally a sorting strategy is in place by `createdAt` property in `descending` order (the default is `ASC`)
+
+> Note: Since custom properties are persisted in their [expanded form](#23-serialization-via-json-ld), we have to use the expanded form also when querying.
+
+The `filterExpression` property is a list of `Criterion`, which expresses a single filtering condition based on:
+
+- `operandLeft`: the property to filter on 
+- `operator`: the operator to apply e.g. `=`
+- `operandRight`: the value of the filtering
+
+The supported operators are:
+
+- Equal: `=`
+- Not equal: `!=`
+- In: `in`
+- Like: `like`
+- Ilike: `ilike` (same as `like` but ignoring case sensitive)
+- Contains: `contains`
+
+
+> Note: multiple filtering expressions are always logically conjoined using an "AND" operation.
+
+The properties that can be expressed in the `operandLeft` of a `Criterion` depend on the shape of the entity that we are want to query.
+
+> Note: nested properties are also supported using the dot notation.
+
+`QuerySpec` can also be used when doing the catalog request using the `querySpec` property in the catalog request payload for filtering the datasets:
+
+```json
+{
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+    },
+    "counterPartyAddress": "http://provider/api/dsp",
+    "protocol": "dataspace-protocol-http",
+    "counterPartyId": "providerId",
+    "querySpec": {
+        "filterExpression": [
+            {
+                "operandLeft": "https://w3id.org/edc/v0.0.1/ns/description",
+                "operator": "=",
+                "operandRight": "This asset"
+            }
+        ]
+    }
+}
+```
+
+Entities are backed by [stores](#261-store-layers) for doing CRUD operations. For each entity there is an associated store interface (SPI). Most of the stores SPI have a `query` like method which takes a `QuerySpec` type as input and returns the matched entities in a collection. Indivitual implementations are then responsible for translating the `QuerySpec` to a proper fetching strategy. 
+
+The description on how the translation and mapping works will be explained in each implementation. Currently EDC support out of the box:
+
+- [In-memory stores](#2611-in-memory-stores) (default implementation). 
+- [SQL stores](#28-postgre-sql-persistence) provied as extensions for each store, mostly tailored for and tested with PostgreSQL. 
+
+For guaranteeing the highest compatibility between store implementations, a base tests suite is provided for each store that each technology implementors need to fulfill in order to have a minimum usable store implementation.
 
 ### 2.2 Programming Primitives
 
@@ -818,8 +896,12 @@ demand) dependency graph lifecycle best practices
 
 - api controllers: transformers, validators
 - (aggregate) services: transaction management
-- stores:
+- stores: default in-mem stores, predicate converters, CriterionOperatorRegistry, ReflectionBasedQueryResolver
 - Events and callbacks
+
+#### 2.6.1 Store layers
+
+#### 2.6.1.1 In-Memory stores
 
 ### 2.7 Protocol extensions (DSP)
 
