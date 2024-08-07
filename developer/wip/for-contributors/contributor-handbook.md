@@ -22,7 +22,7 @@
       * [2.1.3 Contract definitions](#213-contract-definitions)
       * [2.1.4 Contract agreements](#214-contract-agreements)
       * [2.1.5 Catalog](#215-catalog)
-      * [2.1.5 Querying with `QuerySpec` and `Criterion`](#215-querying-with-queryspec-and-criterion)
+      * [2.1.6 Querying with `QuerySpec` and `Criterion`](#216-querying-with-queryspec-and-criterion)
     * [2.2 Programming Primitives](#22-programming-primitives)
       * [2.2.1 State machines](#221-state-machines)
         * [2.2.1.1 Batch-size, sorting and tick-over timeout](#2211-batch-size-sorting-and-tick-over-timeout)
@@ -34,6 +34,9 @@
         * [2.2.2.3 Reporting transformation errors](#2223-reporting-transformation-errors)
       * [2.2.3 Token generation and decorators](#223-token-generation-and-decorators)
       * [2.2.4 Token validation and rules](#224-token-validation-and-rules)
+        * [2.2.4.1 Public Key Resolvers](#2241-public-key-resolvers)
+        * [2.2.4.2 Validation Rules](#2242-validation-rules)
+        * [2.2.4.3 Validation Rules Registry](#2243-validation-rules-registry)
     * [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
     * [2.4 Extension model](#24-extension-model)
     * [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
@@ -42,6 +45,8 @@
       * [2.6.2 Validators](#262-validators)
       * [2.6.3 Transformers](#263-transformers)
       * [2.6.4 Aggregate services](#264-aggregate-services)
+      * [2.6.1 Store layers](#261-store-layers)
+      * [2.6.1.1 In-Memory stores](#2611-in-memory-stores)
     * [2.7 Protocol extensions (DSP)](#27-protocol-extensions-dsp)
     * [2.8 (Postgre-)SQL persistence](#28-postgre-sql-persistence)
     * [2.9 Data plane signaling](#29-data-plane-signaling)
@@ -992,7 +997,81 @@ Transformers should report errors to the context instead of throwing exceptions.
 
 #### 2.2.3 Token generation and decorators
 
+A token is a datastructure that consists of a header and claims and that is signed with a private key. While EDC
+is able to create any type of tokens through [extensions](#24-extension-model), in most use cases JSON Web Tokens (JWT)
+are a good option. 
+
+The `TokenGenerationService` offers a way to generate such a token by passing in a reference to a private key and a set
+of `TokenDecorators`. These are functions that mutate the parameters of a token, for example they could contribute
+claims and headers to JWTs:
+
+```java
+TokenDecorator jtiDecorator = tokenParams -> tokenParams.claim("jti", UUID.randomUuid().toString());
+TokenDecorator typeDecorator = tokenParams -> tokenParams.header("typ", "JWT");
+var token = tokenGenerationService.generate("my-private-key-id", jtiDecorator, typeDecorator);
+```
+
+In the EDC code base the `TokenGenerationService` is not intended to be injectable, because client code typically should
+be opinionated with regards to the token technology.
+
 #### 2.2.4 Token validation and rules
+
+When receiving a token, EDC makes use of the `TokenValidationService` facility to verify and validate the incoming
+token. Out-of-the-box JWTs are supported, but other token types could be supported through
+[extensions](#24-extension-model). This section will be limited to validating JWT tokens.
+
+Every JWT that is validated by EDC _must_ have a `kid` header indicating the ID of the public key with which the token
+can be verified. In addition, a `PublicKeyResolver` implementation is required to download the public key. 
+
+
+
+##### 2.2.4.1 Public Key Resolvers
+
+`PublicKeyResolvers` are services that resolve public key material from public locations. It is common for organizations
+to publish their public keys as JSON Web Key Set (JWKS) or as [verification
+method](https://www.w3.org/TR/did-core/#verification-methods) in a DID document. If operational circumstances require
+that multiple resolution strategies be supported at runtime, the recommended way to achieve this is to implement a
+`PublicKeyResolver` that dispatches to multiple sub-resolvers based on the shape of the key ID.
+
+> Sometimes it is necessary for the connector runtime to resolve its own public key, e.g. when validating a token that was
+sent out in a previous interaction. In these cases it is best to avoid a remote call to a DID document or a JWKS URL,
+but to resolve the public key locally.
+
+##### 2.2.4.2 Validation Rules
+
+With the public key the validation service is able to _verify_ the token's signature, i.e. to assert its cryptographic
+integrity. Once that succeeds, the `TokenValidationService` parses the token string and applies all
+`TokenValidationRules` on the claims. We call this _validation_, since it asserts the correct ("valid") structure of the
+token's claims.
+
+##### 2.2.4.3 Validation Rules Registry
+
+Usually, tokens are validated in different _contexts_, each of which brings its own validation rules. Currently, the
+following token validation contexts exist:
+- `"dcp-si"`: when validating Self-Issued ID tokens in the Decentralized Claims Protocol (DCP)
+- `"dcp-vc"`: when validating VerifiableCredentials that have an external proof in the form of a JWT (JWT-VCs)
+- `"dcp-vp"`: when validating VerifiablePresentations that have an external proof in the form of a JWT (JWT-VPs)
+- `"oauth2"`: when validating OAuth2 tokens
+- `"management-api"`: when validating external tokens in the Management API ingress (relevant when delegated authentication is used)
+
+Using these contexts it is possible to register additional validation rules using extensions:
+```java
+//YourSpecialExtension.java
+
+@Inject
+private TokenValidationRulesRegistry rulesRegistry;
+
+@Override
+public void initialize(ServiceExtensionContext context){
+  rulesRegistry.addRule(DCP_SELF_ISSUED_TOKEN_CONTEXT, (claimtoken, additional) -> {
+      var checkResult = // perform rule check
+      return checkResult;
+  });
+}
+```
+
+This is useful for example when certain dataspaces require additional rules to be satisfied or even [private
+claims](https://datatracker.ietf.org/doc/html/rfc7519#section-4.3) to be exchanged.
 
 ### 2.3 Serialization via JSON-LD
 
