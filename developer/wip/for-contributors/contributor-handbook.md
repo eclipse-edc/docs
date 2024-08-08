@@ -20,9 +20,11 @@
           * [Pre- and Post-Evaluators](#pre--and-post-evaluators)
           * [Dynamic functions](#dynamic-functions)
       * [2.1.3 Contract definitions](#213-contract-definitions)
-      * [2.1.4 Contract agreements](#214-contract-agreements)
-      * [2.1.5 Catalog](#215-catalog)
-      * [2.1.6 Querying with `QuerySpec` and `Criterion`](#216-querying-with-queryspec-and-criterion)
+      * [2.1.4 Contract negotiations](#214-contract-negotiations)
+      * [2.1.5 Contract agreements](#215-contract-agreements)
+      * [2.1.6 Catalog](#216-catalog)
+      * [2.1.7 Transfer processes](#217-transfer-processes)
+      * [2.1.8 Querying with `QuerySpec` and `Criterion`](#218-querying-with-queryspec-and-criterion)
     * [2.2 Programming Primitives](#22-programming-primitives)
       * [2.2.1 State machines](#221-state-machines)
         * [2.2.1.1 Batch-size, sorting and tick-over timeout](#2211-batch-size-sorting-and-tick-over-timeout)
@@ -59,8 +61,9 @@
     * [4.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#41-writing-unit--component--integration--api--endtoend-tests)
     * [4.1 Other best practices](#41-other-best-practices)
   * [5. Further concepts](#5-further-concepts)
-    * [4.3 Autodoc](#43-autodoc)
-    * [4.4 Adapting the Gradle build](#44-adapting-the-gradle-build)
+    * [5.1 Events and callbacks](#51-events-and-callbacks)
+    * [5.2 Autodoc](#52-autodoc)
+    * [5.3 Adapting the Gradle build](#53-adapting-the-gradle-build)
 <!-- TOC -->
 
 ## 0. Intended audience
@@ -585,7 +588,77 @@ The sample expresses that a set of assets identified by their ID be made availab
 
 > Note that asset selector expressions are always logically conjoined using an "AND" operation.
 
-#### 2.1.4 Contract agreements
+#### 2.1.4 Contract negotiations
+
+If a connector fulfills the [contract policy](#213-contract-definitions), it may initiate the negotiation of a contract for
+a particular asset. During that negotiation, both parties can send offers and counter-offers that can contain altered
+terms (= policy) as any human would in a negotiation, and the counter-party may accept or reject them.
+
+Contract negotiations have a few key aspects:
+
+- they target _one_ asset
+- they take place between a _provider_ and a _consumer_ connector
+- they cannot be changed by the user directly
+- users can only decline, terminate or cancel them
+
+As a side note it is also important to note that contract offers are _ephemeral_ objects as they are generated
+on-the-fly for a particular participant, and they are never persisted in a database and thus cannot be queried through
+any API.
+
+Contract negotiations are asynchronous in nature. That means after initiating them, they become (potentially
+long-running) stateful processes that are advanced by an internal [state machine](#221-state-machines).
+The current state of the negotiation can be queried and altered through the management API.
+
+Here's a diagram of the state machine applied to contract negotiations:
+
+![Contract Negotiation State Machine](diagrams/contract-negotiation-states.png)
+
+A contract negotiation can be initiated from the consumer side by sending a `ContractRequest` to the connector management API.
+
+
+```json
+{
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+    },
+    "@type": "ContractRequest",
+    "counterPartyAddress": "http://provider-address",
+    "protocol": "dataspace-protocol-http",
+    "policy": {
+        "@context": "http://www.w3.org/ns/odrl.jsonld",
+        "@type": "odrl:Offer",
+        "@id": "offer-id",
+        "assigner": "providerId",
+        "permission": [],
+        "prohibition": [],
+        "obligation": [],
+        "target": "assetId"
+    },
+    "callbackAddresses": [
+        {
+            "transactional": false,
+            "uri": "http://callback/url",
+            "events": [
+                "contract.negotiation"
+            ],
+            "authKey": "auth-key",
+            "authCodeId": "auth-code-id"
+        }
+    ]
+}
+```
+The `counterPartyAddress` is the address where to send the `ContractRequestMessage` via the specified `protocol` (currently [`dataspace-protocol-http`](#27-protocol-extensions-dsp))
+
+The `policy` should hold the same policy associated to the data offering chosen from the [catalog](#216-catalog), plus two additional properties:
+
+- `assigner` the providers `participantId`
+- `target` the asset (dataset) ID
+
+In addition, the (optional) `callbackAddresses` array can be used to get notified about state changes of the negotiation. Read more on callbacks in the section about [events and callbacks](#51-events-and-callbacks).
+
+> Note: if the `policy` sent by the consumer differs from the one expressed by the provider, the contract negotiation will fail and transition to a `TERMINATED` state.
+
+#### 2.1.5 Contract agreements
 
 Once a contract negotiation is successfully concluded (i.e. it reaches the `FINALIZED` state), it "turns into" a
 contract agreement. It is always the provider connector that gives the final approval. Contract agreements are
@@ -604,7 +677,7 @@ physical paper contract. Cancelling or terminating a contract is therefor handle
 systems. The semantics of cancelling a contract are highly individual to each dataspace and may even bring legal side
 effects, so EDC cannot make an assumption here.
 
-#### 2.1.5 Catalog
+#### 2.1.6 Catalog
 
 The catalog contains the "data offerings" of a connector and one or multiple service endpoints to initiate a negotiation
 for those offerings.
@@ -719,7 +792,9 @@ available. It uses the [Dataplane Signaling Protocol](#29-data-plane-signaling) 
 
 > For details about the FederatedCatalog, please refer to its [documentation](https://github.com/eclipse-edc/FederatedCatalog/).
 
-#### 2.1.6 Querying with `QuerySpec` and `Criterion`
+#### 2.1.7 Transfer processes
+
+#### 2.1.8 Querying with `QuerySpec` and `Criterion`
 
 Most of the entities can be queried with the `QuerySpec` object, which is a generic way of expressing limit, offset, sort and filters when querying a collection of objects managed by the EDC stores. 
 
@@ -1163,6 +1238,8 @@ test pyramid...
 
 ## 5. Further concepts
 
-### 4.3 Autodoc
+### 5.1 Events and callbacks
 
-### 4.4 Adapting the Gradle build
+### 5.2 Autodoc
+
+### 5.3 Adapting the Gradle build
