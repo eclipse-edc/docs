@@ -1,6 +1,5 @@
 # Contributor Documentation
 
-
 <!-- TOC -->
 * [Contributor Documentation](#contributor-documentation)
   * [0. Intended audience](#0-intended-audience)
@@ -41,7 +40,28 @@
         * [2.2.4.3 Validation Rules Registry](#2243-validation-rules-registry)
     * [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
     * [2.4 Extension model](#24-extension-model)
+      * [2.4.1 Extension basics](#241-extension-basics)
+      * [2.4.2 Autodoc and Metamodel Annotations](#242-autodoc-and-metamodel-annotations)
+      * [2.4.3 Configuration and best practices](#243-configuration-and-best-practices)
     * [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
+      * [2.5.1 Registering a service implementation](#251-registering-a-service-implementation)
+        * [2.5.1.1 Use `@Provider` methods (recommended)](#2511-use-provider-methods-recommended)
+        * [2.5.1.2 Provide "defaults"](#2512-provide-defaults)
+        * [2.5.1.3 Register manually (not recommended)](#2513-register-manually-not-recommended)
+      * [2.5.2 Injecting a service](#252-injecting-a-service)
+        * [2.5.2.1 Use `@Inject` to declare dependencies (recommended)](#2521-use-inject-to-declare-dependencies-recommended)
+        * [2.5.2.2 Use `@Requires` to declare dependencies](#2522-use-requires-to-declare-dependencies)
+      * [2.5.3 Extension initialization sequence](#253-extension-initialization-sequence)
+      * [2.5.4 Testing extension classes](#254-testing-extension-classes)
+      * [2.5.5 Advanced concepts: default providers](#255-advanced-concepts-default-providers)
+        * [2.5.5.1 Fallbacks versus extensibility](#2551-fallbacks-versus-extensibility)
+        * [2.5.5.2 Fallback implementations](#2552-fallback-implementations)
+        * [2.5.5.3 Extensibility](#2553-extensibility)
+        * [2.5.5.4 Deep-dive into extension lifecycle management](#2554-deep-dive-into-extension-lifecycle-management)
+        * [2.5.5.5 Example 1 - provider method](#2555-example-1---provider-method)
+        * [2.5.5.6 Example 2 - default provider method](#2556-example-2---default-provider-method)
+        * [2.5.5.7 Usage guidelines when using default providers](#2557-usage-guidelines-when-using-default-providers)
+      * [2.5.6 Limitations](#256-limitations)
     * [2.6 Service layers](#26-service-layers)
       * [2.6.1 API controllers](#261-api-controllers)
       * [2.6.2 Validators](#262-validators)
@@ -571,7 +591,11 @@ and `id3` that must contain the `"foo" : "bar"` property.
       "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
       "edc:operandLeft": "id",
       "edc:operator": "in",
-      "edc:operandRight": ["id1", "id2", "id3"]
+      "edc:operandRight": [
+        "id1",
+        "id2",
+        "id3"
+      ]
     },
     {
       "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
@@ -590,7 +614,8 @@ The sample expresses that a set of assets identified by their ID be made availab
 
 #### 2.1.4 Contract negotiations
 
-If a connector fulfills the [contract policy](#213-contract-definitions), it may initiate the negotiation of a contract for
+If a connector fulfills the [contract policy](#213-contract-definitions), it may initiate the negotiation of a contract
+for
 a particular asset. During that negotiation, both parties can send offers and counter-offers that can contain altered
 terms (= policy) as any human would in a negotiation, and the counter-party may accept or reject them.
 
@@ -613,50 +638,55 @@ Here's a diagram of the state machine applied to contract negotiations:
 
 ![Contract Negotiation State Machine](diagrams/contract-negotiation-states.png)
 
-A contract negotiation can be initiated from the consumer side by sending a `ContractRequest` to the connector management API.
-
+A contract negotiation can be initiated from the consumer side by sending a `ContractRequest` to the connector
+management API.
 
 ```json
 {
-    "@context": {
-        "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-    },
-    "@type": "ContractRequest",
-    "counterPartyAddress": "http://provider-address",
-    "protocol": "dataspace-protocol-http",
-    "policy": {
-        "@context": "http://www.w3.org/ns/odrl.jsonld",
-        "@type": "odrl:Offer",
-        "@id": "offer-id",
-        "assigner": "providerId",
-        "permission": [],
-        "prohibition": [],
-        "obligation": [],
-        "target": "assetId"
-    },
-    "callbackAddresses": [
-        {
-            "transactional": false,
-            "uri": "http://callback/url",
-            "events": [
-                "contract.negotiation"
-            ],
-            "authKey": "auth-key",
-            "authCodeId": "auth-code-id"
-        }
-    ]
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "ContractRequest",
+  "counterPartyAddress": "http://provider-address",
+  "protocol": "dataspace-protocol-http",
+  "policy": {
+    "@context": "http://www.w3.org/ns/odrl.jsonld",
+    "@type": "odrl:Offer",
+    "@id": "offer-id",
+    "assigner": "providerId",
+    "permission": [],
+    "prohibition": [],
+    "obligation": [],
+    "target": "assetId"
+  },
+  "callbackAddresses": [
+    {
+      "transactional": false,
+      "uri": "http://callback/url",
+      "events": [
+        "contract.negotiation"
+      ],
+      "authKey": "auth-key",
+      "authCodeId": "auth-code-id"
+    }
+  ]
 }
 ```
-The `counterPartyAddress` is the address where to send the `ContractRequestMessage` via the specified `protocol` (currently [`dataspace-protocol-http`](#27-protocol-extensions-dsp))
 
-The `policy` should hold the same policy associated to the data offering chosen from the [catalog](#216-catalog), plus two additional properties:
+The `counterPartyAddress` is the address where to send the `ContractRequestMessage` via the specified `protocol` (
+currently [`dataspace-protocol-http`](#27-protocol-extensions-dsp))
+
+The `policy` should hold the same policy associated to the data offering chosen from the [catalog](#216-catalog), plus
+two additional properties:
 
 - `assigner` the providers `participantId`
 - `target` the asset (dataset) ID
 
-In addition, the (optional) `callbackAddresses` array can be used to get notified about state changes of the negotiation. Read more on callbacks in the section about [events and callbacks](#51-events-and-callbacks).
+In addition, the (optional) `callbackAddresses` array can be used to get notified about state changes of the
+negotiation. Read more on callbacks in the section about [events and callbacks](#51-events-and-callbacks).
 
-> Note: if the `policy` sent by the consumer differs from the one expressed by the provider, the contract negotiation will fail and transition to a `TERMINATED` state.
+> Note: if the `policy` sent by the consumer differs from the one expressed by the provider, the contract negotiation
+> will fail and transition to a `TERMINATED` state.
 
 #### 2.1.5 Contract agreements
 
@@ -692,7 +722,8 @@ image assets that are available in different file formats (PNG, TIFF, JPEG).
 A [`DataService` object](https://www.w3.org/TR/vocab-dcat-2/#Class:Data_Service) specifies the endpoint where contract
 negotiations and transfers are accepted by the provider. In practice, this will be the DSP endpoint of the connector.
 
-The following example shows an HTTP response to a catalog request, that contains one offer that is available via two channels `HttpData-PUSH` and `HttpData-PULL`.
+The following example shows an HTTP response to a catalog request, that contains one offer that is available via two
+channels `HttpData-PUSH` and `HttpData-PULL`.
 
 <details>
   <summary>catalog example</summary>
@@ -790,43 +821,48 @@ In order to determine how an asset can be _distributed_, the resolver requires k
 available. It uses the [Dataplane Signaling Protocol](#29-data-plane-signaling) to query them and construct the list of
 `Distributions` for an asset.
 
-> For details about the FederatedCatalog, please refer to its [documentation](https://github.com/eclipse-edc/FederatedCatalog/).
+> For details about the FederatedCatalog, please refer to
+> its [documentation](https://github.com/eclipse-edc/FederatedCatalog/).
 
 #### 2.1.7 Transfer processes
 
 #### 2.1.8 Querying with `QuerySpec` and `Criterion`
 
-Most of the entities can be queried with the `QuerySpec` object, which is a generic way of expressing limit, offset, sort and filters when querying a collection of objects managed by the EDC stores. 
+Most of the entities can be queried with the `QuerySpec` object, which is a generic way of expressing limit, offset,
+sort and filters when querying a collection of objects managed by the EDC stores.
 
 Here's an example of how a `QuerySpec` object might look like when querying for Assets via management APIs:
 
 ```json
 {
-	"@context": {
-		"edc": "https://w3id.org/edc/v0.0.1/ns/"
-	},
-	"@type": "QuerySpec",
-	"limit": 1,
-	"offset": 1,
-	"sortField": "createdAt",
-	"sortOrder": "DESC",
-	"filterExpression": [
-		{
-			"operandLeft": "https://w3id.org/edc/v0.0.1/ns/description",
-			"operator": "=",
-			"operandRight": "This asset"
-		}
-	]
+  "@context": {
+    "edc": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "QuerySpec",
+  "limit": 1,
+  "offset": 1,
+  "sortField": "createdAt",
+  "sortOrder": "DESC",
+  "filterExpression": [
+    {
+      "operandLeft": "https://w3id.org/edc/v0.0.1/ns/description",
+      "operator": "=",
+      "operandRight": "This asset"
+    }
+  ]
 }
 ```
 
-which filters by the `description` custom property being equals to `This asset`. The query also paginates the result with limit and p set to 1. Additionally a sorting strategy is in place by `createdAt` property in `descending` order (the default is `ASC`)
+which filters by the `description` custom property being equals to `This asset`. The query also paginates the result
+with limit and p set to 1. Additionally a sorting strategy is in place by `createdAt` property in `descending` order (
+the default is `ASC`)
 
-> Note: Since custom properties are persisted in their [expanded form](#23-serialization-via-json-ld), we have to use the expanded form also when querying.
+> Note: Since custom properties are persisted in their [expanded form](#23-serialization-via-json-ld), we have to use
+> the expanded form also when querying.
 
 The `filterExpression` property is a list of `Criterion`, which expresses a single filtering condition based on:
 
-- `operandLeft`: the property to filter on 
+- `operandLeft`: the property to filter on
 - `operator`: the operator to apply e.g. `=`
 - `operandRight`: the value of the filtering
 
@@ -839,43 +875,50 @@ The supported operators are:
 - Ilike: `ilike` (same as `like` but ignoring case sensitive)
 - Contains: `contains`
 
-
 > Note: multiple filtering expressions are always logically conjoined using an "AND" operation.
 
-The properties that can be expressed in the `operandLeft` of a `Criterion` depend on the shape of the entity that we are want to query.
+The properties that can be expressed in the `operandLeft` of a `Criterion` depend on the shape of the entity that we are
+want to query.
 
 > Note: nested properties are also supported using the dot notation.
 
-`QuerySpec` can also be used when doing the catalog request using the `querySpec` property in the catalog request payload for filtering the datasets:
+`QuerySpec` can also be used when doing the catalog request using the `querySpec` property in the catalog request
+payload for filtering the datasets:
 
 ```json
 {
-    "@context": {
-        "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-    },
-    "counterPartyAddress": "http://provider/api/dsp",
-    "protocol": "dataspace-protocol-http",
-    "counterPartyId": "providerId",
-    "querySpec": {
-        "filterExpression": [
-            {
-                "operandLeft": "https://w3id.org/edc/v0.0.1/ns/description",
-                "operator": "=",
-                "operandRight": "This asset"
-            }
-        ]
-    }
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "counterPartyAddress": "http://provider/api/dsp",
+  "protocol": "dataspace-protocol-http",
+  "counterPartyId": "providerId",
+  "querySpec": {
+    "filterExpression": [
+      {
+        "operandLeft": "https://w3id.org/edc/v0.0.1/ns/description",
+        "operator": "=",
+        "operandRight": "This asset"
+      }
+    ]
+  }
 }
 ```
 
-Entities are backed by [stores](#261-store-layers) for doing CRUD operations. For each entity there is an associated store interface (SPI). Most of the stores SPI have a `query` like method which takes a `QuerySpec` type as input and returns the matched entities in a collection. Indivitual implementations are then responsible for translating the `QuerySpec` to a proper fetching strategy. 
+Entities are backed by [stores](#261-store-layers) for doing CRUD operations. For each entity there is an associated
+store interface (SPI). Most of the stores SPI have a `query` like method which takes a `QuerySpec` type as input and
+returns the matched entities in a collection. Indivitual implementations are then responsible for translating the
+`QuerySpec` to a proper fetching strategy.
 
-The description on how the translation and mapping works will be explained in each implementation. Currently EDC support out of the box:
+The description on how the translation and mapping works will be explained in each implementation. Currently EDC support
+out of the box:
 
-- [In-memory stores](#2611-in-memory-stores) (default implementation). 
-- [SQL stores](#28-postgre-sql-persistence) provied as extensions for each store, mostly tailored for and tested with PostgreSQL. 
+- [In-memory stores](#2611-in-memory-stores) (default implementation).
+- [SQL stores](#28-postgre-sql-persistence) provied as extensions for each store, mostly tailored for and tested with
+  PostgreSQL.
 
-For guaranteeing the highest compatibility between store implementations, a base tests suite is provided for each store that each technology implementors need to fulfill in order to have a minimum usable store implementation.
+For guaranteeing the highest compatibility between store implementations, a base tests suite is provided for each store
+that each technology implementors need to fulfill in order to have a minimum usable store implementation.
 
 ### 2.2 Programming Primitives
 
@@ -910,20 +953,20 @@ application starts up:
 @Override
 protected StateMachineManager.Builder configureStateMachineManager(StateMachineManager.Builder builder) {
     return builder
-        .processor(processNegotiationsInState(OFFERING, this::processOffering))
-        .processor(processNegotiationsInState(REQUESTED, this::processRequested))
-        .processor(processNegotiationsInState(ACCEPTED, this::processAccepted))
-        .processor(processNegotiationsInState(AGREEING, this::processAgreeing))
-        .processor(processNegotiationsInState(VERIFIED, this::processVerified))
-        .processor(processNegotiationsInState(FINALIZING, this::processFinalizing))
-        .processor(processNegotiationsInState(TERMINATING, this::processTerminating));
+            .processor(processNegotiationsInState(OFFERING, this::processOffering))
+            .processor(processNegotiationsInState(REQUESTED, this::processRequested))
+            .processor(processNegotiationsInState(ACCEPTED, this::processAccepted))
+            .processor(processNegotiationsInState(AGREEING, this::processAgreeing))
+            .processor(processNegotiationsInState(VERIFIED, this::processVerified))
+            .processor(processNegotiationsInState(FINALIZING, this::processFinalizing))
+            .processor(processNegotiationsInState(TERMINATING, this::processTerminating));
 }
 
 ```
 
 This instantiates a `Processor` that binds a given state to a callback function. For example `AGREEING` ->
 `this::processAgreeing`. When the `StateMachineManager` invokes this `Processor`, it loads all contract negotiations in
-that state (here: `AGREEING`) and passes each one to the `processAgreeing` method. 
+that state (here: `AGREEING`) and passes each one to the `processAgreeing` method.
 
 All processors are invoked sequentially, because it is possible that one single entity transitions to multiple states in
 the same iteration.
@@ -932,9 +975,11 @@ the same iteration.
 
 In every iteration the state machine loads multiple `StatefulEntity` objects from the database. To avoid overwhelming
 the state machine and to prevent entites from becoming stale, two main safeguards are in place:
+
 - batch-size: this is the maximum amount of entities per state that are fetched from the database
-- sorting: `StatefulEntity` objects are sorted based on when their state was last updated, oldest first. 
-- iteration timeout: if no `StatefulEntities` were processed, the statemachine simply yields for a configurable amount of time.
+- sorting: `StatefulEntity` objects are sorted based on when their state was last updated, oldest first.
+- iteration timeout: if no `StatefulEntities` were processed, the statemachine simply yields for a configurable amount
+  of time.
 
 ##### 2.2.1.2 Database-level locking
 
@@ -945,29 +990,31 @@ data inconsistencies, duplicated DSP messages and other problems.
 
 To avoid this, EDC employs pessimistic exclusive locks on the database level for stateful entities, which are called
 `Lease`. These are entries in a database that indicate whether an entity is currently leased, whether the lease is
-expired and which replica leased the entity. Attempting to acquire a lease for an already-leased entity is only possible if the
+expired and which replica leased the entity. Attempting to acquire a lease for an already-leased entity is only possible
+if the
 lease holder is the same.
 
 > Note that the value of the `edc.runtime.id` property is used to record the holder of a `Lease`. It is _recommended not
 > to configure_ this property in clustered environments so that randomized runtime IDs (= default) are used.
 
 Generally the process is as follows:
+
 - load `N` "leasable" entities and acquire a lease for each one. An entity is considered "leasable" if it is not already
   leased, or the current runtime already holds the lease, or the lease is expired.
 - if the entity was processed, advance state, free the lease
 - if the entity was not processed, free the lease
 
 That way, each replica of the control plane holds an exclusive lock for a particular entity while it is trying to
-process and advance its state. 
-
+process and advance its state.
 
 #### 2.2.2 Transformers
 
 EDC uses JSON-LD serialization on API ingress and egress. For information about this can be found [in this
 chapter](#23-serialization-via-json-ld), but the TL;DR is that it is necessary because of extensible properties and
-namespaces on wire-level DTOs. 
+namespaces on wire-level DTOs.
 
 ##### 2.2.2.1 Basic Serialization and Deserialization
+
 On API ingress and egress this means that conventional serialization and deserialization ("SerDes") cannot be achieved
 with Jackson, because Jackson operates on a configurable, but ultimately rigid schema.
 
@@ -975,9 +1022,13 @@ For that reason, EDC implements its own SerDes layer, called "transformers". The
 is the `AbstractJsonLdTransformer<I,O>` and the naming convention is `JsonObject[To|From]<Entity>Transformer` for
 example `JsonObjectToAssetTransformer`. They typically come in pairs, to enable both serialization and deserialization.
 
-Another rule is that the entity class must contain the fully-qualified (expanded) property names as constants and typical programming patterns are:
-- deserialization: transformers contain a `switch` statement that parses the property names and populates the entity's builder.
-- serialization: transformers simply construct the `JsonObject` based on the properties of the entity using a `JsonObjectBuilder`
+Another rule is that the entity class must contain the fully-qualified (expanded) property names as constants and
+typical programming patterns are:
+
+- deserialization: transformers contain a `switch` statement that parses the property names and populates the entity's
+  builder.
+- serialization: transformers simply construct the `JsonObject` based on the properties of the entity using a
+  `JsonObjectBuilder`
 
 ##### 2.2.2.1 Transformer context
 
@@ -985,22 +1036,26 @@ Many entities in EDC are complex objects that contain other complex objects. For
 contains the asset selector, which is a `List<Criterion>`. However, a `Criterion` is also used in a `QuerySpec`, so it
 makes sense to extract its deserialization into a dedicated transformer. So when the
 `JsonObjectFromContractDefinitionTransformer` encounters the asset selector property in the JSON structure, it delegates
-its deserialization back to the `TransformerContext`, which holds a global list of type transformers (`TypeTransformerRegistry`). 
+its deserialization back to the `TransformerContext`, which holds a global list of type transformers (
+`TypeTransformerRegistry`).
 
 As a general rule of thumb, a transformer should only deserialize first-order properties, and nested complex objects
 should be delegated back to the `TransformerContext`.
 
-Every module that contains a type transformer should register it with the `TypeTransformerRegistry` in its accompanying extension:
+Every module that contains a type transformer should register it with the `TypeTransformerRegistry` in its accompanying
+extension:
 
 ```java
+
 @Inject
 private TypeTransformerRegistry typeTransformerRegistry;
 
 @Override
-public void initialize(ServiceExtensionContext context){
-  typeTransformerRegistry.register(new JsonObjectToYourEntityTransformer());
+public void initialize(ServiceExtensionContext context) {
+    typeTransformerRegistry.register(new JsonObjectToYourEntityTransformer());
 }
 ```
+
 ##### 2.2.2.2 Segmented transformer registries
 
 One might encounter situations, where different serialization formats are required for the same entity, for example
@@ -1012,32 +1067,34 @@ first, because both transformers have the same input and output types:
 
 ```java
 public class JsonObjectFromDataAddressTransformer extends AbstractJsonLdTransformer<DataAddress, JsonObject> {
-  //...
+    //...
 }
 
 public class JsonObjectFromDataAddressDspaceTransformer extends AbstractJsonLdTransformer<DataAddress, JsonObject> {
-  //...
+    //...
 }
 ```
 
 Consequently, all `DataAddress` objects would get serialized in the same way.
 
 To overcome this limitation, EDC has the concept of _segmented_ transformer registries, where the segment is defined by
-a string called a "context": 
+a string called a "context":
 
 ```java
+
 @Inject
 private TypeTransformerRegistry typeTransformerRegistry;
 
 @Override
-public void initialize(ServiceExtensionContext context){
-  var signalingApiRegistry = typeTransformerRegistry.forContext("signaling-api");
-  signalingApiRegistry.register(new JsonObjectFromDataAddressDspaceTransformer(/*arguments*/));
+public void initialize(ServiceExtensionContext context) {
+    var signalingApiRegistry = typeTransformerRegistry.forContext("signaling-api");
+    signalingApiRegistry.register(new JsonObjectFromDataAddressDspaceTransformer(/*arguments*/));
 
-  var dspRegistry = typeTransformerRegistry.forContext("dsp-api");
-  dspRegistry.register(new JsonObjectToDataAddressTransformer());
+    var dspRegistry = typeTransformerRegistry.forContext("dsp-api");
+    dspRegistry.register(new JsonObjectToDataAddressTransformer());
 }
 ```
+
 _Note that this example serves for illustration purposes only!_
 
 Usually, transformation happens in API controllers to deserialize input, process and serialize output, but controllers
@@ -1063,18 +1120,19 @@ private void transformProperties(String key, JsonValue jsonValue, DataPlaneInsta
                 context.reportProblem(e.getMessage());
             }
         }
-    // other properties
+        // other properties
     }
 }
 ```
-Transformers should report errors to the context instead of throwing exceptions. Please note that basic JSON validation should be performed by [validators](#262-validators).
 
+Transformers should report errors to the context instead of throwing exceptions. Please note that basic JSON validation
+should be performed by [validators](#262-validators).
 
 #### 2.2.3 Token generation and decorators
 
 A token is a datastructure that consists of a header and claims and that is signed with a private key. While EDC
 is able to create any type of tokens through [extensions](#24-extension-model), in most use cases JSON Web Tokens (JWT)
-are a good option. 
+are a good option.
 
 The `TokenGenerationService` offers a way to generate such a token by passing in a reference to a private key and a set
 of `TokenDecorators`. These are functions that mutate the parameters of a token, for example they could contribute
@@ -1096,9 +1154,7 @@ token. Out-of-the-box JWTs are supported, but other token types could be support
 [extensions](#24-extension-model). This section will be limited to validating JWT tokens.
 
 Every JWT that is validated by EDC _must_ have a `kid` header indicating the ID of the public key with which the token
-can be verified. In addition, a `PublicKeyResolver` implementation is required to download the public key. 
-
-
+can be verified. In addition, a `PublicKeyResolver` implementation is required to download the public key.
 
 ##### 2.2.4.1 Public Key Resolvers
 
@@ -1108,9 +1164,10 @@ method](https://www.w3.org/TR/did-core/#verification-methods) in a DID document.
 that multiple resolution strategies be supported at runtime, the recommended way to achieve this is to implement a
 `PublicKeyResolver` that dispatches to multiple sub-resolvers based on the shape of the key ID.
 
-> Sometimes it is necessary for the connector runtime to resolve its own public key, e.g. when validating a token that was
-sent out in a previous interaction. In these cases it is best to avoid a remote call to a DID document or a JWKS URL,
-but to resolve the public key locally.
+> Sometimes it is necessary for the connector runtime to resolve its own public key, e.g. when validating a token that
+> was
+> sent out in a previous interaction. In these cases it is best to avoid a remote call to a DID document or a JWKS URL,
+> but to resolve the public key locally.
 
 ##### 2.2.4.2 Validation Rules
 
@@ -1123,13 +1180,16 @@ token's claims.
 
 Usually, tokens are validated in different _contexts_, each of which brings its own validation rules. Currently, the
 following token validation contexts exist:
+
 - `"dcp-si"`: when validating Self-Issued ID tokens in the Decentralized Claims Protocol (DCP)
 - `"dcp-vc"`: when validating VerifiableCredentials that have an external proof in the form of a JWT (JWT-VCs)
 - `"dcp-vp"`: when validating VerifiablePresentations that have an external proof in the form of a JWT (JWT-VPs)
 - `"oauth2"`: when validating OAuth2 tokens
-- `"management-api"`: when validating external tokens in the Management API ingress (relevant when delegated authentication is used)
+- `"management-api"`: when validating external tokens in the Management API ingress (relevant when delegated
+  authentication is used)
 
 Using these contexts it is possible to register additional validation rules using extensions:
+
 ```java
 //YourSpecialExtension.java
 
@@ -1137,11 +1197,11 @@ Using these contexts it is possible to register additional validation rules usin
 private TokenValidationRulesRegistry rulesRegistry;
 
 @Override
-public void initialize(ServiceExtensionContext context){
-  rulesRegistry.addRule(DCP_SELF_ISSUED_TOKEN_CONTEXT, (claimtoken, additional) -> {
-      var checkResult = // perform rule check
-      return checkResult;
-  });
+public void initialize(ServiceExtensionContext context) {
+    rulesRegistry.addRule(DCP_SELF_ISSUED_TOKEN_CONTEXT, (claimtoken, additional) -> {
+        var checkResult = ...// perform rule check
+        return checkResult;
+    });
 }
 ```
 
@@ -1154,17 +1214,526 @@ why its needed, why we sometimes use Jackson SerDes, ingress = expanded, egress 
 
 ### 2.4 Extension model
 
-details about metamodel annotations, (api authentication) registries, configuration best practices
+One of the principles EDC is built around is _extensibility_. This means that by simply putting a Java module on the
+classpath, the code in it will be used to enrich and influence the runtime behaviour of EDC. For instance, contributing
+additional data persistence implementations can be achieved this way. This is sometimes also referred to as "plugin".
+
+#### 2.4.1 Extension basics
+
+Three things are needed to register an extension module with the EDC runtime:
+
+1. a class that implements `ServiceExtension`
+2. a [provider-configuration file](https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html)
+3. adding the module to your runtime's build file. EDC uses Gradle, so your runtime build file should contain
+
+  ```groovy
+  runtimeOnly(project(":module:path:of:your:extension"))
+  ```
+
+Extensions should **not** contain business logic or application code. Their main job is to
+
+- read and handle [configuration](#244-configuration-and-best-practices)
+- instantiate and register services with the service context (read more [here](#25-dependency-injection-deep-dive))
+- allocate and free resources, for example scheduled tasks
+
+#### 2.4.2 Autodoc and Metamodel Annotations
+
+EDC can automatically generate documentation about its extensions, about the settings used therein and about its
+extension points. This feature is available as Gradle task:
+
+```bash
+./gardlew autodoc
+```
+
+Upon execution, this task generates a JSON file located at `build/edc.json`, which contains structural information about
+the extension, for example:
+<details>
+  <summary>Autodoc output in edc.json</summary>
+
+  ```json
+  [
+  {
+    "categories": [],
+    "extensions": [
+      {
+        "categories": [],
+        "provides": [
+          {
+            "service": "org.eclipse.edc.web.spi.WebService"
+          },
+          {
+            "service": "org.eclipse.edc.web.spi.validation.InterceptorFunctionRegistry"
+          }
+        ],
+        "references": [
+          {
+            "service": "org.eclipse.edc.web.spi.WebServer",
+            "required": true
+          },
+          {
+            "service": "org.eclipse.edc.spi.types.TypeManager",
+            "required": true
+          }
+        ],
+        "configuration": [
+          {
+            "key": "edc.web.rest.cors.methods",
+            "required": false,
+            "type": "string",
+            "description": "",
+            "defaultValue": "",
+            "deprecated": false
+          }
+          // other settings
+        ],
+        "name": "JerseyExtension",
+        "type": "extension",
+        "overview": null,
+        "className": "org.eclipse.edc.web.jersey.JerseyExtension"
+      }
+    ],
+    "extensionPoints": [],
+    "modulePath": "org.eclipse.edc:jersey-core",
+    "version": "0.8.2-SNAPSHOT",
+    "name": null
+  }
+]
+  ```
+
+</details>
+
+To achieve this, the [EDC Runtime Metamodel](https://github.com/eclipse-edc/Runtime-Metamode) defines several
+annotations. These are not required for compilation, but they should be added to the appropriate classes and fields with
+proper attributes to enable good documentation.
+
+Note that `@Provider`, `@Inject`, `@Provides` and `@Requires` are used by Autodoc to resolve the dependency graph for
+documentation, but they are also used by the runtime to resolve service dependencies. Read more about that
+[here](#25-dependency-injection-deep-dive).
+
+#### 2.4.3 Configuration and best practices
+
+One important task of extensions is to read and handle configuration. For this, the `ServiceExtensionContext` interface
+provides the `getConfig()` group of methods. 
+
+Configuration values can be _optional_, i.e. they have a default value, or they can be _mandatory_, i.e. no default
+value. Attempting to resolve a mandatory configuration value that was not specified will raise an `EdcException`.
+
+EDC's configuration API can resolve configuration from three places, in this order:
+1. from a `ConfigurationExtension`: this is a special extension class that provides a `Config` object. EDC ships with a file-system based config extension.
+2. from environment variables: `edc.someconfig.someval` would map to `EDC_SOMECONFIG_SOMEVAL`
+3. from Java `Properties`: can be passed in through CLI arguments, e.g. `-Dedc.someconfig.someval=...`
+
+Best practices when handling configuration:
+- resolve early, fail fast: configuration values should be resolved and validated as early as possible in the
+  extension's `initialize()` method. 
+- don't pass the context: it is a code smell if the `ServiceExtensionContext` is passed into a service to resolve config
+- annotate: every setting should have a `@Setting` annotation
+- no magic defaults: default values should be declard as constants in the extension class and documented in the
+  `@Setting` annotation.
+- no secrets: configuration is the wrong place to store secrets
+- naming convention: every config value should start with `edc.`
 
 ### 2.5 Dependency injection deep dive
 
-details regarding `@Provides`, `@Provider`, `@Requires`, `@Inject` defaults of default providers (e.g. resolution on
-demand) dependency graph lifecycle best practices
+In EDC, dependency injection is available to inject services into extension classes (implementors of the
+`ServiceExtension` interface). The `ServiceExtensionContext` acts as service registry, and since it's not _quite_ an IoC
+container, we'll refer to it simple as the "context" in this chapter.
+
+#### 2.5.1 Registering a service implementation
+
+As a general rule, the module that provides the implementation also should register it with the
+`ServiceExtensionContext`. This is done in an accompanying service extension. For example, providing a "FunkyDB" based
+implementation for a `FooStore` (stores `Foo` objects) would require the following classes:
+
+1. A `FooStore.java` interface, located in SPI:
+    ```java
+    public interface FooService {
+        void store(Foo foo);
+    }   
+    ```
+2. A `FunkyFooStore.java` class implementing the interface, located in `:extensions:funky:foo-store-funky`:
+    ```java
+    public class FunkyFooStore implements FooStore {
+        @Override
+        void store(Foo foo){
+            // ...
+        }    
+    }
+    ```
+3. A `FunkyFooStoreExtension.java` located also in `:extensions:funky:foo-store-funky`. Must be accompanied by
+   a _"provider-configuration file"_ as required by
+   the [`ServiceLoader` documentation](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html). Code
+   examples will follow below.
+
+##### 2.5.1.1 Use `@Provider` methods (recommended)
+
+Every `ServiceExtension` may declare methods that are annotated with `@Provider`, which tells the dependency resolution
+mechanism, that this method contributes a dependency into the context. This is very similar to other DI containers, e.g.
+Spring's `@Bean` annotation. It looks like this:
+
+```java
+public class FunkyFooStoreExtension implements ServiceExtension {
+
+    @Override
+    public void initialize(ServiceExtensionContext context) {
+        // ...
+    }
+
+    //Example 1: no args
+    @Provider
+    public SomeService provideSomeService() {
+        return new SomeServiceImpl();
+    }
+
+    //Example 2: using context
+    @Provider
+    public FooStore provideFooStore(ServiceExtensionContext context) {
+        var setting = context.getConfig("...", null);
+        return new FunkyFooStore(setting);
+    }
+}
+```
+
+As the previous code snipped shows, provider methods may have no args, or a single argument, which is the
+`ServiceExtensionContext`. There are a few other restrictions too. Violating these will raise an exception. Provider
+methods must:
+
+- be public
+- return a value (`void` is not allowed)
+- either have no arguments, or a single `ServiceExtensionContext`.
+
+Declaring a provider method is equivalent to invoking
+`context.registerService(SomeService.class, new SomeServiceImpl())`. Thus, the return type of the method defines the
+service `type`, whatever is returned by the provider method determines the implementation of the service.
+
+**Caution**: there is a slight difference between declaring `@Provider` methods and calling
+`service.registerService(...)` with respect to sequence: the DI loader mechanism _first_ invokes
+`ServiceExtension#initialize()`, and _then_ invokes all provider methods. In most situations this difference is
+negligible, but there could be situations, where it is not.
+
+##### 2.5.1.2 Provide "defaults"
+
+Where `@Provider` methods really come into their own is when providing default implementations. This means we can have a
+fallback implementation. For example, going back to our `FooStore` example, there could be an extension that provides a
+default (=in-mem) implementation:
+
+```java
+public class DefaultsExtension implements ServiceExtension {
+
+    @Provider(isDefault = true)
+    public FooStore provideDefaultFooStore() {
+        return new InMemoryFooStore();
+    }
+}
+```
+
+Provider methods configured with `isDefault=true` are only invoked, if the respective service (here: `FooStore`) is not
+provided by any other extension.
+
+> As a general programming rule, every SPI should come with a default implementation if possible.
+
+> Default provider methods are a tricky topic, please be sure to thoroughly read the additional documentation about
+> them [here](#255-advanced-concepts-default-providers)!
+
+##### 2.5.1.3 Register manually (not recommended)
+
+Of course, it is also possible to manually register services by invoking the respective method on
+the `ServiceExtensionContext`
+
+```java
+
+@Provides(FooStore.class/*, possibly others*/)
+public class FunkyFooStoreExtension implements ServiceExtension {
+
+    @Override
+    public void initialize(ServiceExtensionContext context) {
+        var setting = context.getConfig("...", null);
+        var store = new FunkyFooStore(setting);
+        context.registerService(FooStore.class, store);
+    }
+}
+```
+
+There are three important things to mention:
+
+1. the call to `context.registerService()` makes the object available in the context. From this point on other
+   extensions can inject a `FooStore` (and in doing so will provide a `FunkyFooStore`).
+2. the interface class **must** be listed in the `@Provides()` annotation, because it helps the extension loader to
+   determine in which order in which it needs to initialize extensions
+3. service registrations **must** be done in the `initialize()` method.
+
+#### 2.5.2 Injecting a service
+
+As with other DI mechanisms, services should only be referenced by the interface they implement. This will keep
+dependencies clean and maintain extensibility, modularity and testability. Say we have a `FooMaintenanceService` that
+receives `Foo` objects over an arbitrary network channel and stores them.
+
+##### 2.5.2.1 Use `@Inject` to declare dependencies (recommended)
+
+```java
+public class FooMaintenanceService {
+    private final FooStore fooStore;
+
+    public FooMaintenanceService(FooStore fooStore) {
+        this.fooStore = fooStore;
+    }
+}
+```
+
+Note that the example uses what we call _constructor injection_ (even though nothing is actually _injected_), because
+that is needed for object construction, and it increases testability. Also, those types of instance members should be
+declared `final` to avoid programming errors.
+
+In contrast to conventional DI frameworks the `fooStore` dependency won't get auto-injected - rather, this is done in a
+`ServiceExtension` that accompanies the `FooMaintenanceService` and that injects `FooStore`:
+
+```java
+public class FooMaintenanceExtension implements ServiceExtension {
+    @Inject
+    private FooStore fooStore;
+
+    @Override
+    public void initialize(ServiceExtensionContext context) {
+        var service = new FooMaintenanceService(fooStore); //use the injected field
+    }
+}
+```
+
+The `@Inject` annotation on the `fooStore` field tells the extension loading mechanism that `FooMaintenanceExtension`
+depends on a `FooService` and because of that, any provider of a `FooStore` must be initialized _before_ the
+`FooMaintenanceExtension`. Our `FunkyFooStoreExtension` from the previous chapter provides a `FooStore`.
+
+##### 2.5.2.2 Use `@Requires` to declare dependencies
+
+In cases where defining a field seems unwieldy or is simply not desirable, we provide another way to dynamically resolve
+service from the context:
+
+```java
+
+@Requires({ FooService.class, /*maybe others*/ })
+public class FooMaintenanceExtension implements ServiceExtension {
+
+    @Override
+    public void initialize(ServiceExtensionContext context) {
+        var fooStore = context.getService(FooStore.class);
+        var service = new FooMaintenanceService(fooStore); //use the resolved object
+    }
+}
+```
+
+The `@Requires` annotation is necessary to inform the service loader about the dependency. Failing to add it may
+potentially result in a skewed initialization order, and in further consequence, in an `EdcInjectionException`.
+
+> Both options are almost semantically equivalent, except for optional dependencies:
+> while `@Inject(required=false)` allows for nullable dependencies, `@Requires` has no such option and the service
+> dependency must be resolved by explicitly allowing it to be optional: `context.getService(FooStore.class, true)`.
+
+#### 2.5.3 Extension initialization sequence
+
+The extension loading mechanism uses a two-pass procedure to resolve dependencies. First, all implementations of
+of `ServiceExtension` are instantiated using their public default constructor, and sorted using a topological sort
+algorithm based on their dependency graph. Cyclic dependencies would be reported in this stage.
+
+Second, the extension is initialized by setting all fields annotated with `@Inject` and by calling its `initialize()`
+method. This implies that every extension can assume that by the time its `initialize()` method executes, all its
+dependencies are already registered with the context, because the extension(s) providing them were ordered at previous
+positions in the list, and thus have already been initialized.
+
+#### 2.5.4 Testing extension classes
+
+To test classes using the `@Inject` annotation, use the appropriate JUnit extension `@DependencyInjectionExtension`:
+
+```java
+
+@ExtendWith(DependencyInjectionExtension.class)
+class FooMaintenanceExtensionTest {
+    private final FooStore mockStore = mock();
+
+    @BeforeEach
+    void setUp(ServiceExtensionContext context) {
+        context.registerService(FooStore.class, mockStore);
+    }
+
+    @Test
+    void testInitialize(FooMaintenanceExtension extension, ServiceExtensionContext context) {
+        extension.initialize(context);
+        verify(mockStore).someMethodGotInvoked();
+    }
+}
+```
+
+#### 2.5.5 Advanced concepts: default providers
+
+In this chapter we will use the term "default provider" and "default provider method" synonymously to refer to a method
+annotated with `@Provider(isDefault=true)`. Similarly, "provider", "provider method" or "factory method" refer to
+methods annotated with just `@Provider`.
+
+##### 2.5.5.1 Fallbacks versus extensibility
+
+Default provider methods are intended to provide fallback implementations for services rather than to achieve
+extensibility - that is what extensions are for. There is a subtle but important semantic difference between _fallback
+implementations_ and _extensibility_:
+
+##### 2.5.5.2 Fallback implementations
+
+Fallbacks are meant as safety net, in case developers forget or don't want to add a specific implementation for a
+service. It is there so as not to end up _without_ an implementation for a service interface. A good example for this
+are in-memory store implementations. It is expected that an actual persistence implementation is contributed by another
+extension. In-mem stores get you up and running quickly, but we wouldn't recommend using them in production
+environments. Typically, fallbacks should not have any dependencies onto other services.
+
+> Default-provided services, even though they are on the classpath, only get instantiated if there is no other
+> implementation.
+
+##### 2.5.5.3 Extensibility
+
+In contrast, _extensibility_ refers to the possibility of swapping out one implementation of a service for another by
+choosing the respective module at compile time. Each implementation must therefore be contained in its own java module,
+and the choice between one or the other is made by referencing one or the other in the build file. The service
+implementation is typically instantiated and provided by its own extension. In this case, the `@Provider`-annotation **
+must not** have the `isDefault` attribute. This is also the case if there will likely only ever be one implementation
+for a service.
+
+One example for extensibility is the `IdentityService`: there could be several implementations for it (OAuth,
+DecentralizedIdentity, Keycloak etc.), but providing either one as default would make little sense, because all of them
+require external services to work. Each implementation would be in its own module and get instantiated by its own
+extension.
+
+> Provided services get instantiated only if they are on the classpath, but always get instantiated.
+
+##### 2.5.5.4 Deep-dive into extension lifecycle management
+
+Generally speaking every extension goes through these lifecycle stages during loading:
+
+- `inject`: all fields annotated with `@Inject` are resolved
+- `initialize`: the `initialize()` method is invoked. All required collaborators are expected to be resolved after this.
+- `provide`: all `@Provider` methods are invoked, the object they return is registered in the context.
+
+Due to the fact that default provider methods act a safety net, they only get invoked if no other provider method offers
+the same service type. However, what may be a bit misleading is the fact that they typically get invoked _during the
+`inject` phase_. The following section will demonstrate this.
+
+##### 2.5.5.5 Example 1 - provider method
+
+Recall that `@Provider` methods get invoked regardless, and after the `initialze` phase. That means, assuming both
+extensions are on the classpath, the extension that declares the provider method (= `ExtensionA`) will get fully
+instantiated before another extension (= `ExtensionB`) can use the provided object:
+
+```java
+public class ExtensionA { // gets loaded first
+    @Inject
+    private SomeStore store; // provided by some other extension
+
+    @Provider
+    public SomeService getSomeService() {
+        return new SomeServiceImpl(store);
+    }
+}
+
+public class ExtensionB { // gets loaded second
+    @Inject
+    private SomeService service;
+}
+```
+
+After building the dependency graph, the loader mechanism would first fully construct `ExtensionA`, i.e.
+`getSomeService()` is invoked, and the instance of `SomeServiceImpl` is registered in the context. Note that this is
+done regardless whether another extension _actually injects a `SomeService`_. After that, `ExtensionB` gets constructed,
+and by the time it goes through its `inject` phase, the injected `SomeService` is already in the context, so the
+`SomeService` field gets resolved properly.
+
+##### 2.5.5.6 Example 2 - default provider method
+
+Methods annotated with `@Provider(isDefault=true)` only get invoked if there is no other provider method for that
+service, and at the time when the corresponding `@Inject` is resolved. Modifying example 1 slightly we get:
+
+```java
+public class ExtensionA {
+
+    @Inject
+    private SomeStore store;
+
+    @Provider(isDefault = true)
+    public SomeService getSomeService() {
+        return new SomeServiceImpl(store);
+    }
+}
+
+public class ExtensionB {
+    @Inject
+    private SomeService service;
+}
+```
+
+The biggest difference here is the point in time at which `getSomeService` is invoked. Default provider methods get
+invoked _when the `@Inject` dependency is resolved_, because that is the "latest" point in time that that decision can
+be made. That means, they get invoked during `ExtensionB`'s inject phase, and _not_ during `ExtensionA`'s provide phase.
+There is no guarantee that `ExtensionA` is already initialized by that time, because the extension loader does not know
+whether it needs to invoke `getSomeService` at all, until the very last moment, i.e. when resolving `ExtensionB`'s
+`service` field. By that time, the dependency graph is already built.
+
+Consequently, default provider methods could (and likely would) get invoked before the defining extension's `provide`
+phase has completed. They even could get invoked before the `initialize` phase has completed: consider the following
+situation the previous example:
+
+1. all implementors of `ServiceExtension` get constructed by the Java `ServiceLoader`
+2. `ExtensionB` gets loaded, runs through its inject phase
+3. no provider for `SomeService`, thus the default provider kicks in
+4. `ExtensionA.getSomeService()` is invoked, but `ExtensionA` is not yet loaded -> `store` is null
+5. -> potential NPE
+
+Because there is no explicit ordering in how the `@Inject` fields are resolved, the order may depend on several factors,
+like the Java version or specific JVM used, the classloader and/or implementation of reflection used, etc.
+
+##### 2.5.5.7 Usage guidelines when using default providers
+
+From the previous sections and the examples demonstrated above we can derive a few important guidelines:
+
+- do not use them to achieve extensibility. That is what extensions are for.
+- use them only to provide a _fallback implementation_
+- they should not depend on other injected fields (as those may still be null)
+- they should be in their own dedicated extension (cf. `DefaultServicesExtension`) and Java module
+- do not provide and inject the same service in one extension
+- rule of thumb: unless you know exactly what you're doing and why you need them - don't use them!
+
+#### 2.5.6 Limitations
+
+- Only available in `ServiceExtension`: services can only be injected into `ServiceExtension` objects at this time as
+  they are the main hook points for plugins, and they have a clearly defined interface. All subsequent object creation
+  must be done manually using conventional mechanisms like constructors or builders.
+
+- No multiple registrations: registering two implementations for an interface will result in the first registration
+  being overwritten by the second registration. If both providers have the same topological ordering it is undefined
+  which comes first. A warning is posted to the `Monitor`.
+
+  _It was a conscientious architectural decision to forego multiple service registrations for the sake of simplicity and
+  clean design. Patterns like composites or delegators exist for those rare cases where having multiple implementors of
+  the same interface is indeed needed. Those should be used sparingly and not without good reason._
+
+- No collection-based injection: Because there can be only ever one implementation for a service, it is not possible to
+  inject a collection of implementors as it is in other DI frameworks.
+
+- Field injection only: `@Inject` can only target fields. For example
+  `public SomeExtension(@Inject SomeService someService){ ... }` would not be possible.
+
+- No named dependencies: dependencies cannot be decorated with an identifier, which would technically allow for multiple
+  service registrations (using different _tags_). Technically this is linked to the limitation of single service
+  registrations.
+
+- Direct inheritors/implementors only: this is not due to a limitation of the dependency injection mechanism, but rather
+  due to the way how the context maintains service registrations: it simply maintains a `Map` containing interface class
+  and implementation type.
+
+- Cyclic dependencies: cyclic dependencies are detected by the `TopologicalSort` algorithm
+
+- No generic dependencies: `@Inject private SomeInterface<SomeType> foobar` is not possible. 
 
 ### 2.6 Service layers
 
 #### 2.6.1 API controllers
+
 ```java
+
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 @Path("/v1/foo/bar")
@@ -1179,15 +1748,15 @@ public class SomeApiObjectController {
     @POST
     @Override
     public JsonObject create(JsonObject someApiObject) {
-      // deserialize JSON -> SomeApiObject
-      var someApiObject = typeTransformerRegistry.transform(someApiObject, SomeApiObject.class)
+        // deserialize JSON -> SomeApiObject
+        var someApiObject = typeTransformerRegistry.transform(someApiObject, SomeApiObject.class)
                 .onFailure(f -> /*log warning*/)
                 .orElseThrow(InvalidRequestException::new);
 
-      var processedObject = someService.process(someApiObject);
+        var processedObject = someService.process(someApiObject);
 
-      // serialize SomeApiObject -> JSON
-      return typeTransformerRegistry.transform(processedObject, JsonObject.class)
+        // serialize SomeApiObject -> JSON
+        return typeTransformerRegistry.transform(processedObject, JsonObject.class)
                 .orElseThrow(f -> new EdcException(f.getFailureDetail()));
     }
 }
@@ -1199,7 +1768,8 @@ public class SomeApiObjectController {
 
 #### 2.6.4 Aggregate services
 
-The above example 
+The above example
+
 - (aggregate) services: transaction management
 - stores: default in-mem stores, predicate converters, CriterionOperatorRegistry, ReflectionBasedQueryResolver
 - Events and callbacks
