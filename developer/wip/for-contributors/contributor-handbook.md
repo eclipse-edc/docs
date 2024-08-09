@@ -902,7 +902,7 @@ __Provider and consumer agree to a contract (not displayed in the diagram)__
 
 ###### 2.1.7.1.2 Provider Push
 
-A push transfer is when the Provider data plane initiates sending data to the consumer provided destination.
+A push transfer is when the Provider data plane initiates sending data to the destination specified by the consumer.
 
 ![Provider Push](diagrams/transfer-data-plane-provider-push.png)
 
