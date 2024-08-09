@@ -932,7 +932,7 @@ On the provider side transfer processes can also be terminated by the [policy mo
 A data destination is a description of where the consumer expects to find the data after the transfer completes. In a "
 provider-push" scenario this could be an object storage container, a directory on a file system, etc. In a
 "consumer-pull" scenario this would be a placeholder, that does not contain any information about the destination, as
-the provider "decides" on which endpoint he makes the data available.
+the provider "decides" which endpoint he makes the data available on.
 
 A data address is a schemaless object, and the provider and the consumer need to have a common understanding of the
 required fields. For example, if the provider is supposed to put the data into a file share, the `DataAddress` object
