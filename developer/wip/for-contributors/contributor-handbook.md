@@ -826,7 +826,7 @@ Here is a diagram of the state machine applied to transfer processes on consumer
 
 ![Transfer Process Consumer State Machine](diagrams/transfer-process-consumer-states.png)
 
-Here's a diagram of the state machine applied to transfer processes on provider side:
+Here is a diagram of the state machine applied to transfer processes on provider side:
 
 ![Transfer Process Provider State Machine](diagrams/transfer-process-provider-states.png)
 
