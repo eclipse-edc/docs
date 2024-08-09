@@ -24,7 +24,14 @@
       * [2.1.5 Contract agreements](#215-contract-agreements)
       * [2.1.6 Catalog](#216-catalog)
       * [2.1.7 Transfer processes](#217-transfer-processes)
-      * [2.1.8 Querying with `QuerySpec` and `Criterion`](#218-querying-with-queryspec-and-criterion)
+        * [2.1.7.1 Transfer and flow types](#2171-transfer-and-data-flows-types)
+          * [2.1.7.1.1 Consumer Pull](#21711-consumer-pull)
+          * [2.1.7.1.2 Provider Push](#21712-provider-push)
+          * [2.1.7.1.2 Finite and Non-finite data](#21712-finite-and-non-finite-data)
+        * [2.1.7.2 About data destinations](#2172-about-data-destinations)
+        * [2.1.7.2 Transfer callbacks](#2173-transfer-process-callbacks)
+      * [2.1.8 Endpoint Data References](#218-endpoint-data-references)
+      * [2.1.9 Querying with `QuerySpec` and `Criterion`](#219-querying-with-queryspec-and-criterion)
     * [2.2 Programming Primitives](#22-programming-primitives)
       * [2.2.1 State machines](#221-state-machines)
         * [2.2.1.1 Batch-size, sorting and tick-over timeout](#2211-batch-size-sorting-and-tick-over-timeout)
@@ -49,9 +56,10 @@
       * [2.6.4 Aggregate services](#264-aggregate-services)
       * [2.6.1 Store layers](#261-store-layers)
       * [2.6.1.1 In-Memory stores](#2611-in-memory-stores)
-    * [2.7 Protocol extensions (DSP)](#27-protocol-extensions-dsp)
-    * [2.8 (Postgre-)SQL persistence](#28-postgre-sql-persistence)
-    * [2.9 Data plane signaling](#29-data-plane-signaling)
+    * [2.7 Policy Monitor](#27-policy-monitor)   
+    * [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
+    * [2.9 (Postgre-)SQL persistence](#29-postgre-sql-persistence)
+    * [2.10 Data plane signaling](#210-data-plane-signaling)
   * [3. The data plane](#3-the-data-plane)
     * [3.1 Data plane self-registration](#31-data-plane-self-registration)
     * [3.2 Public API authentication](#32-public-api-authentication)
@@ -794,7 +802,196 @@ available. It uses the [Dataplane Signaling Protocol](#29-data-plane-signaling) 
 
 #### 2.1.7 Transfer processes
 
-#### 2.1.8 Querying with `QuerySpec` and `Criterion`
+A `TransferProcess` is a record of the data sharing procedure between a _consumer_ and a _provider_. As they traverse
+through the system, they transition through several
+states ([`TransferProcessStates`](#221-state-machines)).
+
+Once a contract is [negotiated](#214-contract-negotiations) and an [agreement](#215-contract-agreements) is reached, the
+consumer connector may send a transfer initiate request to start the transfer. In the course of doing that, both parties may provision additional resources, for example deploying a
+temporary object store, where the provider should put the data. Similarly, the provider may need to take some
+preparatory steps, e.g. anonymizing the data before sending it out.
+
+This is sometimes referred to as the _provisioning phase_. If no additional provisioning is needed, the transfer process
+simply transitions through the state with a NOOP.
+
+Once that is done, the transfer begins in earnest. Data is transmitted according to the `dataDestination`, that was
+passed in the initiate-request.
+
+Once the transmission has completed, the transfer process will transition to the `COMPLETED` state, or - if an error
+occurred - to the `TERMINATED` state.
+
+The Management API provides several endpoints to manipulate data transfers.
+
+Here is a diagram of the state machine applied to transfer processes on consumer side:
+
+![Transfer Process Consumer State Machine](diagrams/transfer-process-consumer-states.png)
+
+Here is a diagram of the state machine applied to transfer processes on provider side:
+
+![Transfer Process Provider State Machine](diagrams/transfer-process-provider-states.png)
+
+A transfer process can be initiated from the consumer side by sending a `TransferRequest` to the connector Management API:
+
+```json
+{
+    "@context": {
+        "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+    },
+    "@type": "https://w3id.org/edc/v0.0.1/ns/TransferRequest",
+    "protocol": "dataspace-protocol-http",
+    "counterPartyAddress": "http://provider-address",
+    "contractId": "contract-id",
+    "transferType": "transferType",
+    "dataDestination": {
+        "type": "data-destination-type"
+    },
+    "privateProperties": {
+        "private-key": "private-value"
+    },
+    "callbackAddresses": [
+        {
+            "transactional": false,
+            "uri": "http://callback/url",
+            "events": [
+                "contract.negotiation",
+                "transfer.process"
+            ],
+            "authKey": "auth-key",
+            "authCodeId": "auth-code-id"
+        }
+    ]
+}
+```
+
+where:
+
+- `counterPartyAddress`: the address where to send the `TransferRequestMessage` via the specified `protocol` (currently [`dataspace-protocol-http`](#27-protocol-extensions-dsp))
+- `contractId`: the ID of a previously negotiated [contract agreement](#215-contract-agreements) which is a result of the [contract negotiation](#214-contract-negotiations) process.
+- [`transferType`](#2171-transfer-and-data-flows-types) and the [`dataDestination`](#2172-about-data-destinations) define how and where the data transfer should happen.
+- [`callbackAddresses`](#2173-transfer-process-callbacks) custom hooks in order bo be notified about state transition of the transfer process.
+- `privateProperties`: custom properties not shared with the counter party.
+
+##### 2.1.7.1 Transfer and data flows types
+
+The transfer type defines the channel (Distribution) for the data transfer and it depends on the capabilities of the [data plane](#3-the-data-plane) if it can be fulfilled. The `transferType` available for a data offering is available in the `dct:format` of the `Distribution` when inspecting the [catalog](#216-catalog) response.
+
+Each transfer type also characterizes the type of the flow, which can be either [pull](#21711-consumer-pull) or [push](#21712-provider-push) and it's data can be either [finite](#21712-finite-and-non-finite-data) or [non-finite](#21712-finite-and-non-finite-data)
+
+
+###### 2.1.7.1.1 Consumer Pull
+
+A pull transfer is when the consumer receives information (in the form of a `DataAddress`) on how to retrieve data from the Provider. 
+Then it's up to the consumer to use this information for pulling the data.
+
+![Consumer Pull](diagrams/transfer-data-plane-consumer-pull.png)
+
+__Provider and consumer agree to a contract (not displayed in the diagram)__
+
+1. Consumer initiates the transfer process by sending a [`TransferRequestMessage`](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/transfer-process/transfer.process.protocol#21-transfer-request-message)
+2. The Provider Control Plane retrieves the `DataAddress` of the actual data source and creates a `DataFlowStartMessage`.
+3. The Provider Control Plane asks the selector which Data Plane instance can be used for this data transfer
+4. The Selector returns an eligible Data Plane instance (if any)
+5. Provider Control Plane sends the `DataFlowStartMessage` to the selected Data Plane instance through [data plane signaling](#29-data-plane-signaling) protocol.
+6. The Provider `DataPlaneManager` validates the incoming request and  delegates to the `DataPlaneAuthorizationService` the generation of `DataAddress`, containing the information on location and authorization for fetching the data 
+7. The Provider Data Plane acknowledges the Provider control plane and attach the `DataAddress` generated.
+8. The Provider Control Plane notifies the start of the transfer attaching the `DataAddress` in the [`TransferStartMessage`](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/transfer-process/transfer.process.protocol#22-transfer-start-message).
+9. The Consumer Control plane receives the `DataAddress` and dispatch it accordingly to the configured runtime. Consumer can either decide to receive the `DataAddress` using the eventing system [callbacks](#2173-transfer-process-callbacks) using the `transfer.process.started` type, or use the [EDRs](#218-endpoint-data-references) extensions for automatically store it on consumer control plane side.
+10. With the informations in the `DataAddress` such as the `endpointUrl` and the `Authorization` data can be fetched.
+11. The Provider Data plane validates and authenticates the incoming request and retrieves the source `DataAddress`.
+12. The he provider data plane proxies the validated request to the configured backend in the source `DataAddress`.
+
+###### 2.1.7.1.2 Provider Push
+
+A push transfer is when the Provider data plane initiates sending data to the destination specified by the consumer.
+
+![Provider Push](diagrams/transfer-data-plane-provider-push.png)
+
+__Provider and consumer agree to a contract (not displayed in the diagram)__
+
+1. The Consumer initiates the transfer process, i.e. sends [`TransferRequestMessage`](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/transfer-process/transfer.process.protocol#21-transfer-request-message) with a destination [DataAddress](#2172-about-data-destinations)
+2. The Provider Control Plane retrieves the `DataAddress` of the actual data source and creates a `DataFlowStartMessage` with both source and destination `DataAddress`.
+3. The Provider Control Plane asks the selector which Data Plane instance can be used for this data transfer
+4. The Selector returns an eligible Data Plane instance (if any)
+5. The Provider Control Plane sends the `DataFlowStartMessage` to the selected Data Plane instance through [data plane signaling](#29-data-plane-signaling) protocol.
+6. The Provider Data Plane validates the incoming request
+7. If request is valid, the Provider Data Plane returns acknowledgement
+8. The `DataPlaneManager` of the the Provider Data Plane processes the request: it creates a `DataSource`/`DataSink` pair based on the source/destination data addresses
+9. The Provider Data Plane fetches data from the actual data source (see `DataSource`)
+10. The Provider Data Plane pushes data to the consumer services (see `DataSink`)
+
+###### 2.1.7.1.2 Finite and Non-Finite Data
+
+The charaterization of the data applies to either `push` and `pull` transfers. Finite data transfers cause the transfer process to transitition to the state `COMPLETED`, once the transmission has finished. For example a transfer of a single file that is hosted and transferred into a cloud storage system.
+
+Non-finite data means that once the transfer process request has been accepted by the provider the transfer process is in the `STARTED` state until it gets terminated by the consumer or the provider. Exampes of Non-finite data are streams or API endpoins.
+
+On the provider side transfer processes can also be terminated by the [policy monitor](#27-policy-monitor) that periodically watches over the on going transfer and checks if the associated [contract agreement](#215-contract-agreements) still fulfills the contract [policy](#212-policies).
+
+##### 2.1.7.2 About Data Destinations
+
+A data destination is a description of where the consumer expects to find the data after the transfer completes. In a "
+provider-push" scenario this could be an object storage container, a directory on a file system, etc. In a
+"consumer-pull" scenario this would be a placeholder, that does not contain any information about the destination, as
+the provider "decides" which endpoint he makes the data available on.
+
+A data address is a schemaless object, and the provider and the consumer need to have a common understanding of the
+required fields. For example, if the provider is supposed to put the data into a file share, the `DataAddress` object
+representing the data destination will likely contain the host URL, a path and possibly a file name. So both connectors
+need to be "aware" of that.
+
+The actual data transfer is handled by a [data plane](#3-the-data-plane) through extensions (called "sources" and "
+sinks"). Thus, the way to establish that "understanding" is to make sure that both parties have matching sources and
+sinks. That means, if a consumer asks to put the data in a file share, the provider must have the appropriate data plane
+extensions to be able to perform that transfer.
+
+If the provider connector does _not_ have the appropriate extensions loaded at runtime, the transfer process will fail.
+
+##### 2.1.7.3 Transfer process callbacks
+
+In order to get timely updates about status changes of a transfer process, we could simply poll the management API by
+firing a `GET /v*/transferprocesses/{tp-id}/state` request every X amount of time. That will not only put unnecessary load on the connector,
+you may also run into rate-limiting situations, if the connector is behind a load balancer of some sort. Thus, we recommend using event callbacks.
+
+Callbacks must be specified when requesting to initiate the transfer:
+
+```json
+{
+  // ...
+  "callbackAddresses": [
+    {
+      "transactional": false,
+      "uri": "http://callback/url",
+      "events": [
+        "transfer.process"
+      ],
+      "authKey": "auth-key",
+      "authCodeId": "auth-code-id"
+    }
+  ]
+  //...
+}
+```
+
+Currently, we support the following events:
+
+- `transfer.process.deprovisioned`
+- `transfer.process.completed`
+- `transfer.process.deprovisioningRequested`
+- `transfer.process.initiated`
+- `transfer.process.provisioned`
+- `transfer.process.provisioning`
+- `transfer.process.requested`
+- `transfer.process.started`
+- `transfer.process.terminated`
+
+The connector's event dispatcher will send invoke the webhook specified in the `uri` field passing the event
+payload as JSON object.
+
+More info about events and callbacks can be found [here](#51-events-and-callbacks).
+
+#### 2.1.8 Endpoint Data References
+
+#### 2.1.9 Querying with `QuerySpec` and `Criterion`
 
 Most of the entities can be queried with the `QuerySpec` object, which is a generic way of expressing limit, offset, sort and filters when querying a collection of objects managed by the EDC stores. 
 
@@ -1208,13 +1405,15 @@ The above example
 
 #### 2.6.1.1 In-Memory stores
 
-### 2.7 Protocol extensions (DSP)
+### 2.7 Policy Monitor
 
-### 2.8 (Postgre-)SQL persistence
+### 2.8 Protocol extensions (DSP)
+
+### 2.9 (Postgre-)SQL persistence
 
 translation mapping, querying, JSON field mappers, etc.
 
-### 2.9 Data plane signaling
+### 2.10 Data plane signaling
 
 ## 3. The data plane
 
