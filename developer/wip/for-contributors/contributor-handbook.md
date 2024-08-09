@@ -880,7 +880,7 @@ Each transfer type also characterizes the type of the flow, which can be either 
 
 ###### 2.1.7.1.1 Consumer Pull
 
-A pull transfer is when the consumer receives informations (`DataAddress`) on how to retrieve data from the Provider. 
+A pull transfer is when the consumer receives information (in the form of a `DataAddress`) on how to retrieve data from the Provider. 
 Then it's up to the consumer to use this information for pulling the data.
 
 ![Consumer Pull](diagrams/transfer-data-plane-consumer-pull.png)
