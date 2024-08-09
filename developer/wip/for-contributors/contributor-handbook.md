@@ -830,7 +830,7 @@ Here is a diagram of the state machine applied to transfer processes on provider
 
 ![Transfer Process Provider State Machine](diagrams/transfer-process-provider-states.png)
 
-A transfer process can be initiated from the consumer side by sending a `TransferRequest` to the connector management API:
+A transfer process can be initiated from the consumer side by sending a `TransferRequest` to the connector Management API:
 
 ```json
 {
