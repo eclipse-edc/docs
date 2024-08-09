@@ -866,7 +866,7 @@ A transfer process can be initiated from the consumer side by sending a `Transfe
 where:
 
 - `counterPartyAddress`: the address where to send the `TransferRequestMessage` via the specified `protocol` (currently [`dataspace-protocol-http`](#27-protocol-extensions-dsp))
--  `contractId`: the ID of a previously negotiated [contract agreement](#215-contract-agreements) through the [contract negotiation](#214-contract-negotiations) process.
+- `contractId`: the ID of a previously negotiated [contract agreement](#215-contract-agreements) which is a result of the [contract negotiation](#214-contract-negotiations) process.
 - [`transferType`](#2171-transfer-and-data-flows-types) and the [`dataDestination`](#2172-about-data-destinations) define how and where the data transfer should happen.
 - [`callbackAddresses`](#2173-transfer-process-callbacks) custom hooks in order bo be notified about state transition of the transfer process.
 - `privateProperties`: custom properties not shared with the counter party.
