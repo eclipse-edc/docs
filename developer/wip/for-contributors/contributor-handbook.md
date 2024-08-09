@@ -23,12 +23,12 @@
       * [2.1.5 Contract agreements](#215-contract-agreements)
       * [2.1.6 Catalog](#216-catalog)
       * [2.1.7 Transfer processes](#217-transfer-processes)
-        * [2.1.7.1 Transfer and flow types](#2171-transfer-and-data-flows-types)
+        * [2.1.7.1 Transfer and data flows types](#2171-transfer-and-data-flows-types)
           * [2.1.7.1.1 Consumer Pull](#21711-consumer-pull)
           * [2.1.7.1.2 Provider Push](#21712-provider-push)
-          * [2.1.7.1.2 Finite and Non-finite data](#21712-finite-and-non-finite-data)
-        * [2.1.7.2 About data destinations](#2172-about-data-destinations)
-        * [2.1.7.2 Transfer callbacks](#2173-transfer-process-callbacks)
+          * [2.1.7.1.2 Finite and Non-Finite Data](#21712-finite-and-non-finite-data)
+        * [2.1.7.2 About Data Destinations](#2172-about-data-destinations)
+        * [2.1.7.3 Transfer process callbacks](#2173-transfer-process-callbacks)
       * [2.1.8 Endpoint Data References](#218-endpoint-data-references)
       * [2.1.9 Querying with `QuerySpec` and `Criterion`](#219-querying-with-queryspec-and-criterion)
     * [2.2 Programming Primitives](#22-programming-primitives)
@@ -71,12 +71,16 @@
       * [2.5.6 Limitations](#256-limitations)
     * [2.6 Service layers](#26-service-layers)
       * [2.6.1 API controllers](#261-api-controllers)
+        * [2.6.1.1 API contexts](#2611-api-contexts)
+        * [2.6.1.2 Registering controllers](#2612-registering-controllers)
+        * [2.6.1.3 Registering other resources](#2613-registering-other-resources)
+        * [2.6.1.4 API Authentication](#2614-api-authentication)
       * [2.6.2 Validators](#262-validators)
       * [2.6.3 Transformers](#263-transformers)
       * [2.6.4 Aggregate services](#264-aggregate-services)
-      * [2.6.1 Store layers](#261-store-layers)
-      * [2.6.1.1 In-Memory stores](#2611-in-memory-stores)
-    * [2.7 Policy Monitor](#27-policy-monitor)   
+      * [2.6.5 Data persistence](#265-data-persistence)
+        * [2.6.1.1 In-Memory stores](#2611-in-memory-stores)
+    * [2.7 Policy Monitor](#27-policy-monitor)
     * [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
     * [2.9 (Postgre-)SQL persistence](#29-postgre-sql-persistence)
     * [2.10 Data plane signaling](#210-data-plane-signaling)
@@ -93,7 +97,6 @@
     * [5.2 Autodoc](#52-autodoc)
     * [5.3 Adapting the Gradle build](#53-adapting-the-gradle-build)
 <!-- TOC -->
-
 ## 0. Intended audience
 
 This document is aimed at software developers who have already read the [adopter documentation](../for-adopters) and
@@ -599,11 +602,7 @@ and `id3` that must contain the `"foo" : "bar"` property.
       "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
       "edc:operandLeft": "id",
       "edc:operator": "in",
-      "edc:operandRight": [
-        "id1",
-        "id2",
-        "id3"
-      ]
+      "edc:operandRight": ["id1", "id2", "id3"]
     },
     {
       "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
@@ -671,9 +670,7 @@ management API.
     {
       "transactional": false,
       "uri": "http://callback/url",
-      "events": [
-        "contract.negotiation"
-      ],
+      "events": ["contract.negotiation"],
       "authKey": "auth-key",
       "authCodeId": "auth-code-id"
     }
@@ -866,32 +863,29 @@ A transfer process can be initiated from the consumer side by sending a `Transfe
 
 ```json
 {
-    "@context": {
-        "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-    },
-    "@type": "https://w3id.org/edc/v0.0.1/ns/TransferRequest",
-    "protocol": "dataspace-protocol-http",
-    "counterPartyAddress": "http://provider-address",
-    "contractId": "contract-id",
-    "transferType": "transferType",
-    "dataDestination": {
-        "type": "data-destination-type"
-    },
-    "privateProperties": {
-        "private-key": "private-value"
-    },
-    "callbackAddresses": [
-        {
-            "transactional": false,
-            "uri": "http://callback/url",
-            "events": [
-                "contract.negotiation",
-                "transfer.process"
-            ],
-            "authKey": "auth-key",
-            "authCodeId": "auth-code-id"
-        }
-    ]
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "https://w3id.org/edc/v0.0.1/ns/TransferRequest",
+  "protocol": "dataspace-protocol-http",
+  "counterPartyAddress": "http://provider-address",
+  "contractId": "contract-id",
+  "transferType": "transferType",
+  "dataDestination": {
+    "type": "data-destination-type"
+  },
+  "privateProperties": {
+    "private-key": "private-value"
+  },
+  "callbackAddresses": [
+    {
+      "transactional": false,
+      "uri": "http://callback/url",
+      "events": ["contract.negotiation", "transfer.process"],
+      "authKey": "auth-key",
+      "authCodeId": "auth-code-id"
+    }
+  ]
 }
 ```
 
@@ -909,22 +903,21 @@ The transfer type defines the channel (Distribution) for the data transfer and i
 
 Each transfer type also characterizes the type of the flow, which can be either [pull](#21711-consumer-pull) or [push](#21712-provider-push) and it's data can be either [finite](#21712-finite-and-non-finite-data) or [non-finite](#21712-finite-and-non-finite-data)
 
-
 ###### 2.1.7.1.1 Consumer Pull
 
-A pull transfer is when the consumer receives information (in the form of a `DataAddress`) on how to retrieve data from the Provider. 
+A pull transfer is when the consumer receives information (in the form of a `DataAddress`) on how to retrieve data from the Provider.
 Then it's up to the consumer to use this information for pulling the data.
 
 ![Consumer Pull](diagrams/transfer-data-plane-consumer-pull.png)
 
-__Provider and consumer agree to a contract (not displayed in the diagram)__
+**Provider and consumer agree to a contract (not displayed in the diagram)**
 
 1. Consumer initiates the transfer process by sending a [`TransferRequestMessage`](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/transfer-process/transfer.process.protocol#21-transfer-request-message)
 2. The Provider Control Plane retrieves the `DataAddress` of the actual data source and creates a `DataFlowStartMessage`.
 3. The Provider Control Plane asks the selector which Data Plane instance can be used for this data transfer
 4. The Selector returns an eligible Data Plane instance (if any)
 5. Provider Control Plane sends the `DataFlowStartMessage` to the selected Data Plane instance through [data plane signaling](#29-data-plane-signaling) protocol.
-6. The Provider `DataPlaneManager` validates the incoming request and  delegates to the `DataPlaneAuthorizationService` the generation of `DataAddress`, containing the information on location and authorization for fetching the data 
+6. The Provider `DataPlaneManager` validates the incoming request and delegates to the `DataPlaneAuthorizationService` the generation of `DataAddress`, containing the information on location and authorization for fetching the data
 7. The Provider Data Plane acknowledges the Provider control plane and attach the `DataAddress` generated.
 8. The Provider Control Plane notifies the start of the transfer attaching the `DataAddress` in the [`TransferStartMessage`](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/transfer-process/transfer.process.protocol#22-transfer-start-message).
 9. The Consumer Control plane receives the `DataAddress` and dispatch it accordingly to the configured runtime. Consumer can either decide to receive the `DataAddress` using the eventing system [callbacks](#2173-transfer-process-callbacks) using the `transfer.process.started` type, or use the [EDRs](#218-endpoint-data-references) extensions for automatically store it on consumer control plane side.
@@ -938,7 +931,7 @@ A push transfer is when the Provider data plane initiates sending data to the de
 
 ![Provider Push](diagrams/transfer-data-plane-provider-push.png)
 
-__Provider and consumer agree to a contract (not displayed in the diagram)__
+**Provider and consumer agree to a contract (not displayed in the diagram)**
 
 1. The Consumer initiates the transfer process, i.e. sends [`TransferRequestMessage`](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/transfer-process/transfer.process.protocol#21-transfer-request-message) with a destination [DataAddress](#2172-about-data-destinations)
 2. The Provider Control Plane retrieves the `DataAddress` of the actual data source and creates a `DataFlowStartMessage` with both source and destination `DataAddress`.
@@ -993,9 +986,7 @@ Callbacks must be specified when requesting to initiate the transfer:
     {
       "transactional": false,
       "uri": "http://callback/url",
-      "events": [
-        "transfer.process"
-      ],
+      "events": ["transfer.process"],
       "authKey": "auth-key",
       "authCodeId": "auth-code-id"
     }
@@ -1423,9 +1414,9 @@ Three things are needed to register an extension module with the EDC runtime:
 2. a [provider-configuration file](https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html)
 3. adding the module to your runtime's build file. EDC uses Gradle, so your runtime build file should contain
 
-  ```groovy
-  runtimeOnly(project(":module:path:of:your:extension"))
-  ```
+```groovy
+runtimeOnly(project(":module:path:of:your:extension"))
+```
 
 Extensions should **not** contain business logic or application code. Their main job is to
 
@@ -1444,11 +1435,12 @@ extension points. This feature is available as Gradle task:
 
 Upon execution, this task generates a JSON file located at `build/edc.json`, which contains structural information about
 the extension, for example:
+
 <details>
   <summary>Autodoc output in edc.json</summary>
 
-  ```json
-  [
+```json
+[
   {
     "categories": [],
     "extensions": [
@@ -1495,7 +1487,7 @@ the extension, for example:
     "name": null
   }
 ]
-  ```
+```
 
 </details>
 
@@ -1510,19 +1502,21 @@ documentation, but they are also used by the runtime to resolve service dependen
 #### 2.4.3 Configuration and best practices
 
 One important task of extensions is to read and handle configuration. For this, the `ServiceExtensionContext` interface
-provides the `getConfig()` group of methods. 
+provides the `getConfig()` group of methods.
 
 Configuration values can be _optional_, i.e. they have a default value, or they can be _mandatory_, i.e. no default
 value. Attempting to resolve a mandatory configuration value that was not specified will raise an `EdcException`.
 
 EDC's configuration API can resolve configuration from three places, in this order:
+
 1. from a `ConfigurationExtension`: this is a special extension class that provides a `Config` object. EDC ships with a file-system based config extension.
 2. from environment variables: `edc.someconfig.someval` would map to `EDC_SOMECONFIG_SOMEVAL`
 3. from Java `Properties`: can be passed in through CLI arguments, e.g. `-Dedc.someconfig.someval=...`
 
 Best practices when handling configuration:
+
 - resolve early, fail fast: configuration values should be resolved and validated as early as possible in the
-  extension's `initialize()` method. 
+  extension's `initialize()` method.
 - don't pass the context: it is a code smell if the `ServiceExtensionContext` is passed into a service to resolve config
 - annotate: every setting should have a `@Setting` annotation
 - no magic defaults: default values should be declard as constants in the extension class and documented in the
@@ -1543,20 +1537,20 @@ As a general rule, the module that provides the implementation also should regis
 implementation for a `FooStore` (stores `Foo` objects) would require the following classes:
 
 1. A `FooStore.java` interface, located in SPI:
-    ```java
-    public interface FooService {
-        void store(Foo foo);
-    }   
-    ```
+   ```java
+   public interface FooService {
+       void store(Foo foo);
+   }
+   ```
 2. A `FunkyFooStore.java` class implementing the interface, located in `:extensions:funky:foo-store-funky`:
-    ```java
-    public class FunkyFooStore implements FooStore {
-        @Override
-        void store(Foo foo){
-            // ...
-        }    
-    }
-    ```
+   ```java
+   public class FunkyFooStore implements FooStore {
+       @Override
+       void store(Foo foo){
+           // ...
+       }
+   }
+   ```
 3. A `FunkyFooStoreExtension.java` located also in `:extensions:funky:foo-store-funky`. Must be accompanied by
    a _"provider-configuration file"_ as required by
    the [`ServiceLoader` documentation](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html). Code
@@ -1923,14 +1917,44 @@ From the previous sections and the examples demonstrated above we can derive a f
 
 - Cyclic dependencies: cyclic dependencies are detected by the `TopologicalSort` algorithm
 
-- No generic dependencies: `@Inject private SomeInterface<SomeType> foobar` is not possible. 
+- No generic dependencies: `@Inject private SomeInterface<SomeType> foobar` is not possible.
 
 ### 2.6 Service layers
 
+Like many other applications and application frameworks, EDC is built upon a vertically oriented set of different layers
+that we call "service layers".
+
+This is shown best by the example of a standard REST API endpoint.
+
 #### 2.6.1 API controllers
 
-```java
+EDC uses JAX-RS/Jersey to expose REST endpoints, so our REST controllers look like this:
 
+```java
+@Consumes({ MediaType.APPLICATION_JSON })
+@Produces({ MediaType.APPLICATION_JSON })
+@Path("/v1/foo/bar")
+public class SomeApiController implements SomeApi{
+
+    @POST
+    @Override
+    public JsonObject create(JsonObject someApiObject) {
+       //perform logic
+    }
+}
+```
+
+it is worth noting that as a rule, EDC API controllers only carry JAX-RS annotations, where all other annotations, such
+as OpenApi should be put on the interface `SomeApi`.
+
+In addition, EDC APIs accept their arguments as `JsonObject` due to the use of [JSON-LD](#23-serialization-via-json-ld).
+This applies to internal APIs and external APIs alike.
+
+API controllers should not contain any business logic other than _validation_, _serialization_ and _service invocation_.
+
+> All API controllers perform JSON-LD expansion upon ingress and JSON-LD compaction upon egress.
+
+<!-- ```java
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 @Path("/v1/foo/bar")
@@ -1957,9 +1981,135 @@ public class SomeApiObjectController {
                 .orElseThrow(f -> new EdcException(f.getFailureDetail()));
     }
 }
+``` -->
+
+##### 2.6.1.1 API contexts
+
+API controllers must be registered with the Jersey web server. To better separate the different API controllers and
+cluster them in coherent groups, EDC has the notion of "web contexts". Technically, these are individual
+`ServletContainer` instances, each of which available at a separate port and URL path.
+
+To register a new _context_, it needs to be configured first:
+
+```java
+@Inject
+private WebService webService;
+@Inject
+private WebServiceConfigurer configurer;
+@Inject
+private WebServer webServer;
+
+@Override
+public void initialize(ServiceExtensionContext context) {
+
+  var defaultConfig = WebServiceSettings.Builder.newInstance()
+            .apiConfigKey("web.http.yourcontext")
+            .contextAlias("yourcontext")
+            .defaultPath("/api/some")
+            .defaultPort(10080)
+            .useDefaultContext(false)
+            .name("Some new API")
+            .build();
+  var config = context.getConfig("web.http.yourcontext"); //reads web.http.yourcontext.[port|path] from the configuration
+  configurer.configure(config, webServer, defaultConfig);
+}
 ```
 
+##### 2.6.1.2 Registering controllers
+
+After the previous step, the `"yourcontext"` context is available with the web server and the API controller can be
+registered:
+
+```java
+webservice.registerResource("yourcontext", new SomeApiController(/* arguments */)).
+```
+
+This makes the `SomeApiController` available at http://localhost:10080/api/some/v1/foo/bar. It is possible to register
+multiple controllers with the same context.
+
+> Note that the default port and path can be changed by configuring `web.http.yourcontext.port` and
+> `web.http.yourcontext.path`.
+
+##### 2.6.1.3 Registering other resources
+
+Any JAX-RS Resource (as per the [JAX-RS Specification, Chapter 3. Resources](https://download.oracle.com/otn-pub/jcp/jaxrs-2_0-fr-eval-spec/jsr339-jaxrs-2.0-final-spec.pdf)) can be registered with the web server.
+
+Examples of this in EDC are JSON-LD interceptors, that expand/compact JSON-LD on ingress and egress, respectively, and
+`ContainerFilter` instances that are used for request authentication.
+
+##### 2.6.1.4 API Authentication
+
+In Jersey, one way to do request authentication is by implementing the `ContainerRequestFilter` interface. Usually,
+authentication and authorization information is communicated in the request header, so EDC defines the
+`AuthenticationRequestFilter`, which extracts the headers from the request, and forwards them to an
+`AuthenticationService` instance.
+
+Implementations for the `AuthenticationService` interface must be registered by an extension:
+```java
+@Inject
+private ApiAuthenticationRegistry authenticationRegistry;
+
+@Inject
+private WebService webService;
+
+@Override
+public void initialize(ServiceExtensionContext context) {
+  authenticationRegistry.register("your-api-auth", new SuperCustomAuthService());
+
+  var authenticationFilter = new AuthenticationRequestFilter(authenticationRegistry, "your-api-auth");
+  webService.registerResource("yourcontext", authenticationFilter);
+}
+```
+
+This registers the request filter for the web context, and registers the authentication service within the request
+filter. That way, whenever a HTTP request hits the `"yourcontext"` servlet container, the request filter gets invoked,
+delegating to the `SuperCustomAuthService` instance.
+
 #### 2.6.2 Validators
+
+Extending the API controller example from the previous chapter, we add input validation. The `validatorRegistry`
+variable is of type `JsonObjectValidatorRegistry` and contains `Validator`s that are registered for an arbitrary string,
+but usually the `@type` field of a JSON-LD structure is used.
+
+```java
+public JsonObject create(JsonObject someApiObject) {
+  validatorRegistry.validate(SomeApiObject.TYPE_FIELD, someApiObject)
+                    .orElseThrow(ValidationFailureException::new);
+
+  // perform logic
+}
+```
+
+A common pattern to construct a `Validator` for a `JsonObject` is to use the `JsonObjectValidator`:
+
+```java
+public class SomeApiObjectValidator {
+    public static Validator<JsonObject> instance() {
+        return JsonObjectValidator.newValidator()
+                .verify(path -> new TypeIs(path, SomeApiObject.TYPE_FIELD))
+                .verifyId(MandatoryIdNotBlank::new)
+                .verifyObject(SomeApiObject.NESTED_OBJECT, v -> v.verifyId(MandatoryIdNotBlank::new))
+                .verify(SomeApiObject.NAME_PROPERTY, MandatoryValue::new)
+                .build();
+    }
+}
+```
+
+This validator asserts that, the `@type` field is equal to `SomeApiObject.TYPE_FIELD`, that the input object has an
+`@id` that is non-null, that the input object has a nested object on it, that also has an `@id`, and that the input
+object has a non-null property that contains the name.
+
+Of course, defining a separate class that implements the `Validator<JsonObject>` interface is possible as well.
+
+This validator must then be registered in the extension class with the `JsonObjectValidatorRegistry`:
+
+```java
+// YourApiExtension.java
+@Override
+public void initialize() {
+  validatorRegistry.register(SomeApiObject.TYPE_FIELD, SomeApiObjectValidator.instance());
+}
+```
 
 #### 2.6.3 Transformers
 
@@ -1971,9 +2121,9 @@ The above example
 - stores: default in-mem stores, predicate converters, CriterionOperatorRegistry, ReflectionBasedQueryResolver
 - Events and callbacks
 
-#### 2.6.1 Store layers
+#### 2.6.5 Data persistence
 
-#### 2.6.1.1 In-Memory stores
+##### 2.6.1.1 In-Memory stores
 
 ### 2.7 Policy Monitor
 
