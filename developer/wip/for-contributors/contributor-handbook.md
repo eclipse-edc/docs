@@ -873,7 +873,7 @@ where:
 
 ##### 2.1.7.1 Transfer and data flows types
 
-The transfer type defines the channel (Distribution) for the data transfer and it depends on the capabilities of the [data plane](#3-the-data-plane). The `transferType` available for a data offering is available in the `dct:format` of the `Distribution` when inspecting the [catalog](#216-catalog) response.
+The transfer type defines the channel (Distribution) for the data transfer and it depends on the capabilities of the [data plane](#3-the-data-plane) if it can be fulfilled. The `transferType` available for a data offering is available in the `dct:format` of the `Distribution` when inspecting the [catalog](#216-catalog) response.
 
 Each transfer type also characterizes the type of the flow, which can be either [pull](#21711-consumer-pull) or [push](#21712-provider-push) and it's data can be either [finite](#21712-finite-and-non-finite-data) or [non-finite](#21712-finite-and-non-finite-data)
 
