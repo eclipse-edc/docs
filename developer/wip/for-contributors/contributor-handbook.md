@@ -923,7 +923,7 @@ __Provider and consumer agree to a contract (not displayed in the diagram)__
 
 The charaterization of the data applies to either `push` and `pull` transfers. Finite data transfers cause the transfer process to transitition to the state `COMPLETED`, once the transmission has finished. For example a transfer of a single file that is hosted and transferred into a cloud storage system.
 
-Non-finite data means that once the transfer process request has been accepted by the provider the transfer process is in `STARTED` state until it gets terminated by the consumer or the provider. Exampes of Non-finite data are streams or API endpoins.
+Non-finite data means that once the transfer process request has been accepted by the provider the transfer process is in the `STARTED` state until it gets terminated by the consumer or the provider. Exampes of Non-finite data are streams or API endpoins.
 
 On the provider side transfer processes can also be terminated by the [policy monitor](#27-policy-monitor) that periodically watches over the on going transfer and checks if the associated [contract agreement](#215-contract-agreements) still fulfills the contract [policy](#212-policies).
 
