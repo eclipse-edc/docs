@@ -921,7 +921,7 @@ __Provider and consumer agree to a contract (not displayed in the diagram)__
 
 ###### 2.1.7.1.2 Finite and Non-Finite Data
 
-The charaterization of the data applies to either `push` and `pull` transfers. Finite data applied to a transfer process, means that once the transmission has finished, the transfer process transtitions to the state `COMPLETED`, for example a transfer of a single file that is hosted and transferred into a cloud storage system.
+The charaterization of the data applies to either `push` and `pull` transfers. Finite data transfers cause the transfer process to transitition to the state `COMPLETED`, once the transmission has finished. For example a transfer of a single file that is hosted and transferred into a cloud storage system.
 
 Non-finite data means that once the transfer process request has been accepted by the provider the transfer process is in `STARTED` state until it gets terminated by the consumer or the provider. Exampes of Non-finite data are streams or API endpoins.
 
