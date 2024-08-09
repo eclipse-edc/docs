@@ -822,7 +822,7 @@ occurred - to the `TERMINATED` state.
 
 The Management API provides several endpoints to manipulate data transfers.
 
-Here's a diagram of the state machine applied to transfer processes on consumer side:
+Here is a diagram of the state machine applied to transfer processes on consumer side:
 
 ![Transfer Process Consumer State Machine](diagrams/transfer-process-consumer-states.png)
 
