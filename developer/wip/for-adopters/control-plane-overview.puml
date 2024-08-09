@@ -1,0 +1,35 @@
+@startuml
+!pragma layout smetana
+
+!include diagram.styles.puml
+
+autonumber
+
+box "Consumer"
+participant "Control Plane" as CCP
+participant "Data Plane" as CDP
+end box
+
+box "Provider"
+participant "Control Plane" as PCP
+participant "Data Plane" as PDP
+end box
+
+group #F3F7FF Catalog Request
+CCP <- PCP: Catalog
+end
+
+group #F3F7FF Contract Negotiation
+CCP <-> PCP: Negotiate Contract Agreement
+end
+
+group #F3F7FF Transfer Process Management
+CCP <-> PCP: Transfer Process Control
+end
+
+group #E3F7FF Data Transfer
+CDP <- PDP: Data
+end
+
+
+@enduml

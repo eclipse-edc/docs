@@ -1,0 +1,21 @@
+@startuml
+!pragma layout smetana
+
+!include diagram.styles.puml
+
+autonumber
+
+box "Consumer"
+participant "Client" as CC
+participant "Control Plane" as CCP
+end box
+
+box "Provider"
+participant "Control Plane" as PCP
+end box
+
+CC ->CCP: Non-blocking\ninitiate negotiation
+CCP <-> PCP: Negotiate Contract Agreement
+CCP <- PCP: Agreement Finalized
+CC <-- CCP: <color:red>Callback hook
+@enduml
