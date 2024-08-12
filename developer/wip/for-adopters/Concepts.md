@@ -21,7 +21,7 @@ Details how EDC implements decentralized identity, access control, and trust usi
 
 ## The Federated Catalog
 
-Covers how publishing and retrieving data catalogs works.
+Covers how publishing and retrieving federated data catalogs works.
 
 ## General Concepts
 
