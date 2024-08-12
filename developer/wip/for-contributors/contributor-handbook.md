@@ -80,6 +80,8 @@
       * [2.6.4 Aggregate services](#264-aggregate-services)
       * [2.6.5 Data persistence](#265-data-persistence)
         * [2.6.1.1 In-Memory stores](#2611-in-memory-stores)
+      * [2.6.7 Events and Callbacks](#267-events-and-callbacks)
+      * [2.6.8 API exception mappers](#268-api-exception-mappers)
     * [2.7 Policy Monitor](#27-policy-monitor)
     * [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
     * [2.9 (Postgre-)SQL persistence](#29-postgre-sql-persistence)
@@ -93,7 +95,6 @@
     * [4.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#41-writing-unit--component--integration--api--endtoend-tests)
     * [4.1 Other best practices](#41-other-best-practices)
   * [5. Further concepts](#5-further-concepts)
-    * [5.1 Events and callbacks](#51-events-and-callbacks)
     * [5.2 Autodoc](#52-autodoc)
     * [5.3 Adapting the Gradle build](#53-adapting-the-gradle-build)
 <!-- TOC -->
@@ -1093,7 +1094,7 @@ payload for filtering the datasets:
 }
 ```
 
-Entities are backed by [stores](#261-store-layers) for doing CRUD operations. For each entity there is an associated
+Entities are backed by [stores](#2611-in-memory-stores) for doing CRUD operations. For each entity there is an associated
 store interface (SPI). Most of the stores SPI have a `query` like method which takes a `QuerySpec` type as input and
 returns the matched entities in a collection. Indivitual implementations are then responsible for translating the
 `QuerySpec` to a proper fetching strategy.
@@ -1102,7 +1103,7 @@ The description on how the translation and mapping works will be explained in ea
 out of the box:
 
 - [In-memory stores](#2611-in-memory-stores) (default implementation).
-- [SQL stores](#28-postgre-sql-persistence) provied as extensions for each store, mostly tailored for and tested with
+- [SQL stores](#29-postgre-sql-persistence) provied as extensions for each store, mostly tailored for and tested with
   PostgreSQL.
 
 For guaranteeing the highest compatibility between store implementations, a base tests suite is provided for each store
@@ -1954,35 +1955,6 @@ API controllers should not contain any business logic other than _validation_, _
 
 > All API controllers perform JSON-LD expansion upon ingress and JSON-LD compaction upon egress.
 
-<!-- ```java
-@Consumes({ MediaType.APPLICATION_JSON })
-@Produces({ MediaType.APPLICATION_JSON })
-@Path("/v1/foo/bar")
-public class SomeApiObjectController {
-
-    private final TypeTransformerRegistry typeTransformerRegistry;
-
-    public SomeApiObjectController(TypeTransformerRegistry typeTransformerRegistry) {
-        this.typeTransformerRegistry = typeTransformerRegistry;
-    }
-
-    @POST
-    @Override
-    public JsonObject create(JsonObject someApiObject) {
-        // deserialize JSON -> SomeApiObject
-        var someApiObject = typeTransformerRegistry.transform(someApiObject, SomeApiObject.class)
-                .onFailure(f -> /*log warning*/)
-                .orElseThrow(InvalidRequestException::new);
-
-        var processedObject = someService.process(someApiObject);
-
-        // serialize SomeApiObject -> JSON
-        return typeTransformerRegistry.transform(processedObject, JsonObject.class)
-                .orElseThrow(f -> new EdcException(f.getFailureDetail()));
-    }
-}
-``` -->
-
 ##### 2.6.1.1 API contexts
 
 API controllers must be registered with the Jersey web server. To better separate the different API controllers and
@@ -2113,17 +2085,161 @@ public void initialize() {
 
 #### 2.6.3 Transformers
 
+Transformers are among the EDC's fundamental [programming primitives](#222-transformers). They are responsible for
+SerDes only, they are not supposed to perform any validation or any sort of business logic.
+
+Recalling the code example from the [API controllers chapter](#261-api-controllers), we can add transformation as
+follows:
+
+```java
+
+@Override
+public JsonObject create(JsonObject someApiObject) {
+    validatorRegistry.validate(SomeApiObject.TYPE_FIELD, someApiObject)
+            .orElseThrow(ValidationFailureException::new);
+
+    // deserialize JSON -> SomeApiObject
+    var someApiObject = typeTransformerRegistry.transform(someApiObject, SomeApiObject.class)
+            .onFailure(f -> monitor.warning(/*warning message*/))
+            .orElseThrow(InvalidRequestException::new);
+
+    var modifiedObject = someService.someServiceMethod(someApiObject);
+
+    // serialize SomeApiObject -> JSON
+    return typeTransformerRegistry.transform(modifiedObject, JsonObject.class)
+            .orElseThrow(f -> new EdcException(f.getFailureDetail()));
+}
+```
+
+Note that validation should always be done first, as it is supposed to operate on the raw JSON structure. A failing
+transformation indicates a client error, which is represented as a HTTP 400 error code. Throwing a
+`ValidationFailureException` takes care of that.
+
+This example assumes, that the input object get processed by the service and the modified object is returned in the HTTP
+body.
+
+> The step sequence should always be: Validation, Transformation, Aggregate Service invocation.
+
 #### 2.6.4 Aggregate services
 
-The above example
+Aggregate services are merely an _integration_ of several other services to provide a single, unified service contract
+to the
+caller. They should be understood as higher-order operations that delegate down to lower-level services. A typical
+example in EDC is when trying to delete an `Asset`. The `AssetService` would first check whether the asset in question
+is referenced by a `ContractNegotiation`, and - if not - delete the asset. For that it requires two collaborator
+services, an `AssetIndex` and a `ContractNegotiationStore`.
 
-- (aggregate) services: transaction management
-- stores: default in-mem stores, predicate converters, CriterionOperatorRegistry, ReflectionBasedQueryResolver
+Likewise, when creating assets, the `AssetService` would first perform some validation, then create the asset (again
+using the `AssetIndex`) and the emit an [event](#267-events-and-callbacks).
+
+Note that the validation mentioned here is different from [API validators](#262-validators). API validators only
+validate the _structure_ of a JSON object, so check if mandatory fields are missing etc., whereas _service validation_
+asserts that all _business rules_ are adhered to.
+
+In addition to business logic, aggregate services are also responsible for transaction management, by enclosing relevant
+code with transaction boundaries:
+
+```java
+public ServiceResult<SomeApiObject> someServiceMethod(SomeApiObject input) {
+    transactionContext.execute(() -> {
+        input.modifySomething();
+        return ServiceResult.from(apiObjectStore.update(input))
+    }
+}
+```
+
+_the example presumes that the `apiObjectStore` returns a `StoreResult` object_.
+
 - Events and callbacks
 
 #### 2.6.5 Data persistence
 
+One important collaborator service for aggregate services is data persistence because ost operations involve some sort
+of persistence interaction. In EDC, these persistence services are often called "stores" and they usually provide CRUD
+functionality for entities.
+
+Typically, stores fulfill the following contract:
+
+- all store operations are _transactional_, i.e. they run in a `transactionContext`
+- `create` and `update` are separate operations. Creating an existing object and updating a non-existent one should
+  return errors
+- stores should have a query method that takes a `QuerySpec` object and returns either a `Stream` or a `Collection`.
+  Read the next chapter for details.
+- stores return a `StoreResult`
+- stores don't implement business logic.
+
 ##### 2.6.1.1 In-Memory stores
+
+By default and unless configured otherwise, EDC provides in-memory store
+implementations [by default](#2512-provide-defaults). These are light-weight, thread-safe `Map`-based implementations,
+that are intended for
+**testing, demonstration and tutorial purposes only**.
+
+**Querying in InMemory stores**
+
+Memory-stores are based on Java collection types and can therefor can make use of the capabilities of the Streaming-API
+for filtering and querying. What we are looking for is a way to convert a `QuerySpec` into a set of Streaming-API
+expressions. This is pretty straight forward for the `offset`, `limit` and `sortOrder` properties, because there are
+direct counterparts in the Streaming API.
+
+For filter expressions (which are `Criterion` objects), we first need to convert each criterion into a `Predicate` which
+can be passed into the `.filter()` method.
+
+Since all objects held by in-memory stores are just Java classes, we can perform the query based on field names which we
+obtain through Reflection. For this, we use a `QueryResolver`, in particular the `ReflectionBasedQueryResolver`.
+
+The query resolver then attempts to find an instance field that corresponds to the `leftOperand` of a `Criterion`. Let's
+assume a simple entity `SimpleEntity`:
+
+```java
+public class SimpleEntity {
+    private String name;
+}
+```
+
+and a filter expression
+
+```json
+{
+  "leftOperand": "name",
+  "operator": "=",
+  "rightOperand": "foobar"
+}
+```
+
+The `QueryResolver` attempts to resolve a field named `"name"` and resolve its assigned value, convert the `"="` into a
+`Predicate` and pass `"foobar"` to the `test()` method. In other words, the `QueryResolver` checks, if the value
+assigned to a field that is identified by the `leftOperand` matches the value specified by `rightOperand`.
+
+Here is a full example of how querying is implemented in in-memory stores:
+
+<details>
+  <summary>Example: ContractDefinitionStore</summary>
+
+  ```java
+  public class InMemoryContractDefinitionStore implements ContractDefinitionStore {
+    private final Map<String, ContractDefinition> cache = new ConcurrentHashMap<>();
+    private final QueryResolver<ContractDefinition> queryResolver;
+
+    // usually you can pass CriterionOperatorRegistryImpl.ofDefaults() here
+    public InMemoryContractDefinitionStore(CriterionOperatorRegistry criterionOperatorRegistry) {
+        queryResolver = new ReflectionBasedQueryResolver<>(ContractDefinition.class, criterionOperatorRegistry);
+    }
+
+    @Override
+    public @NotNull Stream<ContractDefinition> findAll(QuerySpec spec) {
+        return queryResolver.query(cache.values().stream(), spec);
+    }
+
+    // other methods
+}
+  ```
+
+</details>
+
+#### 2.6.7 Events and Callbacks
+
+#### 2.6.8 API exception mappers
 
 ### 2.7 Policy Monitor
 
@@ -2156,8 +2272,6 @@ test pyramid...
 -> link to best practices doc
 
 ## 5. Further concepts
-
-### 5.1 Events and callbacks
 
 ### 5.2 Autodoc
 
