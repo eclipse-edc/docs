@@ -23,7 +23,7 @@ The Data Plane Signaling flow is shown below:
 
 ![[data-plane-signalling.png]]
 
-When a transfer process is started, and a data plane is selected, a start message will be sent. If the transfer process is a consumer-pull type where data is accessed by the consumer,  the response will contain an Endpoint Data Reference (EDR) that contains the coordinates to the data and an access token if one is required. The control plane may send additional signals, such as SUSPEND and RESUME, or TERMINATE, in response to events.  For example, the control plane policy monitor could send a SUSPEND or TERMINATE message if a policy violation is encountered.
+When a transfer process is started, and a data plane is selected, a start message will be sent. If the transfer process is a consumer-pull type where data is accessed by the consumer, the response will contain an Endpoint Data Reference (EDR) that contains the coordinates to the data and an access token if one is required. The control plane may send additional signals, such as SUSPEND and RESUME, or TERMINATE, in response to events. For example, the control plane policy monitor could send a SUSPEND or TERMINATE message if a policy violation is encountered.
 ## The Data Plane Framework (DPF)
 
 EDC includes a framework for building custom data planes called the DPF. DPF supports end-to-end streaming transfers (i.e., data content is streamed rather than materialized in memory) for scalability and both pull- and push- style transfers. The framework has extensibility points for supporting different data sources and sinks (e.g., S3, HTTP, Kafka) and can perform direct streaming between different source and sink types.
