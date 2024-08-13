@@ -81,6 +81,11 @@
       * [2.6.5 Data persistence](#265-data-persistence)
         * [2.6.1.1 In-Memory stores](#2611-in-memory-stores)
       * [2.6.7 Events and Callbacks](#267-events-and-callbacks)
+        * [2.6.7.1 `Event` vs `EventEnvelope`](#2671-event-vs-eventenvelope)
+        * [2.6.7.2 Registering for events (in-process)](#2672-registering-for-events-in-process)
+        * [2.6.7.3 Registering for callbacks (webhooks)](#2673-registering-for-callbacks-webhooks)
+        * [2.6.7.4 Emitting custom events](#2674-emitting-custom-events)
+        * [2.6.7.5 Serialization / Deserialization of custom events](#2675-serialization--deserialization-of-custom-events)
       * [2.6.8 API exception mappers](#268-api-exception-mappers)
     * [2.7 Policy Monitor](#27-policy-monitor)
     * [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
@@ -2255,6 +2260,20 @@ There are two ways how events can be consumed: in-process and webhooks
 This variant is applicable when events are to be consumed by a custom extension in an EDC runtime. The term "in-process"
 refers to the fact that event producer and event consumer run in the same Java process. 
 
+The entry point for event listening is the `EventRouter` interface, on which an `EventSubscriber` can be registered.
+There are two ways to register an `EventSubscriber`:
+- **async**: every event will be sent to the subscribers in an asynchronous way. Features:
+  - fast, as the main thread won't be blocked during event dispatch
+  - not-reliable, as an eventual subscriber dispatch failure won't get handled
+  - to be used for notifications and for send-and-forget event dispatch
+- **sync**: every event will be sent to the subscriber in a synchronous way. Features:
+  - slow, as the subscriber will block the main thread until the event is dispatched
+  - reliable, an eventual exception will be thrown to the caller, and it could make a transactional fail
+  - to be used for event persistence and to satisfy the "at-least-one" rule
+
+The `EventSubscriber` is typed over the event kind (Class), and it will be invoked only if the type of the event matches 
+the published one (instanceOf). The base class for all events is `Event`.
+
 For example, developing an auditing extension could be done through event subscribers:
 
 ```java
@@ -2263,25 +2282,25 @@ private EventRouter eventRouter;
 
 @Override
 public void initialize(ServiceExtensionContext context) {
-  eventRouter.register(TransferProcessEvent.class, new AuditingEventHandler());
-  //or
-  eventRouter.registerSync(TransferProcessEvent.class, new AuditingEventHandler());
+  eventRouter.register(TransferProcessEvent.class, new AuditingEventHandler()); // sync dispatch
+  // or
+  eventRouter.registerSync(TransferProcessEvent.class, new AuditingEventHandler()); // async dispatch
 }
 ```
+Note that `TransferProcessEvent` is not a concrete class, it is a super class for all events related to transfer process
+events. This implies that subscribers can either be registered for "groups" of events or for concrete events (e.g.
+`TransferProcessStarted`).
 
-the difference between `register()` and `registerSync()` is that sync subscribers are notified "synchronously" before
-all other subscribers, and they if a sync subscriber throws an exception, subsequent subscribers are **not** invoked.
 The `AuditingEventHandler` could look like this: 
 
 ```java
 @Override
 public <E extends Event> void on(EventEnvelope<E> event) {
   if (event.getPayload() instanceof TransferProcessEvent transferProcessEvent) {
-    // process event
+    // react to event
   }
 }
 ```
-
 
 ##### 2.6.7.3 Registering for callbacks (webhooks)
 
@@ -2321,6 +2340,85 @@ negotiation](https://eclipse-edc.github.io/Connector/openapi/management-api/#/Co
 ```
 If your webhook endpoint requires authentication, the secret must be sent in the `authKey` property. The `authCodeId`
 field should contain a string which EDC can use to temporarily store the secret in its secrets vault.
+
+
+##### 2.6.7.4 Emitting custom events
+
+It is also possible to create and publish custom events on top of the EDC eventing system. To define the event, extend
+the `Event` class.
+
+> Rule of thumb: events should be named in past tense, to describe something that has already happened
+
+```java
+public class SomethingHappened extends Event {
+
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    private SomethingHappened() {
+    }
+
+    // Builder class not shown
+}
+```
+
+All the data pertaining an event should be stored in the `Event` class. Like any other events, custom events can be
+published through the `EventRouter` component:
+
+```java
+public class ExampleBusinessLogic {
+    public void doSomething() {
+        // some business logic that does something
+        var event = SomethingHappened.Builder.newInstance()
+                .description("something interesting happened")
+                .build();
+
+        var envelope = EventEnvelope.Builder.newInstance()
+                .at(clock.millis())
+                .payload(event)
+                .build();
+        
+        eventRouter.publish(envelope);
+    }    
+}
+```
+
+Please note that the `at` field is a timestamp that every event has, and it's mandatory (please use the `Clock` to get
+the current timestamp).
+
+##### 2.6.7.5 Serialization / Deserialization of custom events
+
+All events must be serializable, because of this, every class that extends `Event` will be serializable to JSON through
+the `TypeManager` service. The JSON structure will contain an additional field called `type` that describes the name of
+the event class. For example, a serialized `EventEnvelope<SomethingHappened>` event will look like:
+
+
+```json
+{
+  "type": "SomethingHappened",
+  "at": 1654764642188,
+  "payload": {
+    "description": "something interesting happened"  
+  }
+}
+```
+
+In order to make such an event deserializable by the `TypeManager` is necessary to register the type:
+
+```java
+typeManager.registerTypes(new NamedType(SomethingHappened.class, SomethingHappened.class.getSimpleName()));
+```
+
+doing so, the event can be deserialized using the `EvenEnvelope` class as type:
+
+```
+var deserialized = typeManager.readValue(json, EventEnvelope.class);
+// deserialized will have the `EventEnvelope<SomethingHappened>` type at runtime
+```
+
 
 #### 2.6.8 API exception mappers
 
