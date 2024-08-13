@@ -2239,6 +2239,89 @@ Here is a full example of how querying is implemented in in-memory stores:
 
 #### 2.6.7 Events and Callbacks
 
+In EDC, all processing in the control plane is asynchronous and state changes are communicated by events. The base class
+for all events is `Event`.
+
+##### 2.6.7.1 `Event` vs `EventEnvelope`
+
+Subclasses of `Event` are supposed to carry all relevant information pertaining _to the event_ such as entity IDs. They
+are **not** supposed to carry event metadata such as event timestamp or event ID. These should be stored on the
+`EventEnvelope` class, which also contains the `Event` class as payload.
+
+There are two ways how events can be consumed: in-process and webhooks
+
+##### 2.6.7.2 Registering for events (in-process)
+
+This variant is applicable when events are to be consumed by a custom extension in an EDC runtime. The term "in-process"
+refers to the fact that event producer and event consumer run in the same Java process. 
+
+For example, developing an auditing extension could be done through event subscribers:
+
+```java
+@Inject 
+private EventRouter eventRouter;
+
+@Override
+public void initialize(ServiceExtensionContext context) {
+  eventRouter.register(TransferProcessEvent.class, new AuditingEventHandler());
+  //or
+  eventRouter.registerSync(TransferProcessEvent.class, new AuditingEventHandler());
+}
+```
+
+the difference between `register()` and `registerSync()` is that sync subscribers are notified "synchronously" before
+all other subscribers, and they if a sync subscriber throws an exception, subsequent subscribers are **not** invoked.
+The `AuditingEventHandler` could look like this: 
+
+```java
+@Override
+public <E extends Event> void on(EventEnvelope<E> event) {
+  if (event.getPayload() instanceof TransferProcessEvent transferProcessEvent) {
+    // process event
+  }
+}
+```
+
+
+##### 2.6.7.3 Registering for callbacks (webhooks)
+
+This variant is applicable when adding extensions that contain event subscribers is not possible. Rather, the EDC
+runtime invokes a webhook when a particular event occurs and sends event data there. 
+
+Webhook information must be sent alongside in the request body of certain Management API requests. For details, please
+refer to the [Management API documentation](https://eclipse-edc.github.io/Connector/openapi/management-api). Providing
+webhooks is only possible for certain events, for example when [initiating a contract
+negotiation](https://eclipse-edc.github.io/Connector/openapi/management-api/#/Contract%20Negotiation%20V3/initiateContractNegotiationV3):
+
+```json
+// POST /v3/contractnegotiations
+{
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "https://w3id.org/edc/v0.0.1/ns/ContractRequest",
+  "counterPartyAddress": "http://provider-address",
+  "protocol": "dataspace-protocol-http",
+  "policy": {
+    //...
+  },
+  "callbackAddresses": [
+    {
+      "transactional": false,
+      "uri": "http://callback/url",
+      "events": [
+        "contract.negotiation",
+        "transfer.process"
+      ],
+      "authKey": "auth-key",
+      "authCodeId": "auth-code-id"
+    }
+  ]
+}
+```
+If your webhook endpoint requires authentication, the secret must be sent in the `authKey` property. The `authCodeId`
+field should contain a string which EDC can use to temporarily store the secret in its secrets vault.
+
 #### 2.6.8 API exception mappers
 
 ### 2.7 Policy Monitor
