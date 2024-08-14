@@ -24,8 +24,9 @@
 - [2023-09-06 Identity and Trust](2023-09-06-identity-trust/)
 - [2023-09-12 Publishing from GitHub](2023-09-12-publishing_from_github/)
 - [2024-04-19 Separating Release process of Technology repos](2024-04-19-tech-repo-split/)
-- [2024-05-27 EDC Maturity Levels and Deprecation Policy](2024-05-27-maturity-levels-deprecation-policy)
-- [2024-07-17 Bootstrapping SQL Databases](2024-07-17-bootstrap-sql-database)
+- [2024-05-27 EDC Maturity Levels and Deprecation Policy](2024-05-27-maturity-levels-deprecation-policy/)
+- [2024-07-17 Bootstrapping SQL Databases](2024-07-17-bootstrap-sql-database/)
+- [2024-08-13 Technology Repositories Release](2024-08-13-technology-repos-release/)
 
 ## Repository-specific
 
