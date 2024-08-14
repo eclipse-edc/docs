@@ -1,0 +1,16 @@
+@startuml
+!pragma layout smetana
+
+!include diagram.styles.puml
+
+autonumber
+
+participant "Control Plane" as CP
+participant "Data Plane" as DP
+
+CP -> DP: START
+CP <- DP: START Response w/ EDR 
+CP -> DP: SUSPEND
+CP -> DP: RESUME
+CP -> DP: TERMINATE
+@enduml
