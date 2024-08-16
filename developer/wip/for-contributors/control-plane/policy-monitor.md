@@ -11,7 +11,7 @@ The data plane also gets notified through the [data plane signaling](../contribu
 
 ## Note for implementors
 
-Implementors that want a [Policy functions](./entities.md#23-policy-evaluation-functions) to be evaluated at the policy monitor layer need to bind such function in the `policy.monitor` scope.
+Implementors that want a [Policy function](./entities.md#23-policy-evaluation-functions) to be evaluated at the policy monitor layer need to bind such function to the `policy.monitor` scope.
 
 Since the policy evaluation happens in background, the `PolicyContext` does not contain `ParticipantAgent` as context data. 
 
