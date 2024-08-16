@@ -1,6 +1,6 @@
 # The Policy Monitor
 
-Some transfer types, once accepted by the `provider`, never reach the `COMPLETED` state. Streaming and HTTP transfers in consumer pull scenario are a couple of examples of transfer types that never complete. In those scenario the transfer will stay active (`STARTED`) until it gets terminated either manually by using the transfer processes [management API](./entities.md#7-transfer-processes) or automatically by the policy monitor, if it has been configured in the EDC runtime.
+Some transfer types, once accepted by the `provider`, never reach the `COMPLETED` state. Streaming and HTTP transfers in consumer pull scenario are examples of this. In those scenarios the transfer will remain active (`STARTED`) until it gets terminated either manually by using the transfer processes [management API](./entities.md#7-transfer-processes), or automatically by the policy monitor, if it has been configured in the EDC runtime.
 
 The policy monitor (`PolicyMonitorManager`) is a component that watches over on-going transfers on the provider side and ensures that the associated policies are still valid. The default implementation of the policy monitor is built on top of the [EDC state machine](./programming-primitives.md#1-state-machines) and tracks the monitored transfer processes in it's own entity `PolicyMonitorEntry` stored in the `PolicyMonitorStore`.
 
