@@ -13,7 +13,7 @@ The data plane also gets notified through the [data plane signaling](../contribu
 
 Implementors that want a [Policy function](./entities.md#23-policy-evaluation-functions) to be evaluated at the policy monitor layer need to bind such function to the `policy.monitor` scope.
 
-Since the policy evaluation happens in background, the `PolicyContext` does not contain `ParticipantAgent` as context data. 
+Note that because the policy evaluation happens in the background, the `PolicyContext` does not contain `ParticipantAgent` as context data. This means that the Policy Monitor cannot evaluate policies that involve VerifiableCredentials.
 
 Currently the only information published in the `PolicyContext` available for functions in the `policy.monitor` scope are the [`ContractAgreement`](./entities.md#5-contract-agreements), and the `Instant` at the time of the evaluation.
 
