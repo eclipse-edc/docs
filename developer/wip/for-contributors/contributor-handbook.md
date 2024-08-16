@@ -165,6 +165,10 @@ Detailed documentation about the EDC service layers can be found [here](./contro
 
 ### 2.7 Policy Monitor
 
+The policy monitor is a component that watches over on-going transfers and ensures that the policies associated with the transfer are still valid.
+
+Detailed documentation about the policy monitor can be found [here](./control-plane/policy-monitor.md)
+
 ### 2.8 Protocol extensions (DSP)
 
 ### 3. (Postgre-)SQL persistence

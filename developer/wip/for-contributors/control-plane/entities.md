@@ -10,8 +10,10 @@
         * [2.3 Policy evaluation functions](#23-policy-evaluation-functions)
         * [2.4 Example: binding an evaluation function](#24-example-binding-an-evaluation-function)
         * [2.5 Advanced policy concepts](#25-advanced-policy-concepts)
-            * [Pre- and Post-Evaluators](#pre--and-post-evaluators)
-            * [Dynamic functions](#dynamic-functions)
+            * [2.5.1 Pre- and Post-Evaluators](#251-pre--and-post-evaluators)
+            * [2.5.2 Dynamic functions](#252-dynamic-functions)
+        * [2.6 Bundled policy functions](#26-bundled-policy-functions)
+            * [2.6.1 Contract expiration function](#261-contract-expiration-function)
     * [3. Contract definitions](#3-contract-definitions)
     * [4. Contract negotiations](#4-contract-negotiations)
     * [5. Contract agreements](#5-contract-agreements)
@@ -352,13 +354,13 @@ documentation](https://eclipse-edc.github.io/Connector/openapi/management-api/#/
 
 ### 2.5 Advanced policy concepts
 
-###### Pre- and Post-Evaluators
+#### 2.5.1 Pre- and Post-Evaluators
 
 Pre- and post-validators are functions that are executed before and after the actual policy evaluation, respectively.
 They can be used to perform preliminary evaluation of a policy or to enrich the `PolicyContext`. For example, EDC uses
 pre-validators to inject DCP scope strings using dedicated `ScopeExtractor` objects.
 
-###### Dynamic functions
+#### 2.5.2 Dynamic functions
 
 These are very similar to `AtomicConstraintFunctions`, with one significant difference: they also receive the
 left-operand as function parameter. This is useful when the function cannot be bound to a left-operand of a policy,
@@ -401,6 +403,10 @@ Let's revisit our headquarter policy from earlier and change it a little:
 
 This means two things. One, our policy has changed its semantics: now we require the headquarter to be in the EU, or to
 have more than 5000 employees.
+
+### 2.6 Bundled policy functions
+
+#### 2.6.1 Contract expiration function
 
 ## 3. Contract definitions
 
