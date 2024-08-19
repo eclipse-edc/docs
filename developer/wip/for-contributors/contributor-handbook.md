@@ -169,7 +169,11 @@ Detailed documentation about the policy monitor can be found [here](./control-pl
 
 ### 2.8 Protocol extensions (DSP)
 
-## 3. (Postgre-)SQL persistence
+This chapter describes how EDC abstracts the interaction between connectors in a Dataspace through protocol extensions and introduces the current default implementation which follows the [Dataspace protocol](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol) specification.
+
+Detailed documentation about protocol extensions can be found [here](./control-plane/protocol-extensions.md)
+
+### 3. (Postgre-)SQL persistence
 
 PostgreSQL is a very popular open-source database and it has a large community and vendor adoption. It is also EDCs data
 persistence technology of choice.
