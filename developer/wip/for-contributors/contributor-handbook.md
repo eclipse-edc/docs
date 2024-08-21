@@ -1,36 +1,34 @@
 # Contributor Documentation
 
 <!-- TOC -->
-
 * [Contributor Documentation](#contributor-documentation)
-    * [0. Intended audience](#0-intended-audience)
-    * [1. Getting started](#1-getting-started)
-        * [1.1 Prerequisites](#11-prerequisites)
-        * [1.2 Terminology](#12-terminology)
-        * [1.3 Architectural and coding principles](#13-architectural-and-coding-principles)
-    * [2. The control plane](#2-the-control-plane)
-        * [2.1 Entities](#21-entities)
-        * [2.2 Programming Primitives](#22-programming-primitives)
-        * [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
-        * [2.4 Extension model](#24-extension-model)
-        * [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
-        * [2.6 Service layers](#26-service-layers)
-        * [2.7 Policy Monitor](#27-policy-monitor)
-        * [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
-        * [3. (Postgre-)SQL persistence](#3-postgre-sql-persistence)
-    * [4. The data plane](#4-the-data-plane)
-        * [4.1 Data plane signaling](#41-data-plane-signaling)
-        * [4.2 Data plane self-registration](#42-data-plane-self-registration)
-        * [4.3 Public API authentication](#43-public-api-authentication)
-        * [4.4 Writing a custom data plane extension (sink/source)](#44-writing-a-custom-data-plane-extension-sinksource)
-        * [4.5 Writing a custom data plane (using only DPS)](#45-writing-a-custom-data-plane-using-only-dps)
-    * [5. Development best practices](#5-development-best-practices)
-        * [5.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#51-writing-unit--component--integration--api--endtoend-tests)
-        * [5.1 Other best practices](#51-other-best-practices)
-    * [6. Further concepts](#6-further-concepts)
-        * [6.2 Autodoc](#62-autodoc)
-        * [6.3 Adapting the Gradle build](#63-adapting-the-gradle-build)
-
+  * [0. Intended audience](#0-intended-audience)
+  * [1. Getting started](#1-getting-started)
+    * [1.1 Prerequisites](#11-prerequisites)
+    * [1.2 Terminology](#12-terminology)
+    * [1.3 Architectural and coding principles](#13-architectural-and-coding-principles)
+  * [2. The control plane](#2-the-control-plane)
+    * [2.1 Entities](#21-entities)
+    * [2.2 Programming Primitives](#22-programming-primitives)
+    * [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
+    * [2.4 Extension model](#24-extension-model)
+    * [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
+    * [2.6 Service layers](#26-service-layers)
+    * [2.7 Policy Monitor](#27-policy-monitor)
+    * [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
+  * [3. (Postgre-)SQL persistence](#3-postgre-sql-persistence)
+  * [4. The data plane](#4-the-data-plane)
+    * [4.1 Data plane signaling](#41-data-plane-signaling)
+    * [4.2 Data plane self-registration](#42-data-plane-self-registration)
+    * [4.3 Public API authentication](#43-public-api-authentication)
+    * [4.4 Writing a custom data plane extension (sink/source)](#44-writing-a-custom-data-plane-extension-sinksource)
+    * [4.5 Writing a custom data plane (using only DPS)](#45-writing-a-custom-data-plane-using-only-dps)
+  * [5. Development best practices](#5-development-best-practices)
+    * [5.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#51-writing-unit--component--integration--api--endtoend-tests)
+    * [5.1 Other best practices](#51-other-best-practices)
+  * [6. Further concepts](#6-further-concepts)
+    * [6.2 Autodoc](#62-autodoc)
+    * [6.3 Adapting the Gradle build](#63-adapting-the-gradle-build)
 <!-- TOC -->
 
 ## 0. Intended audience
@@ -171,7 +169,7 @@ Detailed documentation about the policy monitor can be found [here](./control-pl
 
 ### 2.8 Protocol extensions (DSP)
 
-### 3. (Postgre-)SQL persistence
+## 3. (Postgre-)SQL persistence
 
 PostgreSQL is a very popular open-source database and it has a large community and vendor adoption. It is also EDCs data
 persistence technology of choice.
@@ -191,6 +189,8 @@ Detailed documentation about EDCs PostgreSQL implementations can be found [here]
 ## 4. The data plane
 
 ### 4.1 Data plane signaling
+
+Data Plane Signaling (DPS) is the communication protocol that is used between control planes and data planes.  
 
 ### 4.2 Data plane self-registration
 
