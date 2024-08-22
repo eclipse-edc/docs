@@ -227,7 +227,7 @@ Detailed information about testing can be found [here](../../testing.md).
 
 ### 5.3 Other best practices
 
--> link to best practices doc
+Please find general best practices and recommendations [here](./best-practices.md).
 
 ## 6. Further concepts
 
