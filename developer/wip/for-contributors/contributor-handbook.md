@@ -207,8 +207,25 @@ information about it and other topics such as data plane self-registration and p
 ### 5.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests
 
 test pyramid...
+Like any other project, EDC has established a set of recommendations and rules that contributors must adhere to in order
+to guarantee a smooth collaboration with the project. Note that familiarity with our [formal contribution guidelines](../../../CONTRIBUTING.md) is assumed.
+There additional recommendations we have compiled that are relevant when deploying and administering EDC instances.
 
-### 5.1 Other best practices
+### 5.1 Coding best practices
+
+Code should be written to conform with the EDC [style guide](../../contributing/styleguide.md) and our [coding principles](../../contributing/coding-principles.md). 
+
+A frequent subject of critique in pull requests is logging. Spurious and very verbose log lines like "Entering/Leaving method X" or "Performing action Z" should be avoided because they pollute the log output and don't contribute any value. 
+
+Please find detailed information about logging [here](../../logging.md).
+
+### 5.2 Testing best practices
+
+Every class in the EDC code base should have a test class that verifies the correct functionality of the code.
+
+Detailed information about testing can be found [here](../../testing.md).
+
+### 5.3 Other best practices
 
 -> link to best practices doc
 
