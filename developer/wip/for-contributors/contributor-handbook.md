@@ -233,4 +233,27 @@ Please find general best practices and recommendations [here](./best-practices.m
 
 ### 6.2 Autodoc
 
+In EDC there is an automated way to generate basic documentation about extensions, plug points, SPI modules and
+configuration settings. To achieve this, simply annotate respective elements directly in Java code:
+
+```java
+@Extension(value = "Some supercool extension", categories = {"category1", "category2"})
+public class SomeSupercoolExtension implements ServiceExtension {
+
+  // default value -> not required
+  @Setting(value = "Some string config property", type = "string", defaultValue = "foobar", required = false)
+  public static final String SOME_STRING_CONFIG_PROPERTY = "edc.some.supercool.string";
+
+  //no default value -> required
+  @Setting(value = "Some numeric config", type = "integer", required = true)
+  public static final String SOME_INT_CONFIG_PROPERTY = "edc.some.supercool.int";
+
+  // ...
+}
+```
+
+during compilation, the EDC build plugin generates documentation for each module as structured JSON.
+
+Detailed information about autodoc can be found [here](./autodoc.md)
+
 ### 6.3 Adapting the Gradle build
