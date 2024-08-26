@@ -1,35 +1,36 @@
 # Contributor Documentation
 
 <!-- TOC -->
-* [Contributor Documentation](#contributor-documentation)
-  * [0. Intended audience](#0-intended-audience)
-  * [1. Getting started](#1-getting-started)
-    * [1.1 Prerequisites](#11-prerequisites)
-    * [1.2 Terminology](#12-terminology)
-    * [1.3 Architectural and coding principles](#13-architectural-and-coding-principles)
-  * [2. The control plane](#2-the-control-plane)
-    * [2.1 Entities](#21-entities)
-    * [2.2 Programming Primitives](#22-programming-primitives)
-    * [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
-    * [2.4 Extension model](#24-extension-model)
-    * [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
-    * [2.6 Service layers](#26-service-layers)
-    * [2.7 Policy Monitor](#27-policy-monitor)
-    * [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
-    * [3. (Postgre-)SQL persistence](#3-postgre-sql-persistence)
-  * [4. The data plane](#4-the-data-plane)
-    * [4.1 Data plane signaling](#41-data-plane-signaling)
-    * [4.2 Writing a custom data plane extension (sink/source)](#42-writing-a-custom-data-plane-extension-sinksource)
-    * [4.3 Writing a custom data plane (using only DPS)](#43-writing-a-custom-data-plane-using-only-dps)
-  * [5. Development best practices](#5-development-best-practices)
-    * [5.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#51-writing-unit--component--integration--api--endtoend-tests)
-    * [5.1 Coding best practices](#51-coding-best-practices)
-    * [5.2 Testing best practices](#52-testing-best-practices)
-    * [5.3 Other best practices](#53-other-best-practices)
-  * [6. Further concepts](#6-further-concepts)
-    * [6.2 Autodoc](#62-autodoc)
-    * [6.3 Adapting the Gradle build](#63-adapting-the-gradle-build)
-<!-- TOC -->
+
+- [Contributor Documentation](#contributor-documentation)
+  - [0. Intended audience](#0-intended-audience)
+  - [1. Getting started](#1-getting-started)
+    - [1.1 Prerequisites](#11-prerequisites)
+    - [1.2 Terminology](#12-terminology)
+    - [1.3 Architectural and coding principles](#13-architectural-and-coding-principles)
+  - [2. The control plane](#2-the-control-plane)
+    - [2.1 Entities](#21-entities)
+    - [2.2 Programming Primitives](#22-programming-primitives)
+    - [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
+    - [2.4 Extension model](#24-extension-model)
+    - [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
+    - [2.6 Service layers](#26-service-layers)
+    - [2.7 Policy Monitor](#27-policy-monitor)
+    - [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
+    - [3. (Postgre-)SQL persistence](#3-postgre-sql-persistence)
+  - [4. The data plane](#4-the-data-plane)
+    - [4.1 Data plane signaling](#41-data-plane-signaling)
+    - [4.2 Writing a custom data plane extension (sink/source)](#42-writing-a-custom-data-plane-extension-sinksource)
+    - [4.3 Writing a custom data plane (using only DPS)](#43-writing-a-custom-data-plane-using-only-dps)
+  - [5. Development best practices](#5-development-best-practices)
+    - [5.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#51-writing-unit--component--integration--api--endtoend-tests)
+    - [5.1 Coding best practices](#51-coding-best-practices)
+    - [5.2 Testing best practices](#52-testing-best-practices)
+    - [5.3 Other best practices](#53-other-best-practices)
+  - [6. Further concepts](#6-further-concepts)
+  _ [6.2 Autodoc](#62-autodoc)
+  _ [6.3 Adapting the Gradle build](#63-adapting-the-gradle-build)
+  <!-- TOC -->
 
 ## 0. Intended audience
 
@@ -163,13 +164,16 @@ Detailed documentation about the EDC service layers can be found [here](./contro
 
 ### 2.7 Policy Monitor
 
-The policy monitor is a component that watches over on-going transfers and ensures that the policies associated with the transfer are still valid.
+The policy monitor is a component that watches over on-going transfers and ensures that the policies associated with the
+transfer are still valid.
 
 Detailed documentation about the policy monitor can be found [here](./control-plane/policy-monitor.md)
 
 ### 2.8 Protocol extensions (DSP)
 
-This chapter describes how EDC abstracts the interaction between connectors in a Dataspace through protocol extensions and introduces the current default implementation which follows the [Dataspace protocol](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol) specification.
+This chapter describes how EDC abstracts the interaction between connectors in a Dataspace through protocol extensions
+and introduces the current default implementation which follows the [Dataspace
+protocol](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol) specification.
 
 Detailed documentation about protocol extensions can be found [here](./control-plane/protocol-extensions.md)
 
@@ -206,16 +210,18 @@ information about it and other topics such as data plane self-registration and p
 
 ### 5.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests
 
-test pyramid...
-Like any other project, EDC has established a set of recommendations and rules that contributors must adhere to in order
-to guarantee a smooth collaboration with the project. Note that familiarity with our [formal contribution guidelines](../../../CONTRIBUTING.md) is assumed.
-There additional recommendations we have compiled that are relevant when deploying and administering EDC instances.
+test pyramid... Like any other project, EDC has established a set of recommendations and rules that contributors must
+adhere to in order to guarantee a smooth collaboration with the project. Note that familiarity with our [formal
+contribution guidelines](../../../CONTRIBUTING.md) is assumed. There additional recommendations we have compiled that
+are relevant when deploying and administering EDC instances.
 
 ### 5.1 Coding best practices
 
-Code should be written to conform with the EDC [style guide](../../contributing/styleguide.md) and our [coding principles](../../contributing/coding-principles.md). 
+Code should be written to conform with the EDC [style guide](../../contributing/styleguide.md) and our [coding
+principles](../../contributing/coding-principles.md).
 
-A frequent subject of critique in pull requests is logging. Spurious and very verbose log lines like "Entering/Leaving method X" or "Performing action Z" should be avoided because they pollute the log output and don't contribute any value. 
+A frequent subject of critique in pull requests is logging. Spurious and very verbose log lines like "Entering/Leaving
+method X" or "Performing action Z" should be avoided because they pollute the log output and don't contribute any value.
 
 Please find detailed information about logging [here](../../logging.md).
 
@@ -231,7 +237,7 @@ Please find general best practices and recommendations [here](./best-practices.m
 
 ## 6. Further concepts
 
-### 6.2 Autodoc
+### 6.1 Autodoc
 
 In EDC there is an automated way to generate basic documentation about extensions, plug points, SPI modules and
 configuration settings. To achieve this, simply annotate respective elements directly in Java code:
@@ -256,4 +262,53 @@ during compilation, the EDC build plugin generates documentation for each module
 
 Detailed information about autodoc can be found [here](./autodoc.md)
 
-### 6.3 Adapting the Gradle build
+### 6.2 Adapting the Gradle build
+
+The EDC build process is based on Gradle and as such uses several plugins to customize the build and centralize certain
+functionality. One of these plugins has already been [discussed in the previous chapter](#62-autodoc). All of EDC's
+plugins are hosted in the [GradlePlugins repository](https://github.com/eclipse-edc/GradlePlugins).
+
+The most important plugin is the "EDC build" plugin. It consists essentially of these things:
+
+- _a plugin class_: extends `Plugin<Project>` from the Gradle API to hook into the Gradle task infrastructure
+- _extensions_: they are POJOs that are model classes for configuration.
+- _conventions_: individual mutations that are applied to the project. For example, we use conventions to add some
+  standard repositories to all projects, or to implement publishing to OSSRH and MavenCentral in a generic way.
+- _tasks_: executable Gradle tasks that perform a certain action like merging OpenAPI Specification documents.
+
+It is important to note that a Gradle build is separated in _phases_, namely _Initialization_, _Configuration_ and
+_Execution_ (see [documentation](https://docs.gradle.org/current/userguide/build_lifecycle.html)). Some of our
+_conventions_ as well as other plugins have to be applied in the _Configuration_ phase.
+
+### 6.3 The EDC Release process
+
+Generally speaking, EDC publishes `-SNAPSHOT` build artifacts to OSSRH Snapshots and release build artefacts to
+MavenCentral.
+
+We further distinguish our artifacts in "core" modules and "technology" modules. The earlier consists of the Connector,
+IdentityHub and FederatedCatalog as well as the RuntimeMetamodel and the aforementioned GradlePlugins. The latter is
+comprised up of technology-specific implementations of core SPIs, for example cloud-based object storage or `Vault`
+implementations.
+
+#### 6.3.1 Releasing "core" modules
+
+The build processes for two module classes are separated from one another. All modules in the "core" class are published
+under the same Maven group-id `org.eclipse.edc`. This makes it necessary to publish them all at the same time, because
+once publishing of an artifact of a certain group-id is completed, no artifacts with the same group-id can be published
+anymore.
+
+That means, that we cannot publish the _Connector_ repository, then the _IdentityHub_ repository and finally the
+_FederatedCatalog_ repository, because by the time we get to _IdentityHub_, the publishing of _Connector_ would already
+be complete and the publishing of _IdentityHub_ would fail.
+
+The way to get around this limitation is to merge all "core" modules into _one big root project_, where the project
+structure is synthesized and contains all "core" modules as subprojects, and to publish the entire _root project_. The
+artifact names remain unchanged.
+
+This functionality is implemented in the [Release repository](https://github.com/eclipse-edc/Release), which also
+contains GitHub Actions workflows to publish snapshots, nightly builds and release builds.
+
+#### 6.3.2 Releasing "technology" modules
+
+Building and publishing releases for "technology" modules is much simpler, because they do not have to be built together
+with any other repository. With them, we can employ a conventional build-and-publish approach.
