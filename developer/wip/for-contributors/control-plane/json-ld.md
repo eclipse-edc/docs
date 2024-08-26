@@ -1,13 +1,11 @@
 # JSON-LD in EDC
 
 <!-- TOC -->
-
 * [JSON-LD in EDC](#json-ld-in-edc)
-    * [1. JSON-LD in EDC](#1-json-ld-in-edc)
-    * [1.1 Compact IRI](#11-compact-iri)
-    * [1.2 Custom Remote Context](#12-custom-remote-context)
-        * [1.1 JSON-LD Validation](#11-json-ld-validation)
-
+  * [1. JSON-LD in EDC](#1-json-ld-in-edc)
+  * [1.1 Compact IRI](#11-compact-iri)
+  * [1.2 Custom Remote Context](#12-custom-remote-context)
+    * [1.1 JSON-LD Validation](#11-json-ld-validation)
 <!-- TOC -->
 
 Here is a simple example taken from [json-ld.org](https://json-ld.org)

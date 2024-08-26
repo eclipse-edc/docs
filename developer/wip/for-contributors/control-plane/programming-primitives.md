@@ -1,22 +1,20 @@
 # Programming Primitives
 
 <!-- TOC -->
-
 * [Programming Primitives](#programming-primitives)
-    * [1 State machines](#1-state-machines)
-        * [1.1 Batch-size, sorting and tick-over timeout](#11-batch-size-sorting-and-tick-over-timeout)
-        * [1.2 Database-level locking](#12-database-level-locking)
-    * [2. Transformers](#2-transformers)
-        * [2.1 Basic Serialization and Deserialization](#21-basic-serialization-and-deserialization)
-        * [2.1 Transformer context](#21-transformer-context)
-        * [2.2 Segmented transformer registries](#22-segmented-transformer-registries)
-        * [2.3 Reporting transformation errors](#23-reporting-transformation-errors)
-    * [3. Token generation and decorators](#3-token-generation-and-decorators)
-    * [4. Token validation and rules](#4-token-validation-and-rules)
-        * [4.1 Public Key Resolvers](#41-public-key-resolvers)
-        * [4.2 Validation Rules](#42-validation-rules)
-        * [4.3 Validation Rules Registry](#43-validation-rules-registry)
-
+  * [1 State machines](#1-state-machines)
+    * [1.1 Batch-size, sorting and tick-over timeout](#11-batch-size-sorting-and-tick-over-timeout)
+    * [1.2 Database-level locking](#12-database-level-locking)
+  * [2. Transformers](#2-transformers)
+    * [2.1 Basic Serialization and Deserialization](#21-basic-serialization-and-deserialization)
+    * [2.1 Transformer context](#21-transformer-context)
+    * [2.2 Segmented transformer registries](#22-segmented-transformer-registries)
+    * [2.3 Reporting transformation errors](#23-reporting-transformation-errors)
+  * [3. Token generation and decorators](#3-token-generation-and-decorators)
+  * [4. Token validation and rules](#4-token-validation-and-rules)
+    * [4.1 Public Key Resolvers](#41-public-key-resolvers)
+    * [4.2 Validation Rules](#42-validation-rules)
+    * [4.3 Validation Rules Registry](#43-validation-rules-registry)
 <!-- TOC -->
 
 ## 1 State machines
