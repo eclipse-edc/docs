@@ -9,7 +9,8 @@
     * [3.2 Apply the plugin to the project:](#32-apply-the-plugin-to-the-project)
     * [3.3 Configure the plugin [optional]](#33-configure-the-plugin-optional)
   * [4. Merging the manifests](#4-merging-the-manifests)
-  * [5. Using published manifest files (MavenCentral)](#5-using-published-manifest-files-mavencentral)
+  * [5. Rendering manifest files as Markdown or HTML](#5-rendering-manifest-files-as-markdown-or-html)
+  * [6. Using published manifest files (MavenCentral)](#6-using-published-manifest-files-mavencentral)
 <!-- TOC -->
 
 ## 1. Introduction

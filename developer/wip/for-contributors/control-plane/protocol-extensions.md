@@ -3,13 +3,12 @@
 <!-- TOC -->
 * [Protocol Extensions](#protocol-extensions)
   * [1. RemoteMessage](#1-remotemessage)
-    * [1.1 Delivering messages with RemoteMessageDispatcher](#11-delivering-messages-with-remotemessagedispatcher)   
-    * [1.2 Handling incoming messages with protocol services](#12-handling-incoming-messages-with-protocol-services)   
-  * [2. DSP protocol](#2-dsp-protocol-implementation)
+    * [1.1 Delivering messages with RemoteMessageDispatcher](#11-delivering-messages-with-remotemessagedispatcher)
+    * [1.2 Handling incoming messages with protocol services](#12-handling-incoming-messages-with-protocol-services)
+  * [2. DSP protocol implementation](#2-dsp-protocol-implementation)
     * [2.1 `RemoteMessage` handlers](#21-remotemessage-handlers)
     * [2.2 HTTP endpoints](#22-http-endpoints)
-    * [2.3 `RemoteMessage` transformers](#22-remotemessage-transformers)
-
+    * [2.2 `RemoteMessage` transformers](#22-remotemessage-transformers)
 <!-- TOC -->
 
 
