@@ -10,9 +10,15 @@
   * [3. Data plane public API](#3-data-plane-public-api)
     * [3.1 Endpoints and endpoint resolution](#31-endpoints-and-endpoint-resolution)
     * [3.2 Public API Access Control](#32-public-api-access-control)
+      * [3.2.1 Access Duration](#321-access-duration)
+      * [3.2.2 Leaked Access Tokens](#322-leaked-access-tokens)
+      * [3.2.3 Access Token Generation](#323-access-token-generation)
+      * [3.2.4 Access Token Validation and Revocation](#324-access-token-validation-and-revocation)
     * [3.3 Token expiry and renewal](#33-token-expiry-and-renewal)
   * [4. Data plane registration](#4-data-plane-registration)
   * [5. Data plane selection](#5-data-plane-selection)
+    * [5.1 Building the catalog](#51-building-the-catalog)
+    * [5.2 Fulfilling data requests](#52-fulfilling-data-requests)
 <!-- TOC -->
 
 Data plane signaling (DPS) defines a set of API endpoints and message types which are used for communication between a
