@@ -2,24 +2,24 @@
 
 <!-- TOC -->
 * [Data Plane extensions](#data-plane-extensions)
-  * [1. The `DataPlaneManager`](#the-dataplanemanager`)
-    * [1.1 Consumer PULL](#consumer-pull-flow)
-    * [1.2 Provider PUSH](#provider-push-flow)
-  * [2. The Data Plane Framework ](#the-data-plane-framework)
-    * [2.1 Transfer Service](#transferservice)
-    * [2.2 Pipeline Service](#pipelineservice)
-  * [3. Writing custom Source/Sink ](#writing-custom-sourcesink)
-    * [3.1 Custom DataSource ](#custom-source)
-    * [3.2 Custom DataSink ](#custom-datasink)
-    * [3.3 Executing the transfer ](#executing-the-transfer)
+  * [1. The `DataPlaneManager`](#1-the-dataplanemanager)
+    * [1.1 Consumer PULL](#11-consumer-pull-flow)
+    * [1.2 Provider PUSH](#12-provider-push-flow)
+  * [2. The Data Plane Framework ](#2-the-data-plane-framework)
+    * [2.1 Transfer Service](#21-transferservice)
+    * [2.2 Pipeline Service](#22-pipelineservice)
+  * [3. Writing custom Source/Sink ](#3-writing-custom-sourcesink)
+    * [3.1 Custom DataSource ](#31-custom-datasource)
+    * [3.2 Custom DataSink ](#32-custom-datasink)
+    * [3.3 Executing the transfer ](#33-executing-the-transfer)
 
 <!-- TOC -->
 
-The EDC Data Plane is a component responsible for transmitting data using a wire protocol and can be easily extended using the [Data Plane Framework (DPF)](#the-data-plane-framework) for supporting different protocols and transfer types. 
+The EDC Data Plane is a component responsible for transmitting data using a wire protocol and can be easily extended using the [Data Plane Framework (DPF)](#2-the-data-plane-framework) for supporting different protocols and transfer types. 
 
-The main component of an EDC data plane is the [DataPlaneManager](#the-dataplanemanager).
+The main component of an EDC data plane is the [DataPlaneManager](#1-the-dataplanemanager).
 
-## The DataPlaneManager
+## 1. The DataPlaneManager
 
 The `DataPlaneManager` manages execution of data plane requests, using the EDC [State Machine](../control-plane/programming-primitives.md#1-state-machines) pattern for tracking the state of data transmissions. 
 
@@ -27,24 +27,24 @@ It receives `DataFlowStartMessage` from the [Control Plane](../contributor-handb
 
 The `DataPlaneManager` supports two flow [types](../control-plane/entities.md#71-transfer-and-data-flows-types):
 
-- [Consumer PULL](#pull-flow) 
-- [Provider PUSH](#push-flow)
+- [Consumer PULL](#11-consumer-pull-flow) 
+- [Provider PUSH](#12-provider-push-flow)
 
-### Consumer PULL Flow
+### 1.1 Consumer PULL Flow
 
 When the flow type of the `DataFlowStartMessage` is `PULL` the `DataPlaneManager` delegates the creation of the `DataAddress` to the [`DataPlaneAuthorizationService`](./data-plane-signaling/data-plane-signaling.md#323-access-token-generation), and then returns it to the [ControlPlane](../contributor-handbook.md#2-the-control-plane) as part of the response to a `DataFlowStartMessage`. 
 
-### Provider PUSH Flow
+### 1.2 Provider PUSH Flow
 
-When the flow type is `PUSH`, the data transmission is handled by the [DPF](#the-data-plane-framework) using the information contained in the `DataFlowStartMessage` such as `sourceDataAddress` and `destinationDataAddress`. 
+When the flow type is `PUSH`, the data transmission is handled by the [DPF](#2-the-data-plane-framework) using the information contained in the `DataFlowStartMessage` such as `sourceDataAddress` and `destinationDataAddress`. 
 
-## The Data Plane Framework
+## 2. The Data Plane Framework
 
-The `DPF` consists on a set of SPIs and default implementations for transferring data from a `sourceDataAddress` to a `destinationDataAddress`. It has a built-in support for end-to-end streaming transfers using the [PipelineService](#pipelineservice) and it comes with a more generic [TransferService](#transferservice) that can be extended to satisfy more specialized or optimized transfer case.
+The `DPF` consists on a set of SPIs and default implementations for transferring data from a `sourceDataAddress` to a `destinationDataAddress`. It has a built-in support for end-to-end streaming transfers using the [PipelineService](#22-pipelineservice) and it comes with a more generic [TransferService](#21-transferservice) that can be extended to satisfy more specialized or optimized transfer case.
 
 Each `TransferService` is registered in the `TransferServiceRegistry`, that the `DataPlaneManager` uses for validating and initiating a data transfer from a `DataFlowStartMessage`.
 
-### TransferService
+### 2.1 TransferService
 
 Given a `DataFlowStartMessage`, an implementation of a `TransferService` can transfer data from a `sourceDataAddress` to a `destinationDataAddress`. 
 
@@ -69,11 +69,11 @@ public interface TransferService {
 
 - The `transfer` triggers a data transfer from a `sourceDataAddress` to a `destinationDataAddress`.
 
-An implementation of a `TransferService` bundled with the [DPF](#the-data-plane-framework) is the [PipelineService](#pipelineservice).
+An implementation of a `TransferService` bundled with the [DPF](#2-the-data-plane-framework) is the [PipelineService](#pipelineservice).
 
-### PipelineService
+### 2.2 PipelineService
 
-The `PipelineService` is an extension of [TransferService](#transferservice) that leverages on internal Data-Plane transfer mechanism.
+The `PipelineService` is an extension of [TransferService](#transferservice) that leverages on an internal Data-Plane transfer mechanism.
 It supports end-to-end streaming by connecting a `DataSink`(output) and a `DataSource` (input).
 
 `DataSink` and `DataSource` are created for each data transfer using `DataSinkFactory` and `DataSourceFactory` from the `DataFlowStartMessage`. Custom source and sink factories should be registered in the  `PipelineService` for adding support different data source and sink types (e.g. S3, HTTP, Kafka).
@@ -92,11 +92,11 @@ When the `PipelineService` receives a transfer request, it identifies which `Dat
 
 EDC supports out of the box (with specialized extensions) a variety of data source and sink types like S3, HTTP, Kafka, AzureStorage, but it can be easily [extended](#writing-custom-sourcesink) with new types.
 
-## Writing custom Source/Sink
+## 3. Writing custom Source/Sink
 
 The `PipelineService` is the entry point for adding new source and sink types to a data plane runtime.
 
-We will see how to write a [custom data source](#custom-datasource), a [custom data sink](#custom-datasink) and how we can trigger a transfer leveraging those new types.  
+We will see how to write a [custom data source](#31-custom-datasource), a [custom data sink](#32-custom-datasink) and how we can trigger a transfer leveraging those new types.  
 
 Just as example we will write a custom source type that is based on filesystem and a sink type that is based on [SMTP](https://it.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol)
 
@@ -121,7 +121,7 @@ where we inject the `PipelineService`.
 
 > the extension module should include `data-plane-spi` as dependency. 
  
-### Custom DataSource
+### 3.1 Custom DataSource
 
 Just for simplicity the filesystem based `DataSource` will just support transferring a single file and not folders.
 
@@ -221,7 +221,7 @@ public class MyDataPlaneExtension implements ServiceExtension {
 }
 ```
 
-### Custom DataSink
+### 3.2 Custom DataSink
 
 For the `DataSink` we will sketch an implementation of an SMTP based one using the [javamail](https://javaee.github.io/javamail/) API.
 The implementation should send the `Part`s of the input `DataSource` as email attachments to a `recipient`.
@@ -363,7 +363,7 @@ public class MyDataPlaneExtension implements ServiceExtension {
 }
 ```
 
-### Executing the transfer
+### 3.3 Executing the transfer
 
 With the `MyDataPlaneExtension` loaded in the provider data plane, that adds  
 a new `source` type based on filesystem and a `sink` in the runtime we can now complete a `File` -> `Mail` transfer.
