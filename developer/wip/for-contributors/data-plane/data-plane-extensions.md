@@ -164,7 +164,7 @@ public class FileDataSource implements DataSource {
 }
 ```
 
-The relevant method is the `openPartStream`, which will be called for plumbing the source and sink. The `openPartStream` returns a `Stream` of `Part`s, as the `DataSource` can be composed by more that one part (e.g. folders). The `openPartStream` does not actually opens a Java `InputStream`, but rather returns a just stream of `Part`s.
+The relevant method is the `openPartStream`, which will be called for connecting the source and sink. The `openPartStream` returns a `Stream` of `Part` objects, as the `DataSource` can be composed by more that one part (e.g. folders, files, etc.). The `openPartStream` does not actually open a Java `InputStream`, but returns a stream of `Part`s.
 
 How to actually transform a `Part` into an `InputStream` must be implemented. In our case the `FileStreamPart#openStream` just returns a `FileInputStream` from the input `File`.
 
