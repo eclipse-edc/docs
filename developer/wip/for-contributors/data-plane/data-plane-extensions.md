@@ -48,7 +48,7 @@ Each `TransferService` is registered in the `TransferServiceRegistry`, that the 
 
 Given a `DataFlowStartMessage`, an implementation of a `TransferService` can transfer data from a `sourceDataAddress` to a `destinationDataAddress`. 
 
-The `TransferService` does not specify how the transfer should happen. It can be internally in the data plane or it could leverage on external and more performant system.
+The `TransferService` does not specify how the transfer should happen. It can be processed internally in the data plane or it could delegate out to external (and more specialized) systems.
 
 Relevant methods of the `TransferService` are:
 
