@@ -15,7 +15,7 @@
 
 <!-- TOC -->
 
-The EDC Data Plane is a component responsible for transmitting data using a wire protocol and can be easily extended using the [DFF](#the-data-plane-framework) for supporting different protocols and transfer types. 
+The EDC Data Plane is a component responsible for transmitting data using a wire protocol and can be easily extended using the [Data Plane Framework (DPF)](#the-data-plane-framework) for supporting different protocols and transfer types. 
 
 The main component of an EDC data plane is the [DataPlaneManager](#the-dataplanemanager).
 
