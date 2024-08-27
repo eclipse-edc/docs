@@ -27,6 +27,7 @@
 - [2024-05-27 EDC Maturity Levels and Deprecation Policy](2024-05-27-maturity-levels-deprecation-policy/)
 - [2024-07-17 Bootstrapping SQL Databases](2024-07-17-bootstrap-sql-database/)
 - [2024-08-13 Technology Repositories Release](2024-08-13-technology-repos-release/)
+- [2024-08-24 New Release process](./2024-08-26-new-release-process/)
 
 ## Repository-specific
 
