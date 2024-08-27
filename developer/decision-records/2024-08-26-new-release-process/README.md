@@ -11,7 +11,7 @@ For bugfix releases, some manual work needs to be done, that should be avoided.
 
 ## Approach
 
-With "core repositories" we mean:
+By "core repositories" we mean:
 - `Runtime-Metamodel`
 - `GradlePlugins`
 - `Connector`
@@ -23,8 +23,8 @@ Release EDC components should follow a 2-phase process like it was done for [tec
 - release
 
 ### Preparation phase
-With "release preparation" we mean all the operations needed to be done upfront to permit a proper release.
-The workflow will take in input the desired version and the branch to use as starting point.
+By "release preparation" we mean all the preparatory operations that are needed to permit a proper release.
+The workflow will take as input the desired version and the branch name to use as starting point.
 - a `release/x.y.z` or `bugfix/x.y.z` branch will be created on every core repository.
 - the project version, the upstream "edc" dependency and the DEPENDENCIES file will be bumped to `x.y.z-SNAPSHOT`
 - "trigger_snapshot" workflow will be called on every core repository following the dependency order
