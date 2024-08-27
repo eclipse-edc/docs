@@ -23,7 +23,7 @@ The main component of an EDC data plane is the [DataPlaneManager](#the-dataplane
 
 The `DataPlaneManager` manages execution of data plane requests, using the EDC [State Machine](../control-plane/programming-primitives.md#1-state-machines) pattern for tracking the state of data transmissions. 
 
-It receives `DataFlowStartMessage` from the [Control Plane](../contributor-handbook.md#2-the-control-plane) through [data plane signaling](./data-plane-signaling/data-plane-signaling.md) protocol if it's deployed as standalone process, or directly with method call when it's embedded in the same process.
+It receives `DataFlowStartMessage` from the [Control Plane](../contributor-handbook.md#2-the-control-plane) through the [data plane signaling](./data-plane-signaling/data-plane-signaling.md) protocol if it's deployed as standalone process, or directly via method call when it's embedded in the same process.
 
 The `DataPlaneManager` supports two flow [types](../control-plane/entities.md#71-transfer-and-data-flows-types):
 
