@@ -176,7 +176,7 @@ consumer can initiate a new process before or after that period.
 
 #### 3.2.3 Access Token Generation
 
-When the `DataFlowManager` receives a `DataFlowStartMessage` to start the data transmission, it uses the
+When the `DataPlaneManager` receives a `DataFlowStartMessage` to start the data transmission, it uses the
 `DataPlaneAuthorizationService` to generate an access token (in JWT format) and a `DataAddress`, that contains the
 follwing information:
 
