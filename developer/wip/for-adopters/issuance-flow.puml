@@ -1,0 +1,22 @@
+@startuml
+!pragma layout smetana
+
+!include diagram.styles.puml
+
+autonumber
+
+box "Participant"
+participant "Client" as C
+participant "Identity Hub" as IH
+end box
+
+box "Issuer"
+participant "Issuer Service(s)" as IS #FFF4B3
+end box
+
+C -> IH: Initiate process
+IH -> IS: Request Credential using Self-Issued ID token
+IS -> IH: (async) )Write Membership Credential
+
+
+@enduml
