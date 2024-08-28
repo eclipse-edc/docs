@@ -1,0 +1,23 @@
+@startuml
+!pragma layout smetana
+
+!include diagram.styles.puml
+
+autonumber
+
+box "Data Consumer"
+participant "Connector" as C
+participant "Identity Hub" as IH
+end box
+
+box "Data Provider"
+participant "Connector" as PC
+end box
+
+C -> IH: SI token request
+IH -> C: Token response w/ access token
+
+C-> PC: Request w/ si token and access token
+PC-> IH: request w/ access token
+IH ->PC: VP response
+@enduml
