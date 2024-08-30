@@ -23,8 +23,17 @@ Details how EDC implements decentralized identity, access control, and trust usi
 
 Covers how publishing and retrieving federated data catalogs works.
 
-## General Concepts
+## Distributions, Deployment, and Operations
 
-Explains how to create deployment architectures, distributions, and extensions. This section also provides an overview of *Management Domains* and system configuration.
+Explains how to create distributions and design deployment architectures. This chapter also provides an overview of *Management Domains* and system configuration.
+
+## Testing
+
+Covers how to use EDC test runtimes.
+
+## Extensions
+
+Details how to add customizations, features, and new capabilities to EDC components.
+
 
 
