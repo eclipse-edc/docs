@@ -15,7 +15,7 @@ When the data-plane is not embedded, EDC uses the Data Plane Signaling protocol 
 
 For example purposes, this chapter contains JS snippets that use `express` as web framework.
 
->  Since it's just for didactic purpose the code is not to be considered complete since proper error and JSON-LD handling are are not implemented.
+>  Since it's only for educational purposes, the code is not intended to be complete, as proper error handling and JSON-LD processing are not implemented
 
 Our simple data plane setup looks like this:
 
