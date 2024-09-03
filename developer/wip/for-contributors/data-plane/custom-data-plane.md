@@ -202,7 +202,7 @@ First we acknowledge the [Control Plane](../contributor-handbook.md#2-the-contro
 
 Then we transfer the data from `sourceUrl` to `destinationUrl`.
 
-> The `getBaseUrl` is an utility function that extract the `baseUrl` from the `DataAddress`.
+> The `getBaseUrl` is an utility function that extracts the `baseUrl` from the `DataAddress`.
  
 Implementors should keep track of `DataFlowStartMessage`s in some persistent storage system in order to fulfill subsequent `DPS` messages on the same transfer id ([e.g. SUSPEND and TERMINATE](#22-suspend-and-terminate)).
 
