@@ -208,7 +208,7 @@ Detailed documentation about writing a custom data plane extension can be found 
 
 ### 4.3 Writing a custom data plane (using only DPS)
 
-Since the communication between control planes and data plane is well defined in the [DPS](#41-data-plane-signaling) protocol, it's possible to write a data plane from scratch (without using EDC and [DPF](./data-plane/data-plane-extensions.md#2-the-data-plane-framework)) and make it work with the EDC control plane.
+Since the communication between control plane and data plane is well defined in the [DPS](#41-data-plane-signaling) protocol, it's possible to write a data plane from scratch (without using EDC and [DPF](./data-plane/data-plane-extensions.md#2-the-data-plane-framework)) and make it work with the EDC control plane.
 
 Detailed documentation about writing a custom data plane be found [here](./data-plane/custom-data-plane.md).
 
