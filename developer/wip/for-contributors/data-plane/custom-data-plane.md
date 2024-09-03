@@ -58,9 +58,6 @@ Content-Type: application/json
     "allowedSourceTypes": [
         "HttpData"
     ],
-    "allowedDestTypes": [
-        "HttpData"
-    ],
     "allowedTransferTypes": [
         "HttpData-PULL",
         "HttpData-PUSH"
@@ -75,8 +72,6 @@ The `@id` is the data plane's `component ID`, which identify a [logical](./data-
 The `url` is the location on which the data plane will be receiving protocol [messages](#2-handling-dps-messages).  
 
 The `allowedSourceTypes` is an array of source type supported, in this case only `HttpData`.
-
-The `allowedDestTypes` is an array of source type supported, in this case only `HttpData`. 
 
 The `allowedTransferTypes` is an array of supported transfer types. When using the [DPS](./data-plane-signaling/data-plane-signaling.md) the transfer type is by convention a string with format `<label>-{PULL,PUSH}`, which carries the type of the flow `push` or `pull`. By default in EDC the `label` always corresponds to a source/sync type (e.g `HttpData`), but it can be customized for data plane implementation.
 
