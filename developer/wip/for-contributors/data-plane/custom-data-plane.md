@@ -79,7 +79,7 @@ With this configuration we declare that our data plane is able to transfer data 
 
 The lifecycle of a data plane instance is managed by the `DataPlaneSelectorManager` component implemented as [state machine](../control-plane/programming-primitives.md#1-state-machines). A data plane instance is in the `REGISTERED` state when created/updated. Then for each data plane a periodic heartbeat is sent for checking if it is still running.
 
-If the data plane response is successful, the state is `AVAILABLE`. As soon as the data plane does not respond or returns a non successful response, the state is transition to `UNAVAILABLE`.
+If the data plane response is successful, the state transits to `AVAILABLE`. As soon as the data plane does not respond or returns a non successful response, the state transits to `UNAVAILABLE`.
 
 Let's implement a route method for `GET|/dataflows/check` in our custom data plane:
 
