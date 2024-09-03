@@ -37,7 +37,7 @@ app.listen(port, () => {
 
 ```
 
-We start with a basic `express` application that listens on port `3000` and logs every request with a basic middleware.
+It's a basic `express` application that listens on port `3000` and logs every request with a basic middleware.
 
 ## 1. The Registration Phase
 
