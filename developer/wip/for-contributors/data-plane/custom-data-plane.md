@@ -173,7 +173,7 @@ The `destinationDataAddress` is derived from the `dataDestination` in the [`Tran
 
 The simplest `handlePush` function would need to fetch data from the source `baseUrl` and send the result to the sink `baseUrl`.
 
- A naive implementation may look like this:
+A naive implementation may look like this:
 
 ```javascript
 async function handlePush(req, res) {
