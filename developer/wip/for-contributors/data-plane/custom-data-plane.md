@@ -104,7 +104,7 @@ And the status of our the data plane is `AVAILABLE`.
 
 When a transfer process is ready to be started by the [Control Plane](../contributor-handbook.md#2-the-control-plane), the `DataPlaneSignalingFlowController` is engaged for handling the transfer request. The `DPS` flow controller uses the `DataPlaneSelectorService` for selecting the right data plane instance based on it's capabilities and once selected it sends a [DataFlowStartMessage](#21-start) that our custom data plane should be able to process.
 
-> The `AVAILABLE` state is a prerequisite for being a candidate data plane instance in the selection process.
+> The `AVAILABLE` state is a prerequisite to candidate the data plane instance in the selection process.
 
 The `ID` of the selected data plane is stored in the transfer process entity for delivering subsequent messages that may be necessary in the lifecycle of a transfer process. (e.g. [SUSPEND and TERMINATE](#22-suspend-and-terminate)) 
 
