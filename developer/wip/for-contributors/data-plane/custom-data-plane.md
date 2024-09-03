@@ -65,7 +65,7 @@ Content-Type: application/json
 }
 ```
 
-> When the data plane is registered is up to the implementors. This may be a manual operation as well as an in process routine.
+> It's up to the implementors to decide when the data plane gets registered. This may be a manual operation as well as automated in a process routine.
 
 The `@id` is the data plane's `component ID`, which identify a [logical](./data-plane-signaling/data-plane-signaling.md#5-data-plane-selection) data plane component.
 
