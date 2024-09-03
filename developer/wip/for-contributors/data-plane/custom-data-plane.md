@@ -230,7 +230,7 @@ async function handlePull(req, res) {
 }
 ```
 
-We will not implement the `generateDataAddress` function, as it may vary depending on the use case. But at high level a `generateDataAddress` should generate a `DataAddress` in DSP format that contains useful information for the consumer for fetching the data: `endpoint`, `endpointType` and custom extensible properties `endpointProperties`. 
+We will not implement the `generateDataAddress` function, as it may vary depending on the use case. But at the high level a `generateDataAddress` should generate a `DataAddress` in DSP format that contains useful information for the consumer for fetching the data: `endpoint`, `endpointType` and custom extensible properties `endpointProperties`. 
 
 For example the default [EDC](./data-plane-signaling/data-plane-signaling.md#323-access-token-generation) genarates a `DataAddress` that contains also authorization information like the auth token to be used when request data using the Data Plane [public API](./data-plane-signaling/data-plane-signaling.md#3-data-plane-public-api) and the token type (e.g. bearer).
 
