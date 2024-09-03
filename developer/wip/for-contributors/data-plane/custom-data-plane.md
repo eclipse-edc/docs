@@ -13,7 +13,7 @@
 
 When the data-plane is not embedded, EDC uses the Data Plane Signaling protocol ([DPS](./data-plane-signaling/data-plane-signaling.md)) for the communication between control plane and data plane. In this chapter we will see how to leverage on [DPS](./data-plane-signaling/data-plane-signaling.md) for writing a custom data plane from scratch.
 
-Just as example this chapter contains JS snippet using `express` as web framework.
+For example purposes, this chapter contains JS snippets that use `express` as web framework.
 
 >  Since it's just for didactic purpose the code is not to be considered complete since proper error and JSON-LD handling are are not implemented.
 
