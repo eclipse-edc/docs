@@ -81,7 +81,7 @@ The lifecycle of a data plane instance is managed by the `DataPlaneSelectorManag
 
 If the data plane response is successful, the state transits to `AVAILABLE`. As soon as the data plane does not respond or returns a non successful response, the state transits to `UNAVAILABLE`.
 
-Let's implement a route method for `GET|/dataflows/check` in our custom data plane:
+Let's implement a route method for `GET /dataflows/check` in our custom data plane:
 
 ```javascript
 app.get('/dataflows/check', (req, res) => {
