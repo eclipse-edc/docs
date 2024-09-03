@@ -236,7 +236,7 @@ For example the default [EDC](./data-plane-signaling/data-plane-signaling.md#323
 
 Implementors may also want to track `PULL` requests in a persistent storage, which can be useful in scenario like token revocation or transfer process termination.
 
-How the actual data requests is handled depends on the implementation of the custom data plane. It could be like the EDC default one, where it exposes an endpoint that validates the authorization and it proxies the request to the `sourceDataAddress`. 
+How the actual data requests is handled depends on the implementation of the custom data plane. It could be done in the same way as it's done in the EDC data plane, which exposes an endpoint that validates the authorization and it proxies the request to the `sourceDataAddress`. 
 
 The [DPS](./data-plane-signaling/data-plane-signaling.md) gives enough flexibility for implementing different strategy for different use cases. 
 
