@@ -430,7 +430,7 @@ Extensions should use the `EdcHttpClient` to make remote `HTTP/S` calls. The cli
 
 ### Secrets Handling and the Vault
 
-All secrets should be stored in the `Vault`. EDC supports several implementations, including one back by [Hashicorp Vault](https://www.vaultproject.io/).
+All secrets should be stored in the `Vault`. EDC supports several implementations, including one backed by [Hashicorp Vault](https://www.vaultproject.io/).
 
 ### Documenting Extensions
 
