@@ -130,7 +130,8 @@ public interface DataAddressValidatorRegistry {
 ```java
 public class SampleExtension implements ServiceExtension {
 
-	@Inject private DataAddressValidatorRegistry registry;
+	@Inject private 
+	DataAddressValidatorRegistry registry;
 
     @Override
     public void initialize(ServiceExtensionContext context) {
