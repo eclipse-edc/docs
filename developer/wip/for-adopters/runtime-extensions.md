@@ -54,7 +54,7 @@ public class SampleExtension implements ServiceExtension {
 
     @Provider
     public CustomService initializeService(ServiceExtensionContext context) {
-        new CustomServiceImpl();
+       return new CustomServiceImpl();
     }
 }
 ```
