@@ -68,7 +68,8 @@ The `CustomService` can be accessed by injecting it into a `ServiceExtension` us
 ```java
 public class SampleExtension implements ServiceExtension {
 
-	@Inject private CustomService customService;
+	@Inject 
+	private CustomService customService;
 
     @Override
     public void initialize(ServiceExtensionContext context) {
